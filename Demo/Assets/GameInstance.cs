@@ -23,7 +23,7 @@ public class GameInstance : MonoBehaviour
     void Start()
     {
         zoomCam = GetComponentInChildren<Camera>();
-        zoomCam.orthographicSize =  Mathf.Abs(leftScoreSprite.position.y- rightScoreSprite.position.y) * 0.5f;
+        zoomCam.orthographicSize =  Mathf.Abs(leftScoreSprite.position.y- rightScoreSprite.position.y) * 0.55f;
         zoomCam.enabled = false;
         zoomCam.depth = 2;
         zoomCam.eventMask = ~zoomCam.cullingMask;
@@ -109,5 +109,8 @@ public class GameInstance : MonoBehaviour
         selected = false;
         UpdateScoreImages();
         Reset();
+        GetComponentInChildren<EvolvedPlayer>().Reset();
+        GetComponentInChildren<EnemyAIController>().Reset();
+
     }
 }

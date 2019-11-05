@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cc0d1d336df1e84e8d3572ce65e11c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gamesToCreate: 49
+  gamesToCreate: 36
   gamePrefab: {fileID: 325841784141496392, guid: cd5ea04f0110a524e95092b249812e75,
     type: 3}
   mainCam: {fileID: 519420031}

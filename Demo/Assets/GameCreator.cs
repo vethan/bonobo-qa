@@ -14,8 +14,8 @@ public class GameCreator : MonoBehaviour
     public int gamesToCreate  = 1;
     public GameInstance gamePrefab;
     int gameSq = 1;
-    int InputCount = 8;
-    int OutputCount = 2;
+    int InputCount = 6;
+    int OutputCount = 6;
     IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder;
     IGenomeFactory<NeatGenome> genomeFactory;
     List<NeatGenome> genomeList;
@@ -24,10 +24,16 @@ public class GameCreator : MonoBehaviour
     private void Awake()
     {
         NeatGenomeParameters _neatGenomeParams = new NeatGenomeParameters();
-        NetworkActivationScheme _activationScheme = NetworkActivationScheme.CreateAcyclicScheme();
+        NetworkActivationScheme _activationScheme = NetworkActivationScheme.CreateCyclicFixedTimestepsScheme(2);
         _neatGenomeParams.FeedforwardOnly = _activationScheme.AcyclicNetwork;
-        _neatGenomeParams.ActivationFn = LeakyReLU.__DefaultInstance;
+        _neatGenomeParams.ActivationFn = SharpNeat.Network.LeakyReLU.__DefaultInstance;// LeakyReLU.__DefaultInstance;
+        //_neatGenomeParams.ConnectionWeightMutationProbability = .3;
+        _neatGenomeParams.AddNodeMutationProbability = .3;
+        _neatGenomeParams.AddConnectionMutationProbability = .3;
+        //_neatGenomeParams.DeleteConnectionMutationProbability = .1;
         genomeFactory = new NeatGenomeFactory(InputCount, OutputCount, _neatGenomeParams);
+        
+
         genomeDecoder = new NeatGenomeDecoder(_activationScheme);
     }
 
@@ -70,6 +76,10 @@ public class GameCreator : MonoBehaviour
         for(int i = 0;i< gamesToCreate; i++)
         {
             games[i].evolved.SetBrain(genomeDecoder.Decode(genomeList[i]));
+        }
+        for (int i = 0; i < genomeList.Count; i++)
+        {
+            games[i].FullReset();
         }
     }
     uint generation = 0;
@@ -129,7 +139,10 @@ public class GameCreator : MonoBehaviour
                 }
             }
         }
-
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            InitialisePopulation();
+        }
         if(Input.GetKeyDown(KeyCode.Space))
         {
             NewGeneration();

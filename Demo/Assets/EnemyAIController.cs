@@ -22,7 +22,10 @@ public class EnemyAIController : MonoBehaviour
         myGame = GetComponentInParent<GameInstance>();
         Puck = myGame.ball;
     }
-
+    public void Reset()
+    {
+        rb.transform.localPosition = startingPosition;
+    }
     // Update is called once per frame
     private void FixedUpdate()
     {
