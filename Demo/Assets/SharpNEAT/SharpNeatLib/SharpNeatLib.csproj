@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Copyright>Copyright © Colin D. Green 2004 - 2019</Copyright>
+    <Version>2.4.1.5</Version>
+    <Authors>Colin D. Green</Authors>
+    <Company />
+    <Description>SharpNEAT - Evolution of Neural Networks.</Description>
+    <PackageProjectUrl>http://sharpneat.sourceforge.net/</PackageProjectUrl>
+    <PackageLicenseUrl>http://sharpneat.sourceforge.net/licensing.html</PackageLicenseUrl>
+    <PackageTags>neuroevolution neuro evolution neural network</PackageTags>
+    <PackageReleaseNotes>See https://github.com/colgreen/sharpneat/releases/tag/v2.4.1</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Redzen" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>
