@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Threading;
 using SharpNeat.Core;
 using System.Threading.Tasks;
-
 // Disable missing comment warnings for non-private variables.
 #pragma warning disable 1591
 
@@ -164,7 +163,7 @@ namespace SharpNeat.EvolutionAlgorithms
             {   // Create a new thread and start it running.
                 _algorithmThread = new Thread(AlgorithmThreadMethod);
                 _algorithmThread.IsBackground = true;
-                _algorithmThread.Priority = ThreadPriority.BelowNormal;
+                _algorithmThread.Priority = System.Threading.ThreadPriority.BelowNormal;
                 _runState = RunState.Running;
                 OnUpdateEvent();
                 _algorithmThread.Start();
@@ -319,7 +318,7 @@ namespace SharpNeat.EvolutionAlgorithms
                     UpdateEvent(this, EventArgs.Empty);
                 }
                 catch(Exception ex) {
-                  //  __log.Error("UpdateEvent listener threw exception", ex);
+                    UnityEngine.Debug.LogError("UpdateEvent listener threw exception: " +  ex.ToString());
                 }
             }
         }
@@ -333,7 +332,7 @@ namespace SharpNeat.EvolutionAlgorithms
                     PausedEvent(this, EventArgs.Empty);
                 }
                 catch(Exception ex) {
-                   // __log.Error("PausedEvent listener threw exception", ex);
+                    UnityEngine.Debug.LogError("PausedEvent listener threw exception: " + ex.ToString());
                 }
             }
         }

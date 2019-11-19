@@ -572,6 +572,9 @@ MonoBehaviour:
   rightScoreSprite: {fileID: 464549535382736489}
   zoomCam: {fileID: 0}
   evolved: {fileID: 7184870077349214479}
+  graphMaterial: {fileID: 2100000, guid: 9faa5fa4ffe8a8e4f85bb94f7c8bb79e, type: 2}
+  horizBorder: 0
+  vertBorder: 0
 --- !u!65 &8818999801185734562
 BoxCollider:
   m_ObjectHideFlags: 0
