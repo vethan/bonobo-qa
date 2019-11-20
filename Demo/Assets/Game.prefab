@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 747426633}
   - component: {fileID: 747426635}
+  - component: {fileID: 1683031561624534644}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -74,6 +75,66 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1683031561624534644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747426632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 948f4100a11a5c24981795d21301da5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volumeTrigger: {fileID: 747426633}
+  volumeLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  stopNaNPropagation: 1
+  finalBlitToCameraTarget: 0
+  antialiasingMode: 0
+  temporalAntialiasing:
+    jitterSpread: 0.75
+    sharpness: 0.25
+    stationaryBlending: 0.95
+    motionBlending: 0.85
+  subpixelMorphologicalAntialiasing:
+    quality: 2
+  fastApproximateAntialiasing:
+    fastMode: 0
+    keepAlpha: 0
+  fog:
+    enabled: 1
+    excludeSkybox: 1
+  debugLayer:
+    lightMeter:
+      width: 512
+      height: 256
+      showCurves: 1
+    histogram:
+      width: 512
+      height: 256
+      channel: 3
+    waveform:
+      exposure: 0.12
+      height: 256
+    vectorscope:
+      size: 256
+      exposure: 0.12
+    overlaySettings:
+      linearDepth: 0
+      motionColorIntensity: 4
+      motionGridSize: 64
+      colorBlindnessType: 0
+      colorBlindnessStrength: 1
+  m_Resources: {fileID: 11400000, guid: d82512f9c8e5d4a4d938b575d47f88d4, type: 2}
+  m_ShowToolkit: 0
+  m_ShowCustomSorter: 0
+  breakBeforeColorGrading: 0
+  m_BeforeTransparentBundles: []
+  m_BeforeStackBundles: []
+  m_AfterStackBundles: []
 --- !u!1 &325841782805952555
 GameObject:
   m_ObjectHideFlags: 0
@@ -575,6 +636,7 @@ MonoBehaviour:
   graphMaterial: {fileID: 2100000, guid: 9faa5fa4ffe8a8e4f85bb94f7c8bb79e, type: 2}
   horizBorder: 0
   vertBorder: 0
+  filtered: 0
 --- !u!65 &8818999801185734562
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -601,6 +663,7 @@ GameObject:
   - component: {fileID: 325841784195486393}
   - component: {fileID: 325841784195486398}
   - component: {fileID: 325841784195486395}
+  - component: {fileID: 3723247927201536841}
   m_Layer: 0
   m_Name: EnemyPlayer
   m_TagString: Untagged
@@ -639,7 +702,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -720,6 +783,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50cf0cbfea8bab948864ee744ecc4260, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3723247927201536841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325841784195486396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8f6d3c6e4250e84192f5b34ce9e71bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowColor: {r: 0.9803922, g: 0.23529413, b: 0.23529413, a: 1}
+  glowBrightness: 2.3
+  outlineWidth: 10
+  alphaThreshold: 0.01
+  drawOutside: 0
+  enableInstancing: 0
 --- !u!1 &325841784209323894
 GameObject:
   m_ObjectHideFlags: 0
@@ -733,6 +814,7 @@ GameObject:
   - component: {fileID: 325841784209323890}
   - component: {fileID: 325841784209323891}
   - component: {fileID: 7184870077349214479}
+  - component: {fileID: 6835217136307078875}
   m_Layer: 0
   m_Name: PlayerSprite
   m_TagString: Untagged
@@ -771,7 +853,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -838,7 +920,7 @@ Rigidbody2D:
   m_Material: {fileID: 6200000, guid: e13048ea7b81f4d40abfab7adb2ab15e, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!114 &7184870077349214479
 MonoBehaviour:
@@ -852,6 +934,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0801f6fe48eb3ed40852daaa548ca7ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6835217136307078875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325841784209323894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8f6d3c6e4250e84192f5b34ce9e71bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowColor: {r: 0.10196079, g: 0.7372549, b: 0.16470589, a: 1}
+  glowBrightness: 2.3
+  outlineWidth: 10
+  alphaThreshold: 0.01
+  drawOutside: 0
+  enableInstancing: 0
 --- !u!1 &325841784393209848
 GameObject:
   m_ObjectHideFlags: 0
@@ -1007,6 +1107,7 @@ GameObject:
   - component: {fileID: 325841784498610210}
   - component: {fileID: 325841784498610211}
   - component: {fileID: 325841784498610208}
+  - component: {fileID: 6496436841997902638}
   m_Layer: 0
   m_Name: ball
   m_TagString: Untagged
@@ -1045,7 +1146,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1114,6 +1215,24 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
+--- !u!114 &6496436841997902638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325841784498610214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8f6d3c6e4250e84192f5b34ce9e71bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowColor: {r: 1, g: 1, b: 1, a: 1}
+  glowBrightness: 4
+  outlineWidth: 3
+  alphaThreshold: 0.01
+  drawOutside: 0
+  enableInstancing: 0
 --- !u!1 &5089640097021891369
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameInstance : MonoBehaviour
@@ -20,7 +21,8 @@ public class GameInstance : MonoBehaviour
     public float horizBorder = 0;
     public float vertBorder = 0;
     public bool selected { get; private set; }
-    bool filtered;
+    public bool filtered;
+    Transform labelRoot;
     // Start is called before the first frame update
     private void Awake()
     {
@@ -71,11 +73,15 @@ public class GameInstance : MonoBehaviour
     private void OnMouseDown()
     {
         zoomCam.enabled = true;
+        labelRoot.gameObject.SetActive(true);
+
     }
 
     private void OnMouseUp()
     {
         zoomCam.enabled = false;
+        labelRoot.gameObject.SetActive(false);
+
     }
 
 
@@ -105,12 +111,46 @@ public class GameInstance : MonoBehaviour
         ball.velocity = Vector3.right * direction * 3f * transform.lossyScale.x;
     }
 
+    public string GetInputLabel(int index)
+    {
+        switch(index)
+        {
+            case 0:
+                return "Bias";
+            case 1:
+                return "Ball X Direction";
+            case 2:
+                return "Ball Y Direction";
+            case 3:
+                return "Ball X Velocity";
+            case 4:
+                return "Ball Y Velocity";
+            case 5:
+                return "Enemy X Direction";
+            case 6:
+                return "Enemy Y Direction";
+        }
+        return "Unknown";
+    }
+    public string GetOutputLabel(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                return "X Direction";
+            case 1:
+                return "Y Direction";
+        }
+        return "Unknown";
+    }
+
     internal void SetGraph(GameCreator.Graph graph)
     {
         if (graphRoot != null)
         {
             Destroy(graphRoot.gameObject);
         }
+        
 
         graphRoot = new GameObject("GraphRoot").transform;
         graphRoot.parent = transform;
@@ -119,6 +159,10 @@ public class GameInstance : MonoBehaviour
         float vertAmount = (vertBorder * 2) / (graph.layers.Count + 1);
         float vertStart = vertBorder- vertAmount ;
         Dictionary<uint, Vector3> nodePositions = new Dictionary<uint, Vector3>();
+        labelRoot = new GameObject("LabelRoot").transform;
+        labelRoot.parent = graphRoot;
+        labelRoot.localPosition = new Vector3(0, 0, 0);
+        labelRoot.localScale = Vector3.one;
         for (int i = 0; i < graph.layers.Count; i++)
         {
             float horizAmount = (horizBorder * 2) / (graph.layers[i].Count + 1);
@@ -126,11 +170,35 @@ public class GameInstance : MonoBehaviour
 
             for(int j = 0; j < graph.layers[i].Count; j++)
             {
+
                 var node = GameObject.CreatePrimitive(PrimitiveType.Sphere).transform;
                 nodePositions[graph.layers[i][j]] = new Vector3(horizStart + j * horizAmount, vertStart - i * vertAmount);
                 node.parent = graphRoot;
                 node.localPosition = nodePositions[graph.layers[i][j]];
                 node.localScale = Vector3.one;
+                if (i == 0)
+                {
+                    var text = new GameObject("Label").transform;
+                    text.parent = labelRoot;
+                    text.localPosition = nodePositions[graph.layers[i][j]] + Vector3.up*1;
+                    text.localScale = Vector3.one * 0.5f;
+                    var tmpro = text.gameObject.AddComponent<TMPro.TextMeshPro>();
+                    tmpro.text = GetInputLabel(j);
+                    tmpro.fontSize = 4;
+                    tmpro.alignment = TextAlignmentOptions.Center;
+                }
+                if(i==graph.layers.Count-1)
+                {
+                    var text = new GameObject("Label").transform;
+                    text.parent = labelRoot;
+                    text.localPosition = nodePositions[graph.layers[i][j]] + Vector3.up * -1;
+                    text.localScale = Vector3.one * 0.5f;
+                    var tmpro = text.gameObject.AddComponent<TMPro.TextMeshPro>();
+                    tmpro.text = GetOutputLabel(j);
+                    tmpro.fontSize = 4;
+                    tmpro.alignment = TextAlignmentOptions.Center;
+
+                }
             }
         }
         foreach(var connection in graph.connections)
@@ -156,6 +224,7 @@ public class GameInstance : MonoBehaviour
 
 
         }
+        labelRoot.gameObject.SetActive(false);
     }
 
     void UpdateScoreImages()

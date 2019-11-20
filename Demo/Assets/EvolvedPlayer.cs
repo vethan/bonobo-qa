@@ -109,6 +109,6 @@ public class EvolvedPlayer : MonoBehaviour
             yDirection = 0;
         }
         Vector2 targetTranslation = (Vector2)(parent.transform.localToWorldMatrix * new Vector3(xDirection,yDirection));
-        rb.MovePosition(rb.position + (targetTranslation* MaxMovementSpeed * Time.fixedDeltaTime));
+        rb.velocity = ((targetTranslation* MaxMovementSpeed));
     }
 }
