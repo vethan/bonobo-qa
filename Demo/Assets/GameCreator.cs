@@ -216,7 +216,6 @@ public class GameCreator : MonoBehaviour
                 if(instance != null)
                 {
                     instance.ToggleSelect();
-                    Debug.Log("Hit game: " + instance);
                 }
             }
         }
