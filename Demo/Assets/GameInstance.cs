@@ -12,8 +12,8 @@ public class GameInstance : MonoBehaviour
     public Goal rightGoal;
     public Transform leftScoreSprite;
     public Transform rightScoreSprite;
-    int left;
-    int right;
+    int leftScore;
+    int rightScore;
     public Camera zoomCam;
     public EvolvedPlayer evolved;
     public Material graphMaterial;
@@ -48,7 +48,7 @@ public class GameInstance : MonoBehaviour
         {
             if (go == ball.gameObject)
             {
-                right++;
+                rightScore++;
                 UpdateScoreImages();
                 Reset(-1);
             }
@@ -58,7 +58,7 @@ public class GameInstance : MonoBehaviour
         {
             if (go == ball.gameObject)
             {
-                left++;
+                leftScore++;
                 UpdateScoreImages();
                 Reset(1);
             }
@@ -230,23 +230,28 @@ public class GameInstance : MonoBehaviour
     void UpdateScoreImages()
     {
         Vector3 val = leftScoreSprite.transform.localScale;
-        val.x = 0.25f * Mathf.Clamp(left, 0, 20);
+        val.x = 0.25f * Mathf.Clamp(leftScore, 0, 20);
         leftScoreSprite.transform.localScale = val;
 
         val = rightScoreSprite.transform.localScale;
-        val.x = 0.5f * Mathf.Clamp(right, 0, 20);
+        val.x = 0.5f * Mathf.Clamp(rightScore, 0, 20);
         rightScoreSprite.transform.localScale = val;
     }
 
     internal void FullReset()
     {
-        left = 0;
-        right = 0;
+        leftScore = 0;
+        rightScore = 0;
         selected = false;
         UpdateScoreImages();
         Reset();
         GetComponentInChildren<EvolvedPlayer>().Reset();
         GetComponentInChildren<EnemyAIController>().Reset();
 
+    }
+
+    internal float CalculateFitness()
+    {
+        return (2*leftScore) - rightScore;
     }
 }
