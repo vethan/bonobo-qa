@@ -61,12 +61,12 @@ public class DropFeetGameInstance : AbstractGameInstance
         switch(killType)
         {
             case PlayerCharacter.KillType.DoubleKill:
-                Debug.Log("Double Kill");
+                //Debug.Log("Double Kill");
                 ++leftScore;
                 ++rightScore;
                 break;
             case PlayerCharacter.KillType.Headshot:
-                Debug.Log("Headshot");
+                //Debug.Log("Headshot");
                 if (scoringPlayer == leftPlayer)
                 {
                     leftScore += 2;
@@ -77,7 +77,7 @@ public class DropFeetGameInstance : AbstractGameInstance
                 }
                 break;
             case PlayerCharacter.KillType.Normal:
-                Debug.Log("Nice Kill");
+                //Debug.Log("Nice Kill");
                 if (scoringPlayer == leftPlayer)
                 {
                     ++leftScore;
