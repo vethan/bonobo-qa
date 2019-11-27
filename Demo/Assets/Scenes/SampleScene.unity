@@ -235,7 +235,7 @@ MonoBehaviour:
   automaticPanel: {fileID: 401090134}
   interactivePanel: {fileID: 614502429}
   gamesToCreate: 36
-  gamePrefab: {fileID: 325841784141496392, guid: cd5ea04f0110a524e95092b249812e75,
+  gamePrefab: {fileID: 8931451556186507420, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
     type: 3}
   mainCam: {fileID: 519420031}
   interactiveMode: 0
@@ -1662,7 +1662,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 5.1049805, y: -4.039978}
+  m_AnchoredPosition: {x: 5.1054688, y: -4.039978}
   m_SizeDelta: {x: -10.21, y: 47.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1077072558

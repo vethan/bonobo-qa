@@ -25,14 +25,13 @@ public class GameCreator : MonoBehaviour
     public GameObject interactivePanel;
 
     public int gamesToCreate  = 1;
-    public GameInstance gamePrefab;
+    public AbstractGameInstance gamePrefab;
     int gameSq = 1;
-    int InputCount = 6;
-    int OutputCount = 2;
+
     IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder;
     IGenomeFactory<NeatGenome> genomeFactory;
     List<NeatGenome> genomeList;
-    List<GameInstance> games;
+    List<AbstractGameInstance> games;
     public Camera mainCam;
     public bool interactiveMode = false;
     int currentTextIndex = 0;
@@ -74,15 +73,10 @@ public class GameCreator : MonoBehaviour
         _neatGenomeParams.AddConnectionMutationProbability = .4;
 
         //_neatGenomeParams.DeleteConnectionMutationProbability = .1;
-        genomeFactory = new NeatGenomeFactory(InputCount, OutputCount, _neatGenomeParams);
+        genomeFactory = new NeatGenomeFactory(gamePrefab.InputCount, gamePrefab.OutputCount, _neatGenomeParams);
         
 
         genomeDecoder = new NeatGenomeDecoder(_activationScheme);
-    }
-    public struct Graph
-    {
-        public List<List<uint>> layers;
-        public List<System.Tuple<uint, uint>> connections;
     }
 
     Graph GenerateGraph(NeatGenome genome)
@@ -164,7 +158,7 @@ public class GameCreator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        games = new List<GameInstance>();
+        games = new List<AbstractGameInstance>();
         bool done = false;
         while(!done)
         {
@@ -186,7 +180,7 @@ public class GameCreator : MonoBehaviour
         {
             var x = i % gameSq;
             var y = (gamesToCreate - (i + 1)) / gameSq;
-            var instance = GameObject.Instantiate<GameInstance>(gamePrefab);
+            var instance = GameObject.Instantiate<AbstractGameInstance>(gamePrefab);
             instance.transform.localScale = new Vector3(100.0f / gameSq, 100.0f / gameSq, 1);
             instance.transform.position = new Vector3(xAdj * x, yAdj*y) + offset;
             games.Add(instance);
@@ -247,7 +241,7 @@ public class GameCreator : MonoBehaviour
 
     private void SetupGame(int i)
     {
-        games[i].evolved.SetBrain(genomeDecoder.Decode(genomeList[i]));
+        games[i].SetEvolvedBrain(genomeDecoder.Decode(genomeList[i]));
         games[i].SetGraph(GenerateGraph(genomeList[i]));
         games[i].FullReset();
     }
@@ -326,7 +320,7 @@ public class GameCreator : MonoBehaviour
             //Calculate the fitnesses of each game instance
             for(int i =0; i< games.Count; i++)
             {
-                GameInstance gi = games[i];
+                AbstractGameInstance gi = games[i];
                 fitnesses[i] = gi.CalculateFitness();
             }
 

@@ -62,12 +62,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\EnemyAIController.cs" />
-    <Compile Include="Assets\EvolvedPlayer.cs" />
+    <Compile Include="Assets\AbstractGameInstance.cs" />
+    <Compile Include="Assets\DropFeetGame\AbstractDropFeetController.cs" />
+    <Compile Include="Assets\DropFeetGame\AuthoredAIDropFeetController.cs" />
+    <Compile Include="Assets\DropFeetGame\DoNothingDropFeetController.cs" />
+    <Compile Include="Assets\DropFeetGame\DropFeetGameInstance.cs" />
+    <Compile Include="Assets\DropFeetGame\EvolvedDropFeetController.cs" />
+    <Compile Include="Assets\DropFeetGame\KeyboardDropFeetController.cs" />
+    <Compile Include="Assets\DropFeetGame\PlayerCharacter.cs" />
     <Compile Include="Assets\GameCreator.cs" />
-    <Compile Include="Assets\GameInstance.cs" />
-    <Compile Include="Assets\Goal.cs" />
-    <Compile Include="Assets\MouseControlledPlayer.cs" />
+    <Compile Include="Assets\Graph.cs" />
+    <Compile Include="Assets\PongGame\EnemyAIController.cs" />
+    <Compile Include="Assets\PongGame\EvolvedPlayer.cs" />
+    <Compile Include="Assets\PongGame\GameInstance.cs" />
+    <Compile Include="Assets\PongGame\Goal.cs" />
+    <Compile Include="Assets\PongGame\MouseControlledPlayer.cs" />
     <Compile Include="Assets\SharpNEAT\SharpNeatDomains\ExperimentUtils.cs" />
     <Compile Include="Assets\SharpNEAT\SharpNeatDomains\INeatExperiment.cs" />
     <Compile Include="Assets\SharpNEAT\SharpNeatDomains\IntPoint.cs" />
@@ -450,16 +459,16 @@
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
     </Reference>
     <Reference Include="Redzen">
-      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/Redzen.dll</HintPath>
+      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/SharpNEAT/Redzen.dll</HintPath>
     </Reference>
     <Reference Include="System.Buffers">
-      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Memory">
-      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/System.Memory.dll</HintPath>
+      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/SharpNEAT/System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/SharpNEAT/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/SharpNEAT/System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
