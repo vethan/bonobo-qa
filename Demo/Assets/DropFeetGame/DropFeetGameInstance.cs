@@ -46,9 +46,11 @@ public class DropFeetGameInstance : AbstractGameInstance
         isPausedForKill = false;
     }
     public bool isPausedForKill  { get; private set;}
+    
     IEnumerator PauseThenReset()
     {
         yield return new WaitForSeconds(0.5f);
+        yield return new WaitForFixedUpdate();
         ResetPositions();
     }
 
@@ -98,9 +100,9 @@ public class DropFeetGameInstance : AbstractGameInstance
         switch (index)
         {
             case 0:
-                return "Drop";
+                return "Jump";
             case 1:
-                return "Foot";
+                return "DiveKick/Hop Back";
         }
         return "Unknown";
     }
@@ -124,9 +126,9 @@ public class DropFeetGameInstance : AbstractGameInstance
             case 6:
                 return "Opponent Foot Y";
             case 7:
-                return "Opponent Dropping";
+                return "Opponent Diving";
             case 8:
-                return "Self Dropping";
+                return "Self Diving";
             case 9:
                 return "Opponent On Floor";
             case 10:
@@ -137,12 +139,16 @@ public class DropFeetGameInstance : AbstractGameInstance
 
     public override float CalculateFitness()
     {
+        float fit = 0;
         if(!evolvedPlayer.everDrop && !evolvedPlayer.everFeet)
         {
-            return -10;
+            fit = -10;
         }
-        float fit = evolvedPlayer.everDrop ? 0.1f : 0;
-        fit += evolvedPlayer.everFeet ? 0.1f : 0;
+        else if (evolvedPlayer.everDrop && evolvedPlayer.everFeet)
+        {
+            fit = 10;
+        }
+        
         return (2 * leftScore) - rightScore + fit;
     }
 

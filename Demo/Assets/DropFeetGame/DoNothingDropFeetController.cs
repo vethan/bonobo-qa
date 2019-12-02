@@ -14,4 +14,8 @@ public class DoNothingDropFeetController : AbstractDropFeetController
         return false;
     }
 
+    public override void UpdateButtons()
+    {
+
+    }
 }

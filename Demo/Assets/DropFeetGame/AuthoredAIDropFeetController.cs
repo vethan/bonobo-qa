@@ -2,18 +2,18 @@
 
 public class AuthoredAIDropFeetController : AbstractDropFeetController
 {
-    DropFeetGameInstance gameInstance;
-    PlayerCharacter opponent;
-    PlayerCharacter self;
-    Collider2D opponentFoot;
-    Collider2D myFoot;
-    bool shouldDrop;
-    bool shouldFeet;
-    Rigidbody2D myRigid;
-    Rigidbody2D opponentRigid;
+    protected PlayerCharacter opponent;
+    protected PlayerCharacter self;
+    protected Collider2D opponentFoot;
+    protected Collider2D myFoot;
+    protected bool shouldDrop;
+    protected bool shouldFeet;
+    protected Rigidbody2D myRigid;
+    protected Rigidbody2D opponentRigid;
+    protected DropFeetGameInstance gameInstance;
 
-    int meOnlyLayerMask;
-    int opponentOnlyLayerMask;
+    protected int meOnlyLayerMask;
+    protected int opponentOnlyLayerMask;
 
     public override bool DropButtonDown()
     {
@@ -26,7 +26,7 @@ public class AuthoredAIDropFeetController : AbstractDropFeetController
     }
 
     // Start is called before the first frame update
-    void Awake()
+    protected void Awake()
     {
         myRigid = GetComponent<Rigidbody2D>();
         gameInstance = GetComponentInParent<DropFeetGameInstance>();
@@ -60,22 +60,21 @@ public class AuthoredAIDropFeetController : AbstractDropFeetController
         }
     }
 
-    bool OpponentAttackWillHit()
+    protected bool OpponentAttackWillHit()
     {
         var attackVector = opponent.GetAttackVector();
         Debug.DrawRay(opponentFoot.transform.position, attackVector);
         return Physics2D.Raycast(opponentFoot.transform.position, attackVector, 50, meOnlyLayerMask);
     }
 
-    bool MyAttackWillHit()
+    protected bool MyAttackWillHit()
     {
         var attackVector = self.GetAttackVector();
         Debug.DrawRay(myFoot.transform.position, attackVector);
         return Physics2D.Raycast(myFoot.transform.position, attackVector, 50, opponentOnlyLayerMask);
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void UpdateButtons()
     {
         shouldDrop = false;
         shouldFeet = false;

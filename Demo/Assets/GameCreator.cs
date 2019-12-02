@@ -306,7 +306,7 @@ public class GameCreator : MonoBehaviour
 
     void HandleAutomaticUpdate()
     {
-        Time.timeScale = highSpeedMode.isOn ? 4 : 1;
+        Time.timeScale = highSpeedMode.isOn ? 3 : 1;
         if(paused)
         {
             return;

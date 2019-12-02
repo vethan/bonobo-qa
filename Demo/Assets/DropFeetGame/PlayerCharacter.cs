@@ -22,9 +22,14 @@ public class PlayerCharacter : MonoBehaviour
     PlayerCharacter opponent;
     public Vector2 velocity { get; private set; }
     public bool dropping {get; private set; }
-    Rigidbody2D rigid;
+    public Rigidbody2D rigid;
     float lastInAir;
     public bool debug = false;
+
+    public Vector2 GetLocalPhysicsPosition()
+    {
+       return rigid.position - (Vector2)transform.parent.position;
+    }
     // Start is called before the first frame update
     void Awake()
     {
@@ -62,12 +67,47 @@ public class PlayerCharacter : MonoBehaviour
         return new Vector2(15 * transform.localScale.x, -15);
     }
 
+    void HandleInput()
+    {
+        controller.UpdateButtons();
+        if (isOnFloor)
+        {
+            float xScale = transform.localPosition.x - opponent.transform.localPosition.x > 0 ? -1 : 1;
+            transform.localScale = new Vector3(xScale, 1, 1);
+            if (controller.DropButtonDown() && lastInAir > 0.1f)
+            {
+                velocity = new Vector2(0, 22);
+            }
+            if (controller.FeetButtonDown() && lastInAir > 0.1f)
+            {
+                velocity = new Vector2(3.5f * -transform.localScale.x, 13);
+            }
+        }
+        else
+        {
+            if (!dropping)
+            {
+                if (lastOnFloor > 0.1f && controller.FeetButtonDown())
+                {
+                    velocity = GetAttackVector();
+                    dropping = true;
+                }
+            }
+        }
+        
+    }
+
     private void FixedUpdate()
     {
         if (gameInstance.isPausedForKill)
             return;
-        if(debug)
-            Debug.Log("isOnFloor:" + isOnFloor + "::dropping" + dropping + "::yVel" + velocity.y);
+        if (debug)
+        {
+            Debug.Log(Time.fixedDeltaTime);
+           // Debug.Log("isOnFloor:" + isOnFloor + "::dropping" + dropping + "::yVel" + velocity.y);
+        }
+        HandleInput();
+
         if (isOnFloor)
         {
             lastInAir += Time.fixedDeltaTime;
@@ -96,6 +136,7 @@ public class PlayerCharacter : MonoBehaviour
         transform.localPosition += (Vector3)velocity*Time.fixedDeltaTime;
         transform.localPosition = new Vector3(Mathf.Clamp(transform.localPosition.x,-xLimit,xLimit),transform.localPosition.y,transform.localPosition.z);
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Collider2D myCollider;
@@ -143,30 +184,7 @@ public class PlayerCharacter : MonoBehaviour
     {
         if (debug)
             Debug.Log("Update Occurred");
-        if (isOnFloor)
-        {
-            float xScale = transform.localPosition.x - opponent.transform.localPosition.x > 0 ? -1 : 1;
-            transform.localScale = new Vector3(xScale, 1, 1);
-            if (controller.DropButtonDown() && lastInAir > 0.1f)
-            {
-                velocity = new Vector2(0, 22);
-            }
-            if (controller.FeetButtonDown() && lastInAir > 0.1f)
-            {
-                velocity = new Vector2(3.5f * -transform.localScale.x, 13);
-            }
-        }
-        else
-        {
-            if (!dropping)
-            {
-                if (lastOnFloor > 0.1f && controller.FeetButtonDown())
-                {
-                    velocity = GetAttackVector();
-                    dropping = true;
-                }
-            }
-        }
+
         standSprites.SetActive(isOnFloor);
         diveSprites.SetActive(dropping);
         jumpSprites.SetActive(!isOnFloor && !dropping);

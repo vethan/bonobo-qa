@@ -64,6 +64,8 @@ public class EvolvedDropFeetController : AbstractDropFeetController
     public void SetBrain(IBlackBox newBrain)
     {
         brain = newBrain;
+        everDrop = false;
+        everFeet = false;
     }
 
     public override bool DropButtonDown()
@@ -78,21 +80,17 @@ public class EvolvedDropFeetController : AbstractDropFeetController
 
     void OriginalInputs()
     {
-        //First two: Normalised direction to Opponent
 
         var temp = opponentRigid.position - rb.position;
         var dist = temp.magnitude;
         temp.Normalize();
         inputSignals[0] = temp.x;
         inputSignals[1] = temp.y;
-        //NExt one: distance to ball
 
-        //Second two, Normalised opponent velocity
         temp = opponent.velocity.normalized;
         inputSignals[2] = temp.x;
         inputSignals[3] = temp.y;
 
-        //Next: Normalised Direction to enemy foot
         temp = (Vector2)opponentFoot.transform.position- rb.position;
         dist = temp.magnitude;
         temp.Normalize();
@@ -107,14 +105,13 @@ public class EvolvedDropFeetController : AbstractDropFeetController
         brain.InputSignalArray.CopyFrom(inputSignals, 0);
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void UpdateButtons()
     {
         OriginalInputs();
         brain.Activate();
         shouldDrop = brain.OutputSignalArray[0] > 0.5f;
         shouldFeet = brain.OutputSignalArray[1] > 0.5f;
-        everFeet |= shouldFeet;
+        everFeet |= self.dropping;
         everDrop |= shouldDrop;
         
     }
