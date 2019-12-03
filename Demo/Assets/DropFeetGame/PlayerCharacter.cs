@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class PlayerCharacter : MonoBehaviour
 {
@@ -25,14 +26,30 @@ public class PlayerCharacter : MonoBehaviour
     public Rigidbody2D rigid;
     float lastInAir;
     public bool debug = false;
+    const float JUMP_DELAY = 0.2f;
+    const float HOP_DELAY = 0.4f;
+
+    const float LAND_DELAY = 0.2f;
+    float attackDelay = 0.2f;
+    bool attemptedEarlyDive=  false;
+    Collider2D[] colliders;
+
+    public float floorHeight
+    {
+        get
+        {
+            return floor.localPosition.x;
+        }
+    }
 
     public Vector2 GetLocalPhysicsPosition()
     {
-       return rigid.position - (Vector2)transform.parent.position;
+       return (Vector2)transform.parent.InverseTransformPoint(rigid.position);
     }
-    // Start is called before the first frame update
+
     void Awake()
     {
+        colliders = GetComponentsInChildren<Collider2D>(true); 
         controller = GetComponent<AbstractDropFeetController>();
         if(controller == null)
         {
@@ -72,25 +89,34 @@ public class PlayerCharacter : MonoBehaviour
         controller.UpdateButtons();
         if (isOnFloor)
         {
+            attemptedEarlyDive = false;
             float xScale = transform.localPosition.x - opponent.transform.localPosition.x > 0 ? -1 : 1;
             transform.localScale = new Vector3(xScale, 1, 1);
-            if (controller.DropButtonDown() && lastInAir > 0.1f)
+            if (controller.DropButtonDown() && lastInAir > LAND_DELAY)
             {
                 velocity = new Vector2(0, 22);
+                attackDelay = JUMP_DELAY;
             }
-            if (controller.FeetButtonDown() && lastInAir > 0.1f)
+            if (controller.FeetButtonDown() && lastInAir > LAND_DELAY)
             {
                 velocity = new Vector2(3.5f * -transform.localScale.x, 13);
+                attackDelay = HOP_DELAY;
             }
         }
         else
         {
             if (!dropping)
             {
-                if (lastOnFloor > 0.1f && controller.FeetButtonDown())
+
+                if (lastOnFloor > attackDelay && (controller.FeetButtonDown() || attemptedEarlyDive))
                 {
+                    attemptedEarlyDive = false;
                     velocity = GetAttackVector();
                     dropping = true;
+                }
+                else if(lastOnFloor < attackDelay && controller.FeetButtonDown() && controller.HoldDelayedKick())
+                {
+                    attemptedEarlyDive = true;
                 }
             }
         }
@@ -135,6 +161,10 @@ public class PlayerCharacter : MonoBehaviour
 
         transform.localPosition += (Vector3)velocity*Time.fixedDeltaTime;
         transform.localPosition = new Vector3(Mathf.Clamp(transform.localPosition.x,-xLimit,xLimit),transform.localPosition.y,transform.localPosition.z);
+
+        standSprites.SetActive(isOnFloor);
+        diveSprites.SetActive(dropping && !isOnFloor);
+        jumpSprites.SetActive(!isOnFloor && !dropping);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -185,9 +215,7 @@ public class PlayerCharacter : MonoBehaviour
         if (debug)
             Debug.Log("Update Occurred");
 
-        standSprites.SetActive(isOnFloor);
-        diveSprites.SetActive(dropping);
-        jumpSprites.SetActive(!isOnFloor && !dropping);
+
 
     }
 }

@@ -144,6 +144,10 @@ public class DropFeetGameInstance : AbstractGameInstance
         {
             fit = -10;
         }
+        if(evolvedPlayer.everFeet)
+        {
+            fit = 5;
+        }
         else if (evolvedPlayer.everDrop && evolvedPlayer.everFeet)
         {
             fit = 10;

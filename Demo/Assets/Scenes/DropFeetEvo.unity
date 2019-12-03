@@ -1295,7 +1295,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 82b0438e323481a4ea1ca55162a9c100, type: 3}
-    m_FontSize: 11
+    m_FontSize: 9
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -1307,10 +1307,13 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 'Every 10 seconds, we scan for five of the most fit agents, and select them
-    to act as parents for the next generation.   Fitness is  measured by:
+    to act as parents for the next generation.   Fitness equal S+A where:
 
 
-    (2 * Goals scored - Goals conceded)'
+    S = (2 * agent score - opponent score)
+
+
+    A= -10 no actions, 0 if only jumped or kicked, 10 if did both'
 --- !u!222 &867620286
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2280,6 +2283,7 @@ GameObject:
   - component: {fileID: 1574463529}
   - component: {fileID: 1574463528}
   - component: {fileID: 1574463527}
+  - component: {fileID: 1574463530}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -2335,6 +2339,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &1574463530
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574463526}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
 --- !u!1 &1589181882
 GameObject:
   m_ObjectHideFlags: 0

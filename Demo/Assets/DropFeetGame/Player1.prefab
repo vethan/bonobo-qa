@@ -97,6 +97,7 @@ MonoBehaviour:
   standSprites: {fileID: 108252343268779176}
   diveSprites: {fileID: 108252343228297092}
   jumpSprites: {fileID: 108252342661122792}
+  rigid: {fileID: 0}
   debug: 0
 --- !u!50 &108252342249815839
 Rigidbody2D:
@@ -307,15 +308,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 108252343228297092}
-  m_LocalRotation: {x: 0, y: 0, z: -0.21643952, w: 0.97629607}
-  m_LocalPosition: {x: 0, y: 1.2, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: -0.2744628, w: 0.96159774}
+  m_LocalPosition: {x: -0.33, y: 1.2, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children:
   - {fileID: 108252343138609153}
   - {fileID: 108252344223441495}
   m_Father: {fileID: 108252342249815836}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -25}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -31.86}
 --- !u!212 &108252343228297097
 SpriteRenderer:
   m_ObjectHideFlags: 0

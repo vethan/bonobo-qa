@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class UtilityDropFeetController : AuthoredAIDropFeetController
 {
+    public bool DebugMode = false;
     struct UtilityOption
     {
         public Action actionType;
@@ -32,19 +33,62 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         return DirectAttackUtility();
     }
 
+    float NormalisedMyVerticalDistance(float max)
+    {
+        return Mathf.Clamp01((self.GetLocalPhysicsPosition().y - self.floorHeight) / max);
+    }
+
+    float CalculateAttackHitPointUtility(Vector2 worldHitPoint)
+    {
+        float heightModifier = 1;
+        float startModifier = 0;
+        Vector2 hitPoint = (Vector2)transform.parent.InverseTransformPoint(worldHitPoint);
+        DodgeArea areaCovered = opponent.isOnFloor || opponent.velocity.y > 0 || opponent.dropping ? DodgeArea.Upper : DodgeArea.Lower;
+        switch (areaCovered)
+        {
+            case DodgeArea.Upper:
+                heightModifier = 0.6f;
+                startModifier = characterHeight * 0.5f;
+                break;
+            case DodgeArea.Lower:
+                heightModifier = 0.6f;
+                startModifier =  0;
+                break;
+        }
+        if (hitPoint.y > opponent.GetLocalPhysicsPosition().y + startModifier && hitPoint.y < opponent.GetLocalPhysicsPosition().y + startModifier + (characterHeight * heightModifier))
+        {
+            return 1;
+        }
+
+        return 0.25f;
+    }
+
     float DirectAttackUtility()
     {
-        if (!MyAttackWillHit())
+        if (!MyAttackWillHit(out RaycastHit2D raycastHit2))
+        {
+            if (DebugMode)
+            {
+                Debug.Log("GonnaMiss");
+            }
             return 0;
-
+        }
         else
-            return 1 - (NormalisedOpponentHorizontalDistance(12) * 0.5f);
+        {
+            float utility = CalculateAttackHitPointUtility(raycastHit2.point);
+            //float utility = ((1 - (NormalisedOpponentHorizontalDistance(8) * 0.6f)) + 2* CalculateAttackHitPointUtility(raycastHit2.point)) /3;
+            if(DebugMode)
+            {
+                Debug.Log("Attack Utility: " + utility);
+            }
+            return utility;
+        }
 
     }
 
     float NormalisedOpponentHorizontalDistance(float max)
     {
-        return Mathf.Clamp01((self.GetLocalPhysicsPosition().x - opponent.GetLocalPhysicsPosition().x) / max);
+        return Mathf.Clamp01(Mathf.Abs(self.GetLocalPhysicsPosition().x - opponent.GetLocalPhysicsPosition().x) / max);
     }
 
     float ParabolicOpponentHorizontaldistance(float max)
@@ -66,20 +110,41 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
 
         float angle = Mathf.Atan(attackVector.x / attackVector.y);
 
-        float temp = Mathf.Abs(opponent.GetLocalPhysicsPosition().x-self.GetLocalPhysicsPosition().x) /Mathf.Cos(angle);
+        float temp = Mathf.Abs(opponent.rigid.position.x-self.rigid.position.x) /Mathf.Cos(angle);
 
         return r.GetPoint(temp);
     }
-
-    float CalculateJumpDodgeUtility()
+    enum DodgeArea { Upper,Lower,All}
+    float CalculateJumpDodgeUtility(DodgeArea areaCovered = DodgeArea.All)
     {
         if (!opponent.dropping)
         {
             return 0.25f;
         }
+        Vector2 attackPoint;
+        if(OpponentAttackWillHit(out RaycastHit2D raycastHit2))
+        {
+            attackPoint = raycastHit2.point;
+        }
+        else
+        {
+            attackPoint = CalculateOpponentAttackPosition();
 
-        Vector2 attackPoint = CalculateOpponentAttackPosition();
-        if(attackPoint.y > self.GetLocalPhysicsPosition().y &&  attackPoint.y < self.GetLocalPhysicsPosition().y + characterHeight)
+        }
+        attackPoint = (Vector2)transform.parent.InverseTransformPoint(attackPoint);
+        float heightModifier = 1;
+        float startModifier = 0;
+        switch(areaCovered)
+        {
+            case DodgeArea.Lower:
+                heightModifier = 0.5f;
+                break;
+            case DodgeArea.Upper:
+                heightModifier = 0.5f;
+                startModifier = characterHeight * heightModifier;
+                break;
+        }
+        if(attackPoint.y > self.GetLocalPhysicsPosition().y + startModifier &&  attackPoint.y < self.GetLocalPhysicsPosition().y + startModifier + (characterHeight * heightModifier))
         {
             return 1;
         }
@@ -87,12 +152,21 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         return 0.25f;
     }
 
+    private void OnDrawGizmos()
+    {
+        if (opponent == null)
+            return;
+
+        Vector2 attackPoint = CalculateOpponentAttackPosition();
+        Gizmos.DrawSphere(attackPoint, 20);
+    }
+
     float JumpUtility()
     {
         if (!self.isOnFloor)
             return 0;
 
-        return (ParabolicOpponentHorizontaldistance(12) + 1 * CalculateJumpDodgeUtility()) / 2;
+        return (ParabolicOpponentHorizontaldistance(12) + 2 * CalculateJumpDodgeUtility(DodgeArea.Lower)) / 3;
 
         //return 0;
     }
@@ -122,7 +196,7 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         if (!self.isOnFloor)
             return 0;
 
-        return ((CalulateRetreatSpaceUtility() * 1.0f) + 0.0f) * (1-ParabolicOpponentHorizontaldistance(12) + 3*CalculateJumpDodgeUtility())/4 ;
+        return ((CalulateRetreatSpaceUtility() * 1.0f) + 0.0f) * (1-ParabolicOpponentHorizontaldistance(12) + 3*CalculateJumpDodgeUtility(DodgeArea.Upper))/4 ;
     }
 
     // Update is called once per frame

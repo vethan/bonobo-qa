@@ -7,6 +7,9 @@ public abstract class AbstractDropFeetController : MonoBehaviour
 {
     public abstract bool DropButtonDown();
     public abstract bool FeetButtonDown();
-
+    public virtual bool HoldDelayedKick()
+    {
+        return false;
+    }
     public abstract void UpdateButtons();
 }

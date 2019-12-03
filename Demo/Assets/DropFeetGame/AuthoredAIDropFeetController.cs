@@ -15,6 +15,8 @@ public class AuthoredAIDropFeetController : AbstractDropFeetController
     protected int meOnlyLayerMask;
     protected int opponentOnlyLayerMask;
 
+    
+
     public override bool DropButtonDown()
     {
         return shouldDrop;
@@ -60,18 +62,39 @@ public class AuthoredAIDropFeetController : AbstractDropFeetController
         }
     }
 
+
     protected bool OpponentAttackWillHit()
     {
+        return OpponentAttackWillHit(out RaycastHit2D result);
+    }
+
+    protected bool OpponentAttackWillHit(out RaycastHit2D hitResult)
+    {
         var attackVector = opponent.GetAttackVector();
+        ContactFilter2D contactFilter2D = new ContactFilter2D() { layerMask = meOnlyLayerMask, useLayerMask = true, useTriggers = false };
+        RaycastHit2D[] hit = new RaycastHit2D[1];
         Debug.DrawRay(opponentFoot.transform.position, attackVector);
-        return Physics2D.Raycast(opponentFoot.transform.position, attackVector, 50, meOnlyLayerMask);
+        float radius = opponentFoot.transform.localScale.x * ((CircleCollider2D)opponentFoot).radius * 0.85f;
+        int hits = Physics2D.CircleCast(opponentFoot.transform.position, radius, attackVector, contactFilter2D, hit);
+        hitResult = hit[0];
+        return hits > 0 && hit[0].transform == transform;
+    }
+
+    protected bool MyAttackWillHit(out RaycastHit2D hitResult)
+    {
+        var attackVector = self.GetAttackVector();
+        ContactFilter2D contactFilter2D = new ContactFilter2D() { layerMask = opponentOnlyLayerMask, useLayerMask = true, useTriggers = false };
+        RaycastHit2D[] hit = new RaycastHit2D[1];
+        Debug.DrawRay(myFoot.transform.position, attackVector);
+        float radius = myFoot.transform.localScale.x * ((CircleCollider2D)myFoot).radius * 0.85f;
+        int hits = Physics2D.CircleCast(myFoot.transform.position, radius, attackVector, contactFilter2D, hit);
+        hitResult = hit[0];
+        return hits > 0 && hit[0].transform == opponent.transform;
     }
 
     protected bool MyAttackWillHit()
     {
-        var attackVector = self.GetAttackVector();
-        Debug.DrawRay(myFoot.transform.position, attackVector);
-        return Physics2D.Raycast(myFoot.transform.position, attackVector, 50, opponentOnlyLayerMask);
+        return MyAttackWillHit(out RaycastHit2D result);
     }
 
     public override void UpdateButtons()

@@ -27,11 +27,25 @@ public class KeyboardDropFeetController : AbstractDropFeetController
 
     }
 
+    public override bool HoldDelayedKick()
+    {
+        return true;
+    }
+
     public override void UpdateButtons()
     {
         if(shouldUpdate)
         {
+            if(Input.GetKeyDown(dropButton))
+            {
+                Debug.Log(Time.time + "::Jump Pressed");
+            }
             shouldDrop = Input.GetKeyDown(dropButton);
+            
+            if (Input.GetKeyDown(feetButton))
+            {
+                Debug.Log(Time.time + "::Kick Pressed");
+            }
             shouldFeed = Input.GetKeyDown(feetButton);
             shouldUpdate = false;
         }
