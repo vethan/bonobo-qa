@@ -6,7 +6,7 @@ public class MouseControlledPlayer : MonoBehaviour
 {
     Camera main;
     Rigidbody2D body;
-    float maxSpeed = 15.0f;
+    float maxSpeed = 20.0f;
     GameInstance myGame;
 
     // Start is called before the first frame update

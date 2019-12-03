@@ -582,7 +582,7 @@ GameObject:
   - component: {fileID: 325841784141496392}
   - component: {fileID: 8818999801185734562}
   m_Layer: 0
-  m_Name: Game
+  m_Name: PongGame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -626,17 +626,18 @@ MonoBehaviour:
   - {fileID: 325841784393209844}
   - {fileID: 325841783811259984}
   - {fileID: 325841783993772502}
+  zoomCam: {fileID: 747426635}
+  graphMaterial: {fileID: 2100000, guid: 9faa5fa4ffe8a8e4f85bb94f7c8bb79e, type: 2}
+  filtered: 0
+  horizBorder: 0
+  vertBorder: 0
+  isPlayerControlled: 0
   ball: {fileID: 325841784498610208}
   leftGoal: {fileID: 3825411174157310142}
   rightGoal: {fileID: 4099669618390444197}
   leftScoreSprite: {fileID: 3800084622013239464}
   rightScoreSprite: {fileID: 464549535382736489}
-  zoomCam: {fileID: 0}
   evolved: {fileID: 7184870077349214479}
-  graphMaterial: {fileID: 2100000, guid: 9faa5fa4ffe8a8e4f85bb94f7c8bb79e, type: 2}
-  horizBorder: 0
-  vertBorder: 0
-  filtered: 0
 --- !u!65 &8818999801185734562
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1303,7 +1304,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 81
   m_Sprite: {fileID: 21300000, guid: 5a5fc125f13b76843ae7960b44e93d67, type: 3}
   m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
@@ -1432,7 +1433,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 81
   m_Sprite: {fileID: 21300000, guid: 5a5fc125f13b76843ae7960b44e93d67, type: 3}
   m_Color: {r: 0.19806576, g: 1, b: 0, a: 1}
   m_FlipX: 0

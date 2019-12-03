@@ -6,6 +6,18 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/MainMenu.unity
+    guid: d3ab4b2f7a2bf354bbcd535f7c799e35
+  - enabled: 1
+    path: Assets/Scenes/PongEvo.unity
+    guid: 3846a1616e5c871459f1f6a25e319f62
+  - enabled: 1
+    path: Assets/Scenes/PlayerVsAIPong.unity
+    guid: b005f9a5796287645b5c18ccdc55bf39
+  - enabled: 1
+    path: Assets/Scenes/DropFeetEvo.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/PlayerVsAIDropFeet.unity
+    guid: 86eec43a2b9362f46b945f709e627181
   m_configObjects: {}

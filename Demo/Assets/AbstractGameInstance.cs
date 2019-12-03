@@ -20,7 +20,7 @@ public abstract class AbstractGameInstance : MonoBehaviour
     public abstract int InputCount { get; }
     public abstract int OutputCount { get; }
 
-
+    public bool isPlayerControlled;
     // Start is called before the first frame update
     virtual protected void Awake()
     {
@@ -55,6 +55,8 @@ public abstract class AbstractGameInstance : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (isPlayerControlled)
+            return;
         zoomCam.enabled = true;
         labelRoot.gameObject.SetActive(true);
 
@@ -62,9 +64,10 @@ public abstract class AbstractGameInstance : MonoBehaviour
 
     private void OnMouseUp()
     {
+        if (isPlayerControlled)
+            return;
         zoomCam.enabled = false;
         labelRoot.gameObject.SetActive(false);
-
     }
 
     protected abstract string GetOutputLabel(int index);

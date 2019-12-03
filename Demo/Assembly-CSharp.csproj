@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\AbstractGameInstance.cs" />
+    <Compile Include="Assets\ActivateOnHover.cs" />
     <Compile Include="Assets\DropFeetGame\AbstractDropFeetController.cs" />
     <Compile Include="Assets\DropFeetGame\AuthoredAIDropFeetController.cs" />
     <Compile Include="Assets\DropFeetGame\DoNothingDropFeetController.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Assets\PongGame\GameInstance.cs" />
     <Compile Include="Assets\PongGame\Goal.cs" />
     <Compile Include="Assets\PongGame\MouseControlledPlayer.cs" />
+    <Compile Include="Assets\SceneLoader.cs" />
     <Compile Include="Assets\SharpNEAT\SharpNeatDomains\ExperimentUtils.cs" />
     <Compile Include="Assets\SharpNEAT\SharpNeatDomains\INeatExperiment.cs" />
     <Compile Include="Assets\SharpNEAT\SharpNeatDomains\IntPoint.cs" />
@@ -465,11 +467,11 @@
     <Reference Include="System.Buffers">
       <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/SharpNEAT/System.Buffers.dll</HintPath>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/SharpNEAT/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
     <Reference Include="System.Memory">
       <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/SharpNEAT/System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/SharpNEAT/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
