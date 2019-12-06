@@ -9,6 +9,7 @@ public abstract class AbstractGameInstance : MonoBehaviour
     public SpriteRenderer[] walls;
     public Camera zoomCam;
     public Material graphMaterial;
+    public Material graphNodeMaterial;
     protected Transform graphRoot;
     protected Transform labelRoot;
 
@@ -123,6 +124,7 @@ public abstract class AbstractGameInstance : MonoBehaviour
             {
 
                 var node = GameObject.CreatePrimitive(PrimitiveType.Sphere).transform;
+                node.GetComponent<Renderer>().material = graphNodeMaterial;
                 nodePositions[graph.layers[i][j]] = new Vector3(horizStart + j * horizAmount, vertStart - i * vertAmount);
                 node.parent = graphRoot;
                 node.localPosition = nodePositions[graph.layers[i][j]];

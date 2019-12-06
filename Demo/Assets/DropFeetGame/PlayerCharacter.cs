@@ -16,20 +16,22 @@ public class PlayerCharacter : MonoBehaviour
     public GameObject diveSprites;
     public GameObject jumpSprites;
 
+    public readonly static Vector2 gravity = new Vector2(0, 40);
+
     AbstractDropFeetController controller;
     DropFeetGameInstance gameInstance;
     float xLimit = 7.82f;
-    Transform floor;
+    public Transform floor;
     PlayerCharacter opponent;
     public Vector2 velocity { get; private set; }
     public bool dropping {get; private set; }
     public Rigidbody2D rigid;
     float lastInAir;
     public bool debug = false;
-    const float JUMP_DELAY = 0.2f;
-    const float HOP_DELAY = 0.4f;
+    const float JUMP_DELAY = 0.1f;
+    const float HOP_DELAY = 0.2f;
 
-    const float LAND_DELAY = 0.2f;
+    const float LAND_DELAY = 0.1f;
     float attackDelay = 0.2f;
     bool attemptedEarlyDive=  false;
     Collider2D[] colliders;
@@ -38,7 +40,7 @@ public class PlayerCharacter : MonoBehaviour
     {
         get
         {
-            return floor.localPosition.x;
+            return floor.localPosition.y;
         }
     }
 
@@ -151,7 +153,7 @@ public class PlayerCharacter : MonoBehaviour
             lastOnFloor += Time.fixedDeltaTime;
             if (!dropping)
             {
-                velocity -= new Vector2(0, 40) * Time.fixedDeltaTime;
+                velocity -= gravity * Time.fixedDeltaTime;
             }
             if (dropping)
             {

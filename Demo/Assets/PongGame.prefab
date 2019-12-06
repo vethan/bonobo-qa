@@ -628,6 +628,7 @@ MonoBehaviour:
   - {fileID: 325841783993772502}
   zoomCam: {fileID: 747426635}
   graphMaterial: {fileID: 2100000, guid: 9faa5fa4ffe8a8e4f85bb94f7c8bb79e, type: 2}
+  graphNodeMaterial: {fileID: 2100000, guid: d8986971c7b9c234581ce03f85a0fa05, type: 2}
   filtered: 0
   horizBorder: 0
   vertBorder: 0

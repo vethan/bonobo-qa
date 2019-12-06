@@ -48,11 +48,10 @@ public class GameCreator : MonoBehaviour
     private void Awake()
     {
         proTipText.text = proTips[0];
-        nextGenerationButton.enabled = interactiveMode;
         automaticPanel.SetActive(!interactiveMode);
         interactivePanel.SetActive(interactiveMode);
 
-        nextGenerationButton.onClick.AddListener(() => { NewGeneration(); });
+        nextGenerationButton.onClick.AddListener(() => { Debug.Log("NEW GENERATION"); NewGeneration(); });
         resetButton.onClick.AddListener(() => { InitialisePopulation(); });
 
         automaticModeSwitch.onValueChanged.AddListener((newValue) => {
@@ -250,10 +249,13 @@ public class GameCreator : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
+            Debug.Log("Clickerd");
             var mousePos = Input.mousePosition;
             var ray = mainCam.ScreenPointToRay(mousePos);
             if (Physics.Raycast(ray, out RaycastHit raycastHit))
             {
+                Debug.Log("Hit");
+
                 var instance = raycastHit.collider.GetComponent<GameInstance>();
                 if (instance != null)
                 {

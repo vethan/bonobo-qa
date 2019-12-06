@@ -238,7 +238,7 @@ MonoBehaviour:
   gamePrefab: {fileID: 325841784141496392, guid: cd5ea04f0110a524e95092b249812e75,
     type: 3}
   mainCam: {fileID: 519420031}
-  interactiveMode: 0
+  interactiveMode: 1
 --- !u!4 &281205464
 Transform:
   m_ObjectHideFlags: 0
@@ -648,7 +648,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 948f4100a11a5c24981795d21301da5c, type: 3}
   m_Name: 
