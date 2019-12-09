@@ -225,25 +225,10 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         float vx = target.velocity.x;
         float vy = target.velocity.y;
 
-        if (vx == 0 && vy == 0)
-        {
-            return Vector2.zero;
-        }
-
-        if (vx == 0)
-        {
-            return new Vector2(0, vy*relativeTime +(0.2f*g*relativeTime*relativeTime));
-        }
         float xDisplacement = relativeTime * vx;
+        float yDisplacement = vy * relativeTime + .5f * g * relativeTime * relativeTime;
 
-        if (vy == 0)
-        {
-            return new Vector2(xDisplacement,0);
-        }
-        float a = g / (2 * vx * vx);
-        float b = (vy / vx) ;
-
-        return new Vector2(xDisplacement, (a * xDisplacement * xDisplacement) + b * xDisplacement);
+        return new Vector2(xDisplacement, yDisplacement);
     }
 
     float CalulateRetreatSpaceUtility()
