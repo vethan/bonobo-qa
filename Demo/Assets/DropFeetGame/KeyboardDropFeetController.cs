@@ -36,16 +36,10 @@ public class KeyboardDropFeetController : AbstractDropFeetController
     {
         if(shouldUpdate)
         {
-            if(Input.GetKeyDown(dropButton))
-            {
-                Debug.Log(Time.time + "::Jump Pressed");
-            }
+
             shouldDrop = Input.GetKeyDown(dropButton);
             
-            if (Input.GetKeyDown(feetButton))
-            {
-                Debug.Log(Time.time + "::Kick Pressed");
-            }
+
             shouldFeed = Input.GetKeyDown(feetButton);
             shouldUpdate = false;
         }

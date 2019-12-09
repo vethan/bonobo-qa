@@ -15,7 +15,7 @@ public class PlayerCharacter : MonoBehaviour
     public GameObject standSprites;
     public GameObject diveSprites;
     public GameObject jumpSprites;
-
+    public Transform flipper;
     public readonly static Vector2 gravity = new Vector2(0, 40);
 
     AbstractDropFeetController controller;
@@ -83,7 +83,7 @@ public class PlayerCharacter : MonoBehaviour
 
     public Vector2 GetAttackVector()
     {
-        return new Vector2(15 * transform.localScale.x, -15);
+        return new Vector2(15 * flipper.localScale.x, -15);
     }
 
     void HandleInput()
@@ -93,7 +93,9 @@ public class PlayerCharacter : MonoBehaviour
         {
             attemptedEarlyDive = false;
             float xScale = transform.localPosition.x - opponent.transform.localPosition.x > 0 ? -1 : 1;
-            transform.localScale = new Vector3(xScale, 1, 1);
+            flipper.localScale = new Vector3(xScale, 1, 1);
+
+
             if (controller.DropButtonDown() && lastInAir > LAND_DELAY)
             {
                 velocity = new Vector2(0, 22);
@@ -101,7 +103,7 @@ public class PlayerCharacter : MonoBehaviour
             }
             if (controller.FeetButtonDown() && lastInAir > LAND_DELAY)
             {
-                velocity = new Vector2(3.5f * -transform.localScale.x, 13);
+                velocity = new Vector2(3.5f * -flipper.localScale.x, 13);
                 attackDelay = HOP_DELAY;
             }
         }

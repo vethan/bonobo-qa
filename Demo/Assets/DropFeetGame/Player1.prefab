@@ -76,9 +76,7 @@ Transform:
   m_LocalPosition: {x: -5, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 108252343268779179}
-  - {fileID: 108252343228297095}
-  - {fileID: 108252342661122797}
+  - {fileID: 272192644964437233}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -97,6 +95,8 @@ MonoBehaviour:
   standSprites: {fileID: 108252343268779176}
   diveSprites: {fileID: 108252343228297092}
   jumpSprites: {fileID: 108252342661122792}
+  flipper: {fileID: 272192644964437233}
+  floor: {fileID: 0}
   rigid: {fileID: 0}
   debug: 0
 --- !u!50 &108252342249815839
@@ -150,7 +150,7 @@ Transform:
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children:
   - {fileID: 108252342183461496}
-  m_Father: {fileID: 108252342249815836}
+  m_Father: {fileID: 272192644964437233}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &108252342661122794
@@ -308,13 +308,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 108252343228297092}
-  m_LocalRotation: {x: 0, y: 0, z: -0.2744628, w: 0.96159774}
-  m_LocalPosition: {x: -0.33, y: 1.2, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0.2744628, w: 0.96159774}
+  m_LocalPosition: {x: -0.32999992, y: 1.2, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children:
   - {fileID: 108252343138609153}
   - {fileID: 108252344223441495}
-  m_Father: {fileID: 108252342249815836}
+  m_Father: {fileID: 272192644964437233}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -31.86}
 --- !u!212 &108252343228297097
@@ -440,7 +440,7 @@ Transform:
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children:
   - {fileID: 108252343449428893}
-  m_Father: {fileID: 108252342249815836}
+  m_Father: {fileID: 272192644964437233}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &108252343268779178
@@ -634,3 +634,36 @@ CircleCollider2D:
   m_Offset: {x: 0.3, y: -0.15}
   serializedVersion: 2
   m_Radius: 0.07
+--- !u!1 &3915768648541153689
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 272192644964437233}
+  m_Layer: 0
+  m_Name: Flipper
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &272192644964437233
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3915768648541153689}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 108252343268779179}
+  - {fileID: 108252343228297095}
+  - {fileID: 108252342661122797}
+  m_Father: {fileID: 108252342249815836}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

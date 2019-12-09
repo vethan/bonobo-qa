@@ -144,13 +144,14 @@ public class DropFeetGameInstance : AbstractGameInstance
         {
             fit = -10;
         }
-        if(evolvedPlayer.everFeet)
+
+        if((evolvedPlayer.everFeet && !evolvedPlayer.everDrop) || (!evolvedPlayer.everFeet && evolvedPlayer.everDrop))
         {
             fit = 5;
         }
         else if (evolvedPlayer.everDrop && evolvedPlayer.everFeet)
         {
-            fit = 10;
+            fit = 20;
         }
         
         return (2 * leftScore) - rightScore + fit;

@@ -31,88 +31,27 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
 
     bool PredictOpponentPositionWhenAttacking(out Vector2 hitPoint)
     {
-        if (opponent.dropping)
+
+        float opponentRelativeDistance = transform.InverseTransformPoint(opponent.rigid.position).x;
+        float t = opponentRelativeDistance / (self.GetAttackVector().x - opponent.velocity.x);
+        hitPoint = self.GetLocalPhysicsPosition() + t * self.GetAttackVector();
+        
+        if (opponent.isOnFloor)
         {
-            float myC = 0;
-            float myM = 0;
-            if(self.GetAttackVector().x < 0)
-            {
-                myC = self.GetLocalPhysicsPosition().y - self.GetLocalPhysicsPosition().x;
-                myM = 1;
-            }
-            else
-            {
-                myC = self.GetLocalPhysicsPosition().y + self.GetLocalPhysicsPosition().x;
-                myM = -1;
-            }
-
-            float oppC = 0;
-            float oppM = 0;
-            if (opponent.GetAttackVector().x < 0)
-            {
-                oppC = opponent.GetLocalPhysicsPosition().y - opponent.GetLocalPhysicsPosition().x;
-                oppM = 1;
-            }
-            else
-            {
-                oppC = opponent.GetLocalPhysicsPosition().y + opponent.GetLocalPhysicsPosition().x;
-                oppM = -1;
-            }
-
-            float diff = oppM - myM;
-            float cDiff = myC - oppC;
-            if(diff == 0)
-            {
-                hitPoint = Vector2.zero;
-                return false;
-            }
-            float x = cDiff / diff;
-            hitPoint = new Vector2(x, myM * x + myC);
-            return false;// IsLocalXInFront(hitPoint.x);
+            bool hitPointValid = hitPoint.y > self.floorHeight
+                && hitPoint.y  > opponent.GetLocalPhysicsPosition().y + 0.3f * characterHeight
+                && hitPoint.y < opponent.GetLocalPhysicsPosition().y + characterHeight * .8f;
+            return (hitPointValid && t > 0 && t < 0.2f);
         }
-        else if(!opponent.isOnFloor)
+        else
         {
-            float initialXDiff = opponent.GetLocalPhysicsPosition().x - self.GetLocalPhysicsPosition().x;
-            float initialYDiff = opponent.GetLocalPhysicsPosition().y - self.GetLocalPhysicsPosition().y;
-            float themVelY = opponent.velocity.y;
-            float yVelDiff = opponent.velocity.y - self.GetAttackVector().y;
-            float xVelDiff = opponent.velocity.x - self.GetAttackVector().x;
-            float insideRoot = Mathf.Pow(yVelDiff, 2) /
-                (0.25f * Mathf.Pow(PlayerCharacter.gravity.y, 2) * Mathf.Pow(themVelY, 2)) - 4 / (0.5f * PlayerCharacter.gravity.y * themVelY);
-            if(insideRoot <0)
-            {
-                Debug.Log("Nodice");
-                hitPoint = Vector2.zero;
-                return false;
-            }
-            float one = yVelDiff / (0.5f * PlayerCharacter.gravity.y * themVelY) + 0.5f * Mathf.Sqrt(insideRoot);
-            float two = yVelDiff / (0.5f * PlayerCharacter.gravity.y * themVelY) - 0.5f * Mathf.Sqrt(insideRoot);
-            
-            if(Mathf.Abs(initialXDiff /xVelDiff - one) < float.Epsilon)
-            {
-                Debug.Log("zoba");
-                hitPoint = new Vector2(0, one);
-                return true;
-            }
-            else if (Mathf.Abs(initialXDiff / xVelDiff - two) < float.Epsilon)
-            {
-                Debug.Log("ASdf");
-                hitPoint = new Vector2(0, two);
-                return true;
-            } else
-            {
-                Debug.Log("One: " + one + ":: two:" + two + ":: "+ initialXDiff / xVelDiff);
-            }
-
-            hitPoint = Vector2.zero;
-
-            return false;
+            Vector2 opponentHit = CalculateRelativeJumpCurvePoint(opponent, t);
+            opponentHit = transform.parent.InverseTransformPoint(opponent.transform.TransformPoint(opponentHit));
+            return opponentHit.y > self.floorHeight- 0.7f 
+                && hitPoint.y > self.floorHeight  -0.7f
+                && hitPoint.y > opponentHit.y + 0.2f * characterHeight
+                && hitPoint.y <opponentHit.y + characterHeight* .8f;
         }
-        hitPoint = Vector2.zero;
-
-        return false;
-
-        //opponent.velocity; PlayerCharacter.gravity; self.GetAttackVector();
     }
 
     float DiveKickUtility()
@@ -121,7 +60,7 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
             return 0;
 
 
-        return DirectAttackUtility();
+        return PredictOpponentPositionWhenAttacking(out Vector2 hitPoint) ? 1 : 0;// DirectAttackUtility();
     }
 
     float NormalisedMyVerticalDistance(float max)
@@ -132,60 +71,6 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
     float NormalisedOpponentVerticalDistance(float max)
     {
         return Mathf.Clamp01((opponent.GetLocalPhysicsPosition().y - opponent.floorHeight) / max);
-    }
-
-
-    float CalculateAttackHitPointUtility(Vector2 worldHitPoint)
-    {
-        float heightModifier = 1;
-        float startModifier = 0;
-        Vector2 hitPoint = (Vector2)transform.parent.InverseTransformPoint(worldHitPoint);
-        DodgeArea areaCovered = opponent.isOnFloor || opponent.velocity.y > 0 ? DodgeArea.Upper : DodgeArea.Lower;
-        switch (areaCovered)
-        {
-            case DodgeArea.Upper:
-                heightModifier = 0.6f;
-                startModifier = characterHeight * 0.5f;
-                break;
-            case DodgeArea.Lower:
-                heightModifier = 0.6f;
-                startModifier = characterHeight * .2f;
-                break;
-        }
-        if (hitPoint.y > opponent.GetLocalPhysicsPosition().y + startModifier && hitPoint.y < opponent.GetLocalPhysicsPosition().y + startModifier + (characterHeight * heightModifier))
-        {
-            return 1;
-        }
-
-        return 0.25f;
-    }
-
-    float LikelyhoodOfAttackLanding()
-    {
-        return (1 - (NormalisedOpponentHorizontalDistance(5) * 0.4f)) *  (.5f+(NormalisedOpponentVerticalDistance(2)*.5f));
-    }
-
-    float DirectAttackUtility()
-    {
-        if (!MyAttackWillHit(out RaycastHit2D raycastHit2))
-        {
-            if (DebugMode)
-            {
-                Debug.Log("GonnaMiss");
-            }
-            return 0;
-        }
-        else
-        {
-            //float utility = CalculateAttackHitPointUtility(raycastHit2.point);
-            float utility = LikelyhoodOfAttackLanding() * CalculateAttackHitPointUtility(raycastHit2.point) ;
-            if(DebugMode)
-            {
-                Debug.Log("LikelyhoodOfAttack Utility: " + LikelyhoodOfAttackLanding() + "::utility: " + utility);
-            }
-            return utility;
-        }
-
     }
 
     float NormalisedOpponentHorizontalDistance(float max)
@@ -266,17 +151,31 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         return 0.25f;
     }
 
+
     private void OnDrawGizmos()
     {
         if (opponent == null)
             return;
 
-        if(PredictOpponentPositionWhenAttacking(out Vector2 hitPoint))
+
+        Gizmos.DrawLine(transform.position, transform.position + (transform.parent.TransformVector(self.GetAttackVector()) * .02f* transform.lossyScale.x));
+
+
+
+        if (opponent.isOnFloor)
+            return;
+        Vector2 prevPoint = opponent.transform.TransformPoint(CalculateRelativeJumpCurvePoint(opponent, ((0 - 5) * 0.05f)) + Vector2.up * characterHeight * 0.5f);
+        for (int i = 1; i<11;i++)
         {
-            hitPoint = transform.parent.TransformPoint(hitPoint);
-            //Vector2 attackPoint = CalculateWhereOpponentKickHitsFloor();
-            Gizmos.DrawSphere(hitPoint, 1);
+            Vector2 currPoint = opponent.transform.TransformPoint(CalculateRelativeJumpCurvePoint(opponent, ((i - 5) * 0.05f)) + Vector2.up * characterHeight * 0.5f);
+            Gizmos.DrawLine(prevPoint, currPoint);
+            prevPoint = currPoint;
         }
+        float opponentRelativeDistance = transform.InverseTransformPoint(opponent.rigid.position).x;
+
+        float intersectT = opponentRelativeDistance / (self.GetAttackVector().x - opponent.velocity.x); ;
+        Gizmos.DrawSphere(transform.parent.TransformPoint(self.GetLocalPhysicsPosition() + intersectT * self.GetAttackVector()),1);
+
         
     }
 
@@ -301,9 +200,9 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         if (!self.isOnFloor)
             return 0;
 
-        return ((IsOpponentAttackPositionInFront() ? 1:0) + CalculateJumpDodgeUtility(DodgeArea.Lower)) /2;
+        return ((IsOpponentAttackPositionInFront() ? 1:0) + 2*CalculateJumpDodgeUtility(DodgeArea.Lower)) /3;
 
-        //return 0;
+        return 1;
     }
 
     float CalculateNormalisedBackDistanceToEdge()
@@ -318,6 +217,33 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
 
 
         return 1- position ;
+    }
+
+    Vector2 CalculateRelativeJumpCurvePoint(PlayerCharacter target, float relativeTime)
+    {       
+        float g = target.dropping? 0: -PlayerCharacter.gravity.y;
+        float vx = target.velocity.x;
+        float vy = target.velocity.y;
+
+        if (vx == 0 && vy == 0)
+        {
+            return Vector2.zero;
+        }
+
+        if (vx == 0)
+        {
+            return new Vector2(0, vy*relativeTime +(0.2f*g*relativeTime*relativeTime));
+        }
+        float xDisplacement = relativeTime * vx;
+
+        if (vy == 0)
+        {
+            return new Vector2(xDisplacement,0);
+        }
+        float a = g / (2 * vx * vx);
+        float b = (vy / vx) ;
+
+        return new Vector2(xDisplacement, (a * xDisplacement * xDisplacement) + b * xDisplacement);
     }
 
     float CalulateRetreatSpaceUtility()
@@ -337,7 +263,7 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
     // Update is called once per frame
     public override void UpdateButtons()
     {
-        Time.timeScale = 0.3f;
+
         List<UtilityOption> options = new List<UtilityOption>();
         options.Add(new UtilityOption() { actionType = Action.DiveKick, value = DiveKickUtility() });
         options.Add(new UtilityOption() { actionType = Action.Jump, value = JumpUtility() });
