@@ -85,6 +85,7 @@ public class GameCreator : MonoBehaviour
         _eaParams = new NeatEvolutionAlgorithmParameters();
 
         _eaParamsSimplifying = _eaParams.CreateSimplifyingParameters();
+        
         _eaParamsComplexifying = _eaParams;
 
         _stats = new NeatAlgorithmStats(_eaParams);
