@@ -594,6 +594,32 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1752413814}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1739106534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1739106533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fbcedf3950350b4db3ab16bfb39a1fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  feetButton: 113
+  dropButton: 119
+--- !u!114 &1739106535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1739106533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0df94eb22ee98444a4ac1927dda5f7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1739106536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -619,6 +645,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DropFeetGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 8931451557343234648, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8931451556186507420, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
         type: 3}
@@ -689,11 +720,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Enabled
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8931451557343234648, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9008065192087226661, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
         type: 3}

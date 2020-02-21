@@ -28,11 +28,11 @@ public class PlayerCharacter : MonoBehaviour
     public Rigidbody2D rigid;
     float lastInAir;
     public bool debug = false;
-    const float JUMP_DELAY = 0.1f;
-    const float HOP_DELAY = 0.2f;
+    const float JUMP_DELAY = 0.05f;
+    const float HOP_DELAY = 0.05f;
 
-    const float LAND_DELAY = 0.1f;
-    float attackDelay = 0.2f;
+    const float LAND_DELAY = 0.05f;
+    float attackDelay = 0.1f;
     bool attemptedEarlyDive=  false;
     Collider2D[] colliders;
 
@@ -51,11 +51,17 @@ public class PlayerCharacter : MonoBehaviour
 
     void Awake()
     {
-        colliders = GetComponentsInChildren<Collider2D>(true); 
-        controller = GetComponent<AbstractDropFeetController>();
-        if(controller == null)
+        colliders = GetComponentsInChildren<Collider2D>(true);
+
+        controller = GetComponent<MultiDropFeetController>();
+
+        if (controller == null)
         {
-            controller = gameObject.AddComponent<DoNothingDropFeetController>();
+            controller = GetComponent<AbstractDropFeetController>();
+            if (controller == null)
+            {
+                controller = gameObject.AddComponent<DoNothingDropFeetController>();
+            }
         }
         gameInstance = GetComponentInParent<DropFeetGameInstance>();
         floor = gameInstance.floor;

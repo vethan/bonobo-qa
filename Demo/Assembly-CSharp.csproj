@@ -71,6 +71,7 @@
     <Compile Include="Assets\DropFeetGame\DropFeetGameInstance.cs" />
     <Compile Include="Assets\DropFeetGame\EvolvedDropFeetController.cs" />
     <Compile Include="Assets\DropFeetGame\KeyboardDropFeetController.cs" />
+    <Compile Include="Assets\DropFeetGame\MultiDropFeetController.cs" />
     <Compile Include="Assets\DropFeetGame\PlayerCharacter.cs" />
     <Compile Include="Assets\DropFeetGame\UtilityDropFeetController.cs" />
     <Compile Include="Assets\GameCreator.cs" />
