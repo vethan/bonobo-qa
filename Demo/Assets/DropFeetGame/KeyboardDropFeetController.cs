@@ -6,24 +6,15 @@ public class KeyboardDropFeetController : AbstractDropFeetController
 {
     public KeyCode feetButton;
     public KeyCode dropButton;
-    bool shouldDrop;
-    bool shouldFeed;
 
-    bool shouldUpdate = false;
     public override bool DropButtonDown()
     {
-        bool temp = shouldDrop;
-        shouldDrop = false;
-        return temp;
+        return Input.GetKeyDown(dropButton); ;
     }
 
     public override bool FeetButtonDown()
-    {
-        
-        bool temp = shouldFeed;
-        shouldFeed = false;
-
-        return temp;
+    {        
+        return Input.GetKeyDown(feetButton); ;
 
     }
 
@@ -34,22 +25,6 @@ public class KeyboardDropFeetController : AbstractDropFeetController
 
     public override void UpdateButtons()
     {
-        if(shouldUpdate)
-        {
-
-            shouldDrop = Input.GetKeyDown(dropButton);
-            
-
-            shouldFeed = Input.GetKeyDown(feetButton);
-            shouldUpdate = false;
-        }
-    }
-
-    
-
-    private void Update()
-    {
-        shouldUpdate = true;
-
+       
     }
 }

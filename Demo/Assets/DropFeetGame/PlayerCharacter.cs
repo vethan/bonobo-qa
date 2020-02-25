@@ -94,7 +94,6 @@ public class PlayerCharacter : MonoBehaviour
 
     void HandleInput()
     {
-        controller.UpdateButtons();
         if (isOnFloor)
         {
             attemptedEarlyDive = false;
@@ -102,12 +101,12 @@ public class PlayerCharacter : MonoBehaviour
             flipper.localScale = new Vector3(xScale, 1, 1);
 
 
-            if (controller.DropButtonDown() && lastInAir > LAND_DELAY)
+            if (dropButtonPressed && lastInAir > LAND_DELAY)
             {
                 velocity = new Vector2(0, 22);
                 attackDelay = JUMP_DELAY;
             }
-            if (controller.FeetButtonDown() && lastInAir > LAND_DELAY)
+            else if (feetButtonPressed && lastInAir > LAND_DELAY)
             {
                 velocity = new Vector2(3.5f * -flipper.localScale.x, 13);
                 attackDelay = HOP_DELAY;
@@ -118,19 +117,20 @@ public class PlayerCharacter : MonoBehaviour
             if (!dropping)
             {
 
-                if (lastOnFloor > attackDelay && (controller.FeetButtonDown() || attemptedEarlyDive))
+                if (lastOnFloor > attackDelay && (feetButtonPressed || attemptedEarlyDive))
                 {
                     attemptedEarlyDive = false;
                     velocity = GetAttackVector();
                     dropping = true;
                 }
-                else if(lastOnFloor < attackDelay && controller.FeetButtonDown() && controller.HoldDelayedKick())
+                else if(lastOnFloor < attackDelay && feetButtonPressed && controller.HoldDelayedKick())
                 {
                     attemptedEarlyDive = true;
                 }
             }
         }
-        
+        dropButtonPressed = false;
+        feetButtonPressed = false;
     }
 
     private void FixedUpdate()
@@ -142,7 +142,7 @@ public class PlayerCharacter : MonoBehaviour
             Debug.Log(Time.fixedDeltaTime);
            // Debug.Log("isOnFloor:" + isOnFloor + "::dropping" + dropping + "::yVel" + velocity.y);
         }
-        HandleInput();
+        
 
         if (isOnFloor)
         {
@@ -168,7 +168,6 @@ public class PlayerCharacter : MonoBehaviour
                 velocity = GetAttackVector();
             }
         }
-
         transform.localPosition += (Vector3)velocity*Time.fixedDeltaTime;
         transform.localPosition = new Vector3(Mathf.Clamp(transform.localPosition.x,-xLimit,xLimit),transform.localPosition.y,transform.localPosition.z);
 
@@ -218,14 +217,16 @@ public class PlayerCharacter : MonoBehaviour
         velocity = Vector2.zero;
 
     }
-
+    bool dropButtonPressed;
+    bool feetButtonPressed;
     // Update is called once per frame
     void Update()
     {
         if (debug)
             Debug.Log("Update Occurred");
-
-
-
+        controller.UpdateButtons();
+        dropButtonPressed = controller.DropButtonDown();
+        feetButtonPressed = controller.FeetButtonDown();
+        HandleInput();
     }
 }
