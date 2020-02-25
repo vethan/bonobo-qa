@@ -15,6 +15,7 @@ public class DropFeetGameInstance : AbstractGameInstance
 
     int leftScore;
     int rightScore;
+    
     Coroutine killCoroutine = null;
 
     void UpdateScoreImages()
@@ -26,6 +27,7 @@ public class DropFeetGameInstance : AbstractGameInstance
         val = rightScoreSprite.transform.localScale;
         val.x = 0.5f * Mathf.Clamp(rightScore, 0, 20);
         rightScoreSprite.transform.localScale = val;
+        interesting = leftScore > rightScore;
     }
 
     // Start is called before the first frame update
@@ -150,7 +152,7 @@ public class DropFeetGameInstance : AbstractGameInstance
         }
         else if (evolvedPlayer.everDrop && evolvedPlayer.everFeet)
         {
-            fit = 20;
+            fit = 30;
         }
         
         return (2 * leftScore) - rightScore + fit;

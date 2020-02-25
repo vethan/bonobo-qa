@@ -28,10 +28,10 @@ public class PlayerCharacter : MonoBehaviour
     public Rigidbody2D rigid;
     float lastInAir;
     public bool debug = false;
-    const float JUMP_DELAY = 0.05f;
-    const float HOP_DELAY = 0.05f;
+    const float JUMP_DELAY = 0.1f;
+    const float HOP_DELAY = 0.1f;
 
-    const float LAND_DELAY = 0.05f;
+    const float LAND_DELAY = 0.1f;
     float attackDelay = 0.1f;
     bool attemptedEarlyDive=  false;
     Collider2D[] colliders;
@@ -94,6 +94,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void HandleInput()
     {
+        controller.UpdateButtons();
         if (isOnFloor)
         {
             attemptedEarlyDive = false;
@@ -101,12 +102,12 @@ public class PlayerCharacter : MonoBehaviour
             flipper.localScale = new Vector3(xScale, 1, 1);
 
 
-            if (dropButtonPressed && lastInAir > LAND_DELAY)
+            if (controller.DropButtonDown() && lastInAir > LAND_DELAY)
             {
                 velocity = new Vector2(0, 22);
                 attackDelay = JUMP_DELAY;
             }
-            else if (feetButtonPressed && lastInAir > LAND_DELAY)
+            else if (controller.FeetButtonDown() && lastInAir > LAND_DELAY)
             {
                 velocity = new Vector2(3.5f * -flipper.localScale.x, 13);
                 attackDelay = HOP_DELAY;
@@ -117,20 +118,18 @@ public class PlayerCharacter : MonoBehaviour
             if (!dropping)
             {
 
-                if (lastOnFloor > attackDelay && (feetButtonPressed || attemptedEarlyDive))
+                if (lastOnFloor > attackDelay && (controller.FeetButtonDown() || attemptedEarlyDive))
                 {
                     attemptedEarlyDive = false;
                     velocity = GetAttackVector();
                     dropping = true;
                 }
-                else if(lastOnFloor < attackDelay && feetButtonPressed && controller.HoldDelayedKick())
+                else if(lastOnFloor < attackDelay && controller.FeetButtonDown() && controller.HoldDelayedKick())
                 {
                     attemptedEarlyDive = true;
                 }
             }
         }
-        dropButtonPressed = false;
-        feetButtonPressed = false;
     }
 
     private void FixedUpdate()
@@ -142,7 +141,10 @@ public class PlayerCharacter : MonoBehaviour
             Debug.Log(Time.fixedDeltaTime);
            // Debug.Log("isOnFloor:" + isOnFloor + "::dropping" + dropping + "::yVel" + velocity.y);
         }
-        
+        if (controller.FixedUpdateController())
+        {
+            HandleInput();
+        }
 
         if (isOnFloor)
         {
@@ -217,16 +219,15 @@ public class PlayerCharacter : MonoBehaviour
         velocity = Vector2.zero;
 
     }
-    bool dropButtonPressed;
-    bool feetButtonPressed;
+
     // Update is called once per frame
     void Update()
     {
         if (debug)
             Debug.Log("Update Occurred");
-        controller.UpdateButtons();
-        dropButtonPressed = controller.DropButtonDown();
-        feetButtonPressed = controller.FeetButtonDown();
-        HandleInput();
+        if (!controller.FixedUpdateController())
+        {
+            HandleInput();
+        }
     }
 }

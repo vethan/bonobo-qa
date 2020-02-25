@@ -14,6 +14,7 @@ public abstract class AbstractGameInstance : MonoBehaviour
     protected Transform labelRoot;
 
     public bool selected { get; protected set; }
+    public bool interesting { get; protected set; }
     public bool filtered;
     public float horizBorder = 0;
     public float vertBorder = 0;

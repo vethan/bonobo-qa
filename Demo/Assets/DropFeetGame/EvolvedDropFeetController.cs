@@ -60,7 +60,10 @@ public class EvolvedDropFeetController : AbstractDropFeetController
         }
     }
 
-
+    public override bool FixedUpdateController()
+    {
+        return true;
+    }
     public void SetBrain(IBlackBox newBrain)
     {
         brain = newBrain;

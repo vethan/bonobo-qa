@@ -15,8 +15,11 @@ public class AuthoredAIDropFeetController : AbstractDropFeetController
     protected int meOnlyLayerMask;
     protected int opponentOnlyLayerMask;
 
-    
 
+    public override bool FixedUpdateController()
+    {
+        return true;
+    }
     public override bool DropButtonDown()
     {
         return shouldDrop;

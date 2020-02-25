@@ -51,6 +51,8 @@ public class GameCreator : MonoBehaviour
 
 
     public Toggle highSpeedMode;
+    public Toggle pauseEvolution;
+
     public GameObject automaticPanel;
     public GameObject interactivePanel;
 
@@ -354,7 +356,14 @@ public class GameCreator : MonoBehaviour
     void HandleAutomaticUpdate()
     {
         Time.timeScale = highSpeedMode.isOn ? 3 : 1;
-        if (paused)
+        foreach(var game in games)
+        {
+            if(game.interesting != game.selected)
+            {
+                game.ToggleSelect();
+            }
+        }
+        if (paused || pauseEvolution.isOn)
         {
             return;
         }

@@ -11,5 +11,10 @@ public abstract class AbstractDropFeetController : MonoBehaviour
     {
         return false;
     }
+
+    public virtual bool FixedUpdateController()
+    {
+        return false;
+    }
     public abstract void UpdateButtons();
 }
