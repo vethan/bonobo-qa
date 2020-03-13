@@ -13,8 +13,8 @@ public class DropFeetGameInstance : AbstractGameInstance
     public override int InputCount { get { return 10; } }
     public override int OutputCount { get { return 2; } }
 
-    int leftScore;
-    int rightScore;
+    public int leftScore { get; private set; }
+    public int rightScore { get; private set; }
     
     Coroutine killCoroutine = null;
 
