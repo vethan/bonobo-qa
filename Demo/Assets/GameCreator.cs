@@ -71,6 +71,8 @@ public class GameCreator : MonoBehaviour
     float textChangeTimer = 0;
     uint generation = 0;
 
+    public UnityEngine.Events.UnityEvent OnNewGeneration = new UnityEngine.Events.UnityEvent();
+
     string[] proTips = { "The background graphs show the neural networks used by the agents",
         "Left click on a game to zoom in and view details about the neural network",
         "The left player is controlled by a neural net, the right player is a human authored agent"};
@@ -244,11 +246,13 @@ public class GameCreator : MonoBehaviour
         for (int i = 0; i < gamesToCreate; i++)
         {
             SetupGame(i);
-        }        
+        }
+        OnNewGeneration.Invoke();
     }
 
     public void NewGeneration()
     {
+        
         generationTimer = 0;
         paused = false;
         List<NeatGenome> selected = new List<NeatGenome>();
@@ -282,6 +286,7 @@ public class GameCreator : MonoBehaviour
         {
             SetupGame(i);
         }
+
     }
 
     private void SetupGame(int i)
@@ -457,7 +462,7 @@ public class GameCreator : MonoBehaviour
         {
             SetupGame(i);
         }
-
+        OnNewGeneration.Invoke();
         generation++;
         generationTimer = 0;
     }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DropFeetGameInstance : AbstractGameInstance
 {
+    public System.Action OnNewRound = () => { };
     public Transform leftScoreSprite;
     public Transform rightScoreSprite;
     public PlayerCharacter leftPlayer;
@@ -33,6 +34,7 @@ public class DropFeetGameInstance : AbstractGameInstance
     // Start is called before the first frame update
     override protected void Awake()
     {
+        Application.targetFrameRate = 60;
         base.Awake();
         evolvedPlayer = GetComponentInChildren<EvolvedDropFeetController>();
         leftPlayer.OnKill += HandleOnKill;
@@ -41,10 +43,11 @@ public class DropFeetGameInstance : AbstractGameInstance
 
 
     void ResetPositions()
-    {
+    {        
         leftPlayer.SnapToFloorPosition(-4);
         rightPlayer.SnapToFloorPosition(4);
         isPausedForKill = false;
+        OnNewRound();
     }
     public bool isPausedForKill  { get; private set;}
     

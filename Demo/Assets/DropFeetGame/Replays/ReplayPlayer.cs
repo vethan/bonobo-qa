@@ -14,83 +14,85 @@ public class ReplayPlayer : AbstractGameInstance
     public ReplayCharacter leftPlayer;
     public ReplayCharacter rightPlayer;
 
+    public Replay.SerializationStyle serializationStyle = Replay.SerializationStyle.ProtoBufNet;
     public string replayFilePath;
     Replay replay;
     float timer;
 
     public override int InputCount { get { return 10; } }
     public override int OutputCount { get { return 2; } }
+    public bool autoLoad = false;
 
     // Start is called before the first frame update
     override protected void Awake()
     {
-        LoadReplay(replayFilePath);
+        base.Awake();
+        if (autoLoad)
+            LoadReplay(replayFilePath, serializationStyle);        
     }
 
-    public void LoadReplay(string filePath)
+    
+
+    public void LoadReplay(string filePath, Replay.SerializationStyle serializationStyle)
     {
-        var file = File.Open(filePath, FileMode.Open);
-        BinaryFormatter formatter = new BinaryFormatter();
-        SurrogateSelector surrogateSelector = new SurrogateSelector();
-        Vector3SerializationSurrogate vector3SS = new Vector3SerializationSurrogate();
-
-        surrogateSelector.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All), vector3SS);
-        formatter.SurrogateSelector = surrogateSelector;
-        
-        try
-        {
-            replay = formatter.Deserialize(file) as Replay;
-            timer = 0;
-        }
-        catch (SerializationException e)
-        {
-            Debug.Log("Failed to deserialize. Reason: " + e.Message);
-            throw;
-        }
-        finally
-        {
-            file.Close();
-        }
+        LoadReplay(Replay.ImportFromFile(filePath, serializationStyle));
     }
 
-    void SetPlayer(ReplayCharacter character, ReplayPlayerInfo info)
+    public void LoadReplay(Replay r)
     {
-        character.dropping = info.dropping;
-        character.isOnFloor = info.onFloor;
-        character.transform.localPosition = info.position;
+        replay = r.Clone();
+        timer = 0;
     }
 
+    void SetPlayer(ReplayCharacter character, ReplayPlayerInfo previousInfo ,ReplayPlayerInfo info, float t)
+    {
+        character.dropping = previousInfo.dropping;
+        character.isOnFloor = previousInfo.onFloor;
+        character.transform.localPosition = Vector3.Lerp(previousInfo.position, info.position,t);
+    }
+    ReplayEntry previousEntry;
     // Update is called once per frame
-    void Update()
+    override protected void Update()
     {
-
-        if(replay != null && replay.entries.Count > 0)
-        {
-            
+        base.Update();
+        if(replay != null && replay.entries.Count > 1)
+        {            
             var entry = replay.entries.Peek();
-            if (timer > entry.time)
+            while (replay.entries.Count > 1 && timer > entry.time)
             {
                 //Debug.Log("Trying");
                 replay.entries.Dequeue();
                 //Update Score
                 Vector3 val = leftScoreSprite.transform.localScale;
-                val.x = 0.25f * Mathf.Clamp(entry.leftScore, 0, 20);
+                val.x = 0.25f * Mathf.Clamp(entry.leftScore - replay.leftStartScore, 0, 20);
                 leftScoreSprite.transform.localScale = val;
 
                 val = rightScoreSprite.transform.localScale;
-                val.x = 0.5f * Mathf.Clamp(entry.rightScore, 0, 20);
+                val.x = 0.5f * Mathf.Clamp(entry.rightScore - replay.rightStartScore, 0, 20);
                 rightScoreSprite.transform.localScale = val;
-                interesting = entry.leftScore > entry.rightScore;
+                interesting = entry.leftScore - replay.leftStartScore > entry.rightScore - replay.rightStartScore;
 
-                SetPlayer(leftPlayer, entry.leftPlayerData);
-                SetPlayer(rightPlayer, entry.rightPlayerData);
 
-                
+                previousEntry = entry;
+                entry = replay.entries.Peek();
             }
+
+            float t = timer - previousEntry.time / (entry.time - previousEntry.time);
+
+            if(float.IsNaN(t) || float.IsInfinity(t))
+            {
+                t = 0;
+            }
+            SetPlayer(leftPlayer, previousEntry.leftPlayerData, entry.leftPlayerData,t);
+            SetPlayer(rightPlayer, previousEntry.rightPlayerData, entry.rightPlayerData,t);
         }
         timer += Time.deltaTime;
     }
 
+    internal override void SetGraph(Graph graph)
+    {
+        
+    }
     protected override string GetInputLabel(int index)
     {
         switch (index)

@@ -29,6 +29,8 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         return Mathf.Sign(self.GetLocalPhysicsPosition().x - opponent.GetLocalPhysicsPosition().x) == Mathf.Sign(self.GetLocalPhysicsPosition().x - positionToCheck);
     }
 
+
+
     bool PredictOpponentPositionWhenAttacking(out Vector2 hitPoint)
     {
 
@@ -41,7 +43,7 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
             bool hitPointValid = hitPoint.y > self.floorHeight
                 && hitPoint.y  > opponent.GetLocalPhysicsPosition().y + 0.3f * characterHeight
                 && hitPoint.y < opponent.GetLocalPhysicsPosition().y + characterHeight * .8f;
-            return (hitPointValid && t > 0 && t < 0.2f);
+            return (hitPointValid && t > 0 && t < 0.25f);
         }
         else
         {
@@ -54,13 +56,41 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         }
     }
 
+
+    float AdvanceDiveKickUtility()
+    {
+        if(self.isOnFloor || !opponent.dropping)
+            return 0;
+
+        float opponentRelativeDistance = transform.InverseTransformPoint(opponent.rigid.position).x;
+        
+        float myLandTime = (self.floorHeight-self.GetLocalPhysicsPosition().y) / self.GetAttackVector().y;
+        float oppoenentRelativeEndDistance = Mathf.Sign(opponentRelativeDistance) * (Mathf.Abs(opponentRelativeDistance) - Mathf.Abs(opponent.GetAttackVector().x * myLandTime));
+        var myRelativeAttackEndX = myLandTime * self.GetAttackVector().x;
+
+        if (Mathf.Abs(myRelativeAttackEndX - oppoenentRelativeEndDistance) <3.5)
+            return 0;
+
+        float opponentLandTime = opponent.isOnFloor ? 0 : (opponent.GetLocalPhysicsPosition().y - opponent.floorHeight) / opponent.GetAttackVector().y;
+        float timeForCounter = myLandTime - opponentLandTime;
+        var relativeOpponentAttackX = CalculateWhereOpponentKickHitsFloor().x - self.GetLocalPhysicsPosition().x;
+        if (Mathf.Abs(relativeOpponentAttackX) < Mathf.Abs(myRelativeAttackEndX))
+            return 0;
+        
+
+        if (timeForCounter <0.25f)
+            return 1;
+
+        return 0;
+    }
+
     float DiveKickUtility()
     {
         if (self.isOnFloor || self.dropping)
             return 0;
 
 
-        return PredictOpponentPositionWhenAttacking(out Vector2 hitPoint) ? 1 : 0;// DirectAttackUtility();
+        return PredictOpponentPositionWhenAttacking(out Vector2 hitPoint) ? 1 : AdvanceDiveKickUtility();// DirectAttackUtility();
     }
 
     float NormalisedMyVerticalDistance(float max)
@@ -171,7 +201,7 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
             Gizmos.DrawLine(prevPoint, currPoint);
             prevPoint = currPoint;
         }
-        float opponentRelativeDistance = transform.InverseTransformPoint(opponent.rigid.position).x;
+        float opponentRelativeDistance = GetOpponentRelativeDistance();
 
         float intersectT = opponentRelativeDistance / (self.GetAttackVector().x - opponent.velocity.x); ;
         Gizmos.DrawSphere(transform.parent.TransformPoint(self.GetLocalPhysicsPosition() + intersectT * self.GetAttackVector()),1);
@@ -179,20 +209,35 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         
     }
 
+    float GetOpponentRelativeDistance()
+    {
+        return transform.InverseTransformPoint(opponent.rigid.position).x; 
+    }
+
+
     Vector2 CalculateWhereOpponentKickHitsFloor()
     {
 
         var attackVector = opponent.GetAttackVector();
-
         float ratio = attackVector.x / attackVector.y;
-        float difference = opponent.rigid.position.y - opponent.floor.transform.position.y;
+        var opponentPosition = opponent.GetLocalPhysicsPosition();
+        float difference = opponentPosition.y - opponent.floorHeight;
 
 
         float xDistance = ratio * difference;
 
 
-        return new Vector2(opponent.rigid.position.x - xDistance, opponent.floor.transform.position.y);
+        return new Vector2(opponentPosition.x - xDistance, opponent.floorHeight);
 
+    }
+
+    float IsOpponentJumpClose()
+    {
+        if(opponent.velocity.y > 0 && Mathf.Abs(GetOpponentRelativeDistance()) < 3.0f)
+        {
+            return 1;
+        }
+        return 0;
     }
 
     float JumpUtility()
@@ -200,7 +245,7 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         if (!self.isOnFloor)
             return 0;
 
-        return ((IsOpponentAttackPositionInFront() ? 1:0) + 2*CalculateJumpDodgeUtility(DodgeArea.Lower)) /3;
+        return ((IsOpponentAttackPositionInFront() ? 1:0) + 2*CalculateJumpDodgeUtility(DodgeArea.Lower)) /3 + IsOpponentJumpClose();
 
         return 1;
     }

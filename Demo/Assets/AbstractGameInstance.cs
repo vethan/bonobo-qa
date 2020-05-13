@@ -60,8 +60,8 @@ public abstract class AbstractGameInstance : MonoBehaviour
         if (isPlayerControlled)
             return;
         zoomCam.enabled = true;
-        labelRoot.gameObject.SetActive(true);
-
+        if(labelRoot != null)
+            labelRoot.gameObject.SetActive(true);
     }
 
     private void OnMouseUp()
@@ -69,7 +69,8 @@ public abstract class AbstractGameInstance : MonoBehaviour
         if (isPlayerControlled)
             return;
         zoomCam.enabled = false;
-        labelRoot.gameObject.SetActive(false);
+        if (labelRoot != null)
+            labelRoot.gameObject.SetActive(false);
     }
 
     protected abstract string GetOutputLabel(int index);
@@ -77,7 +78,7 @@ public abstract class AbstractGameInstance : MonoBehaviour
     public abstract float CalculateFitness();
     public abstract void FullReset();
     public abstract void SetEvolvedBrain(IBlackBox blackBox);
-    private void Update()
+    protected virtual void Update()
     {
 
         Color wallColor = Color.white;
@@ -97,7 +98,7 @@ public abstract class AbstractGameInstance : MonoBehaviour
         }
     }
 
-    internal void SetGraph(Graph graph)
+    internal virtual void SetGraph(Graph graph)
     {
         if (graphRoot != null)
         {

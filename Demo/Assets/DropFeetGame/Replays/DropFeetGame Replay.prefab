@@ -1,5 +1,23 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1739106535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6695215078766159023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb7a0f77dc74fe943b48f47fcfbe3080, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  standSprites: {fileID: 6695215079961853725}
+  diveSprites: {fileID: 6695215079919236145}
+  jumpSprites: {fileID: 6695215078674714973}
+  flipper: {fileID: 6822317428333156164}
+  isOnFloor: 1
+  dropping: 0
 --- !u!114 &1752413816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28,25 +46,9 @@ MonoBehaviour:
   rightScoreSprite: {fileID: 6695215078237055811}
   leftPlayer: {fileID: 1739106535}
   rightPlayer: {fileID: 784533515}
-  replayFilePath: C:\Users\Nathan John\Documents\Neuroevolution-unity-demo\Demo\replay2020-13-3--17-08-58Session0
---- !u!114 &1739106535
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6695215078766159023}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb7a0f77dc74fe943b48f47fcfbe3080, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  standSprites: {fileID: 6695215079961853725}
-  diveSprites: {fileID: 6695215079919236145}
-  jumpSprites: {fileID: 6695215078674714973}
-  flipper: {fileID: 6822317428333156164}
-  isOnFloor: 1
-  dropping: 0
+  serializationStyle: 1
+  replayFilePath: C:\Users\vetha\Documents\UniDemo\Demo\Builds\ReplayCollectionBuild\Replays\replay2020-15-4--18-19-29Session0
+  autoLoad: 0
 --- !u!114 &784533515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76,6 +78,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DropFeetGame Replay
+      objectReference: {fileID: 0}
+    - target: {fileID: 8931451556186507422, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8931451557343234648, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
         type: 3}
@@ -150,7 +157,7 @@ PrefabInstance:
     - target: {fileID: 8163773440135659929, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9008065192087226661, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
         type: 3}

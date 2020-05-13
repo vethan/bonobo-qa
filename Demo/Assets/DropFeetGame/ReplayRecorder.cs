@@ -13,8 +13,19 @@ public class ReplayRecorder : MonoBehaviour
     public DropFeetGameInstance gameInstance;
 
     Replay currentReplay;
+    public int secondPerSession = 30;
     float timer = 0;
     int sessionNumber = 0;
+    string basePath;
+    DateTime sessionStartTime;
+
+    static float replayTargetFPS = 60;
+    float replayMaxTick = 1.0f / replayTargetFPS;
+    private void Awake()
+    {
+        sessionStartTime = DateTime.Now;
+    }
+
     void OnEnable()
     {
         if(gameInstance == null)
@@ -26,8 +37,19 @@ public class ReplayRecorder : MonoBehaviour
                 return;
             }
             gameInstance = instances[0];
+            gameInstance.OnNewRound += NewRoundHappened;
         }
         InitialiseReplay();
+    }
+
+    private void NewRoundHappened()
+    {
+        if (timer < secondPerSession)
+            return;
+
+
+        WriteReplay();
+        InitialiseReplay(gameInstance.leftScore, gameInstance.rightScore);
     }
 
     private void OnDisable()
@@ -35,42 +57,18 @@ public class ReplayRecorder : MonoBehaviour
         if (gameInstance == null)
             return;
         WriteReplay();
+        InitialiseReplay(gameInstance.leftScore,gameInstance.rightScore);
     }
 
     private void WriteReplay()
     {
-        if(!Directory.Exists(Application.persistentDataPath))
-        {
-            Directory.CreateDirectory(Application.persistentDataPath);
-        }
-
-        String filename = String.Format("replay{0:yyyy-dd-M--HH-mm-ss}Session{1}", DateTime.Now, sessionNumber++);
-        FileStream fileStream = File.Create(filename);
-
-        BinaryFormatter formatter = new BinaryFormatter();
-        SurrogateSelector surrogateSelector = new SurrogateSelector();
-        Vector3SerializationSurrogate vector3SS = new Vector3SerializationSurrogate();
-
-        surrogateSelector.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All), vector3SS);
-        formatter.SurrogateSelector = surrogateSelector;
-        try
-        {
-            formatter.Serialize(fileStream, currentReplay);
-        }
-        catch (SerializationException e)
-        {
-            Console.WriteLine("Failed to serialize. Reason: " + e.Message);
-            throw;
-        }
-        finally
-        {
-            fileStream.Close();
-        }
+        String filename = String.Format("replay{0:yyyy-dd-M--HH-mm-ss}Session{1}", sessionStartTime, sessionNumber++);
+        currentReplay.Save(filename);
     }
 
-    public void InitialiseReplay()
+    public void InitialiseReplay(int leftStartScore = 0, int rightStartScore = 0)
     {
-        currentReplay = new Replay();
+        currentReplay = new Replay(leftStartScore, rightStartScore);
         timer = 0;
     }
 
@@ -89,10 +87,18 @@ public class ReplayRecorder : MonoBehaviour
         };
         currentReplay.entries.Enqueue(replayEntry);
     }
+
+    float framerateTimer;
     // Update is called once per frame
     void Update()
     {
-        CreateEntry();
+        framerateTimer += Time.unscaledDeltaTime;
+        if(framerateTimer > replayMaxTick)
+        {
+            CreateEntry();
+            framerateTimer -= replayMaxTick;
+        }
+        
         timer += Time.unscaledDeltaTime;
         
     }
