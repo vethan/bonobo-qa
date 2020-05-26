@@ -1,4 +1,5 @@
-﻿using SharpNeat.Phenomes;
+﻿using SharpNeat.Genomes.Neat;
+using SharpNeat.Phenomes;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -8,6 +9,7 @@ public abstract class AbstractGameInstance : MonoBehaviour
 {
     public SpriteRenderer[] walls;
     public Camera zoomCam;
+    public Camera displayCam;
     public Material graphMaterial;
     public Material graphNodeMaterial;
     protected Transform graphRoot;
@@ -27,6 +29,7 @@ public abstract class AbstractGameInstance : MonoBehaviour
     virtual protected void Awake()
     {
         zoomCam.enabled = false;
+        displayCam.enabled = false;
         foreach (var wall in walls)
         {
             if (Mathf.Abs(wall.transform.localPosition.x) > horizBorder)
@@ -39,15 +42,32 @@ public abstract class AbstractGameInstance : MonoBehaviour
         }
     }
 
-    protected virtual void Start()
+    private void OnDrawGizmos()
+    {
+        if (displayCam == null || !displayCam.enabled)
+            return;
+
+        Gizmos.DrawIcon(transform.position, "watch.png",false);
+
+
+
+    }
+
+    public void AlignCameras()
     {
         var trueVert = transform.TransformVector(horizBorder, vertBorder, 1).y;
-        zoomCam = GetComponentInChildren<Camera>();
         zoomCam.orthographicSize = 2 * trueVert * 0.55f;
-        
         zoomCam.depth = 2;
         zoomCam.eventMask = ~zoomCam.cullingMask;
 
+        displayCam.orthographicSize = 2 * trueVert * 0.55f;
+        displayCam.depth = 1;
+    }
+
+    protected virtual void Start()
+    {
+
+        AlignCameras();
     }
 
     public void ToggleSelect()
@@ -77,7 +97,7 @@ public abstract class AbstractGameInstance : MonoBehaviour
     protected abstract string GetInputLabel(int index);
     public abstract float CalculateFitness();
     public abstract void FullReset();
-    public abstract void SetEvolvedBrain(IBlackBox blackBox);
+    public abstract void SetEvolvedBrain(IBlackBox blackBox, NeatGenome genome);
     protected virtual void Update()
     {
 

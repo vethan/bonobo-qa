@@ -945,25 +945,32 @@ namespace SharpNeat.Genomes.Neat
                     _auxStateNeuronCount--;
                 } 
             }
+            try
+            {
+                // Target neuron.
+                int tgtNeuronIdx = _neuronGeneList.BinarySearch(connectionToDelete.TargetNodeId);
+                NeuronGene tgtNeuronGene = _neuronGeneList[tgtNeuronIdx];
+                tgtNeuronGene.SourceNeurons.Remove(connectionToDelete.SourceNodeId);
 
-            // Target neuron.
-            int tgtNeuronIdx = _neuronGeneList.BinarySearch(connectionToDelete.TargetNodeId);
-            NeuronGene tgtNeuronGene = _neuronGeneList[tgtNeuronIdx];
-            tgtNeuronGene.SourceNeurons.Remove(connectionToDelete.SourceNodeId);
 
-            // Note. Check that source and target neurons are not the same neuron.
-            if(    srcNeuronGene != tgtNeuronGene
-                && IsNeuronRedundant(tgtNeuronGene))
-            {   
-                // Remove neuron.
-                _neuronGeneList.RemoveAt(tgtNeuronIdx);
+                // Note. Check that source and target neurons are not the same neuron.
+                if (srcNeuronGene != tgtNeuronGene
+                    && IsNeuronRedundant(tgtNeuronGene))
+                {
+                    // Remove neuron.
+                    _neuronGeneList.RemoveAt(tgtNeuronIdx);
 
-                // Track aux state node count.
-                if(_genomeFactory.ActivationFnLibrary.GetFunction(tgtNeuronGene.ActivationFnId).AcceptsAuxArgs) {
-                    _auxStateNeuronCount--;
-                } 
+                    // Track aux state node count.
+                    if (_genomeFactory.ActivationFnLibrary.GetFunction(tgtNeuronGene.ActivationFnId).AcceptsAuxArgs)
+                    {
+                        _auxStateNeuronCount--;
+                    }
+                }
             }
-
+            catch (Exception e)
+            {
+                UnityEngine.Debug.Log("Deleting from target messed up?!");
+            }
             _genomeFactory.Stats._mutationCountDeleteConnection++;
 
             // Indicate success.

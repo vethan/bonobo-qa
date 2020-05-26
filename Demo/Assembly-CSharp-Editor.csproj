@@ -11,10 +11,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{A77DEB61-50BA-3D2B-BA85-CD07C2DB2C66}</ProjectGuid>
+    <ProjectGuid>{DB0005D0-E46F-236E-2F57-76542FED5F47}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Temp\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;UNITY_2019_2_10;UNITY_2019_2;UNITY_2019;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_INCLUDE_TESTS;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_UNET;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_COLLAB_SOFTLOCKS;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;INCLUDE_DYNAMIC_GI;ENABLE_MONO_BDWGC;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_VIDEO;PLATFORM_STANDALONE_WIN;PLATFORM_STANDALONE;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_EVENT_QUEUE;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;ENABLE_VR;ENABLE_AR;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;NET_STANDARD_2_0;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_VSTU;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;UNITY_POST_PROCESSING_STACK_V2;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;UNITY_2019_2_10;UNITY_2019_2;UNITY_2019;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_INCLUDE_TESTS;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_UNET;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_COLLAB_SOFTLOCKS;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;INCLUDE_DYNAMIC_GI;ENABLE_MONO_BDWGC;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_VIDEO;PLATFORM_STANDALONE_WIN;PLATFORM_STANDALONE;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_EVENT_QUEUE;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;ENABLE_VR;ENABLE_AR;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;NET_4_6;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_VSTU;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;UNITY_POST_PROCESSING_STACK_V2;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
@@ -49,7 +49,7 @@
   <PropertyGroup>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <UnityProjectGenerator>Unity/VSTU</UnityProjectGenerator>
-    <UnityProjectType>Game:1</UnityProjectType>
+    <UnityProjectType>Editor:5</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>2019.2.10f1</UnityVersion>
   </PropertyGroup>
@@ -62,203 +62,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\AbstractGameInstance.cs" />
-    <Compile Include="Assets\ActivateOnHover.cs" />
-    <Compile Include="Assets\ComponentToggler.cs" />
-    <Compile Include="Assets\DropFeetGame\AbstractDropFeetController.cs" />
-    <Compile Include="Assets\DropFeetGame\AuthoredAIDropFeetController.cs" />
-    <Compile Include="Assets\DropFeetGame\DoNothingDropFeetController.cs" />
-    <Compile Include="Assets\DropFeetGame\DropFeetGameInstance.cs" />
-    <Compile Include="Assets\DropFeetGame\EvolvedDropFeetController.cs" />
-    <Compile Include="Assets\DropFeetGame\KeyboardDropFeetController.cs" />
-    <Compile Include="Assets\DropFeetGame\MultiDropFeetController.cs" />
-    <Compile Include="Assets\DropFeetGame\PlayerCharacter.cs" />
-    <Compile Include="Assets\DropFeetGame\ReplayRecorder.cs" />
-    <Compile Include="Assets\DropFeetGame\Replays\Replay.cs" />
-    <Compile Include="Assets\DropFeetGame\Replays\ReplayCharacter.cs" />
-    <Compile Include="Assets\DropFeetGame\Replays\ReplayPlayer.cs" />
-    <Compile Include="Assets\DropFeetGame\UtilityDropFeetController.cs" />
-    <Compile Include="Assets\DropFeetGame\Vecor3Surrogate.cs" />
-    <Compile Include="Assets\ExitApplicatoin.cs" />
-    <Compile Include="Assets\GameCreator.cs" />
-    <Compile Include="Assets\Graph.cs" />
-    <Compile Include="Assets\PongGame\EnemyAIController.cs" />
-    <Compile Include="Assets\PongGame\EvolvedPlayer.cs" />
-    <Compile Include="Assets\PongGame\GameInstance.cs" />
-    <Compile Include="Assets\PongGame\Goal.cs" />
-    <Compile Include="Assets\PongGame\MouseControlledPlayer.cs" />
-    <Compile Include="Assets\ReplayLoader.cs" />
-    <Compile Include="Assets\ReplayManager.cs" />
-    <Compile Include="Assets\ReplayMemoryStore.cs" />
-    <Compile Include="Assets\ScaleTester.cs" />
-    <Compile Include="Assets\SceneLoader.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatDomains\ExperimentUtils.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatDomains\INeatExperiment.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatDomains\IntPoint.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatDomains\PolarPoint.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatDomains\XmlUtils.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatDomains\Xor\XorBlackBoxEvaluator.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatDomains\Xor\XorExperiment.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\AuxFitnessInfo.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\CoordinateVector.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\EvaluationInfo.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\FitnessInfo.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\GenomeFitnessComparer.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\IDistanceMetric.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\IEvolutionAlgorithm.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\IGenome.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\IGenomeDecoder.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\IGenomeFactory.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\IGenomeListEvaluator.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\IPhenomeEvaluator.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\ISpeciationStrategy.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\ParallelGenomeListEvaluator.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\RunState.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\SelectiveGenomeListEvaluator.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\SerialGenomeListEvaluator.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\Specie.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\UpdateMode.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\UpdateScheme.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\CyclicNetworkFactory.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\FastAcyclicNetworkFactory.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\FastCyclicNetworkFactory.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\HyperNeat\DefaultNodeSetMappingFunction.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\HyperNeat\HyperNeatDecoder.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\HyperNeat\INodeSetMappingFunction.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\HyperNeat\NodeSetMapping.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\HyperNeat\Substrate.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\HyperNeat\SubstrateConnection.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\HyperNeat\SubstrateNode.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\HyperNeat\SubstrateNodeSet.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\Neat\NeatGenomeDecoder.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\NetworkActivationScheme.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\DistanceMetrics\DistanceMetricUtils.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\DistanceMetrics\EuclideanDistanceMetric.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\DistanceMetrics\ManhattanDistanceMetric.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\EvolutionAlgorithms\AbstractGenerationalAlgorithm.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\EvolutionAlgorithms\ComplexityRegulation\ComplexityCeilingType.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\EvolutionAlgorithms\ComplexityRegulation\ComplexityRegulationMode.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\EvolutionAlgorithms\ComplexityRegulation\DefaultComplexityRegulationStrategy.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\EvolutionAlgorithms\ComplexityRegulation\IComplexityRegulationStrategy.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\EvolutionAlgorithms\ComplexityRegulation\NullComplexityRegulationStrategy.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\EvolutionAlgorithms\NeatAlgorithmStats.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\EvolutionAlgorithms\NeatEvolutionAlgorithm.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\EvolutionAlgorithms\NeatEvolutionAlgorithmParameters.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\HyperNeat\CppnGenomeFactory.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\AddedNeuronGeneStruct.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\ConnectionGene.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\ConnectionGeneComparer.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\ConnectionGeneList.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\ConnectionGeneListBuilder.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\ConnectionMutationInfo.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\ConnectionMutationInfoList.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\ConnectionPerturbanceType.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\ConnectionSelectionType.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\CorrelationItem.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\CorrelationItemType.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\CorrelationResults.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\CorrelationStatistics.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\NeatGenome.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\NeatGenomeFactory.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\NeatGenomeParameters.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\NeatGenomeStats.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\NeatGenomeXmlIO.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\NeuronGene.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\NeuronGeneList.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\RbfNeat\RbfGenomeFactory.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\ActivationFunctionInfo.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\ActivationFunctionRegistry.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Bipolar\BipolarGaussian.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Bipolar\BipolarSigmoid.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Bipolar\Linear.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Bipolar\Sine.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\NullFn.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\RadialBasis\RbfGaussian.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\ArcSinH.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\ArcTan.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\Gaussian.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\LeakyReLU.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\LeakyReLUShifted.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\LogisticFunction.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\LogisticFunctionSteep.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\MaxMinusOne.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\PolynomialApproximantSteep.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\QuadraticSigmoid.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\ReLU.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\ScaledELU.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\SoftSignSteep.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\SReLU.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\SReLUShifted.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\TanH.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\AcyclicNetworkDepthAnalysis.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ConnectionEndpointsStruct.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ConnectionList.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\CyclicNetworkDepthAnalysis.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\CyclicNetworkTest.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\DefaultActivationFunctionLibrary.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\IActivationFunction.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\IActivationFunctionLibrary.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\IConnectionList.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\INetworkConnection.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\INetworkDefinition.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\INetworkNode.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\INodeList.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NetworkConnection.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NetworkConnectivityData.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NetworkDefinition.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NetworkDepthInfo.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NetworkNode.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NetworkXmlIO.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NodeConnectivityData.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NodeList.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NodeType.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\IBlackBox.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\ISignalArray.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\MappingSignalArray.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\NeuralNets\AcyclicNetwork\FastAcyclicNetwork.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\NeuralNets\AcyclicNetwork\LayerInfo.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\NeuralNets\CyclicNetwork\Connection.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\NeuralNets\CyclicNetwork\CyclicNetwork.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\NeuralNets\CyclicNetwork\Neuron.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\NeuralNets\CyclicNetwork\RelaxingCyclicNetwork.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\NeuralNets\FastCyclicNetwork\FastConnection.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\NeuralNets\FastCyclicNetwork\FastCyclicNetwork.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\NeuralNets\FastCyclicNetwork\FastRelaxingCyclicNetwork.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\OutputMappingSignalArray.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\OutputSignalArray.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\SignalArray.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\SharpNeatException.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\SpeciationStrategies\GenomeDistancePair.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\SpeciationStrategies\KMeansClusteringStrategy.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\SpeciationStrategies\ParallelKMeansClusteringStrategy.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\SpeciationStrategies\RandomClusteringStrategy.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\SpeciationStrategies\SpeciationUtils.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Utility\Point2DDouble.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Utility\UInt32IdGenerator.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Utility\Utilities.cs" />
-    <Compile Include="Assets\SharpNEAT\SharpNeatLib\Utility\XmlIoUtils.cs" />
-    <Compile Include="Assets\SimpleGameCreatorEvaluator.cs" />
-    <Compile Include="Assets\SpritePhysicsToggler.cs" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
-    <None Include="Assets\Fonts\OFL.txt" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
-    <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Masking.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Mobile.shader" />
-    <None Include="Assets\SharpNEAT\SharpNeatDomains\SharpNeatDomains.experiments.xml" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF Overlay.shader" />
-    <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Surface.cginc" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Sprite.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
+    <Compile Include="Assets\DropFeetGame\Editor\DropFeetGameInstanceEditor.cs" />
+    <Reference Include="UnityEditor.TestRunner">
+      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TestRunner">
+      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
@@ -475,6 +285,33 @@
     <Reference Include="UnityEngine.XRModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor.VR">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/UnityExtensions/Unity/UnityVR/Editor/UnityEditor.VR.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.Graphs">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/Managed/UnityEditor.Graphs.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.WindowsStandalone.Extensions">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.WebGL.Extensions">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.OSXStandalone.Extensions">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.LinuxStandalone.Extensions">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/UnityEditor.LinuxStandalone.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.Android.Extensions">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.iOS.Extensions">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
+      <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
+    </Reference>
     <Reference Include="protobuf-net">
       <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/MyLibs/protobuf-net.dll</HintPath>
     </Reference>
@@ -492,6 +329,9 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
       <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Assets/SharpNEAT/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
@@ -853,6 +693,12 @@
     <Reference Include="Boo.Lang">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.10f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp.csproj">
+      <Project>{A77DEB61-50BA-3D2B-BA85-CD07C2DB2C66}</Project>
+      <Name>Assembly-CSharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

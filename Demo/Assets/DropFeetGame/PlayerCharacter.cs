@@ -12,9 +12,9 @@ public class PlayerCharacter : MonoBehaviour
 
     public System.Action<PlayerCharacter,KillType> OnKill = (_,__)=>{};
 
-    public GameObject standSprites;
-    public GameObject diveSprites;
-    public GameObject jumpSprites;
+    public ComponentToggler standSprites;
+    public ComponentToggler diveSprites;
+    public ComponentToggler jumpSprites;
     public Transform flipper;
     public readonly static Vector2 gravity = new Vector2(0, 40);
 

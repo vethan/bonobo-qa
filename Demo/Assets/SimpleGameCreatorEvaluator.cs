@@ -240,7 +240,7 @@ public class SimpleGameCreatorEvaluator : MonoBehaviour
 
     private void SetupGame(int i)
     {
-        games[i].SetEvolvedBrain(genomeDecoder.Decode(genomeList[i]));
+        games[i].SetEvolvedBrain(genomeDecoder.Decode(genomeList[i]), genomeList[i]);
         games[i].SetGraph(GenerateGraph(genomeList[i]));
         games[i].FullReset();
     }

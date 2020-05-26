@@ -92,9 +92,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f297cc2d0c2c02848acc301ce085c6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  standSprites: {fileID: 108252343268779176}
-  diveSprites: {fileID: 108252343228297092}
-  jumpSprites: {fileID: 108252342661122792}
+  standSprites: {fileID: 3665903550418786766}
+  diveSprites: {fileID: 2529619210528724650}
+  jumpSprites: {fileID: 6367044890174860173}
   flipper: {fileID: 272192644964437233}
   floor: {fileID: 0}
   rigid: {fileID: 0}
@@ -131,13 +131,14 @@ GameObject:
   - component: {fileID: 108252342661122797}
   - component: {fileID: 108252342661122794}
   - component: {fileID: 108252342661122795}
+  - component: {fileID: 6367044890174860173}
   m_Layer: 0
   m_Name: JumpSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &108252342661122797
 Transform:
   m_ObjectHideFlags: 0
@@ -236,6 +237,22 @@ PolygonCollider2D:
       - {x: 0.14999999, y: -0.185}
       - {x: 0.1413846, y: 0.12487714}
       - {x: 0.041265488, y: 0.16626558}
+--- !u!114 &6367044890174860173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 108252342661122792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3132eb843cb3b2649aa068bbd9ca1401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  togglingSprite: {fileID: 108252342661122794}
+  ComponentsToToggle:
+  - {fileID: 108252342661122795}
+  - {fileID: 108252342183461499}
 --- !u!1 &108252343138609182
 GameObject:
   m_ObjectHideFlags: 0
@@ -294,13 +311,14 @@ GameObject:
   - component: {fileID: 108252343228297095}
   - component: {fileID: 108252343228297097}
   - component: {fileID: 108252343228297094}
+  - component: {fileID: 2529619210528724650}
   m_Layer: 0
   m_Name: DiveSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &108252343228297095
 Transform:
   m_ObjectHideFlags: 0
@@ -410,6 +428,23 @@ PolygonCollider2D:
       - {x: -0.01, y: -0.049999997}
       - {x: 0.04, y: -0.06}
       - {x: 0.03, y: -0.04}
+--- !u!114 &2529619210528724650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 108252343228297092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3132eb843cb3b2649aa068bbd9ca1401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  togglingSprite: {fileID: 108252343228297097}
+  ComponentsToToggle:
+  - {fileID: 108252343228297094}
+  - {fileID: 108252343138609152}
+  - {fileID: 108252344223441494}
 --- !u!1 &108252343268779176
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,6 +456,7 @@ GameObject:
   - component: {fileID: 108252343268779179}
   - component: {fileID: 108252343268779178}
   - component: {fileID: 108252343268779181}
+  - component: {fileID: 3665903550418786766}
   m_Layer: 0
   m_Name: StandSprite
   m_TagString: Untagged
@@ -540,6 +576,22 @@ PolygonCollider2D:
       - {x: 0.19, y: -0.35999998}
       - {x: 0.16700427, y: -0.19299588}
       - {x: 0.0691185, y: 0.055771194}
+--- !u!114 &3665903550418786766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 108252343268779176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3132eb843cb3b2649aa068bbd9ca1401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  togglingSprite: {fileID: 108252343268779178}
+  ComponentsToToggle:
+  - {fileID: 108252343268779181}
+  - {fileID: 108252343449428892}
 --- !u!1 &108252343449428890
 GameObject:
   m_ObjectHideFlags: 0

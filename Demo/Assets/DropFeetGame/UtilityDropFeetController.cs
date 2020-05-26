@@ -1,17 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public class UtilityDropFeetController : AuthoredAIDropFeetController
 {
     public bool DebugMode = false;
-    struct UtilityOption
+    public struct UtilityOption
     {
+        public string name;
         public Action actionType;
         public float value;
     }
     float characterHeight = 2.3f;
-    enum Action
+    public enum Action
     {
         DoNothing,
         DiveKick,
@@ -184,7 +186,7 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
 
     private void OnDrawGizmos()
     {
-        if (opponent == null)
+        if (opponent == null || !DebugMode)
             return;
 
 
@@ -290,21 +292,38 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         return ((CalulateRetreatSpaceUtility() * 1.0f) + 0.0f) * (1-ParabolicOpponentHorizontaldistance(12) + 3*CalculateJumpDodgeUtility(DodgeArea.Upper))/4 ;
     }
 
+    public Dictionary<string, UtilityOption> lastUtility = new Dictionary<string, UtilityOption>();
+
     // Update is called once per frame
     public override void UpdateButtons()
     {
 
         List<UtilityOption> options = new List<UtilityOption>();
-        options.Add(new UtilityOption() { actionType = Action.DiveKick, value = DiveKickUtility() });
-        options.Add(new UtilityOption() { actionType = Action.Jump, value = JumpUtility() });
-        options.Add(new UtilityOption() { actionType = Action.DoNothing, value = DoNothingUtility() });
-        options.Add(new UtilityOption() { actionType = Action.JumpBack, value = JumpBackUtility() });
+        options.Add(new UtilityOption() { actionType = Action.DiveKick, value = DiveKickUtility(), name = "Dive Kick Utility" });
+        options.Add(new UtilityOption() { actionType = Action.Jump, value = JumpUtility(), name = "JumpUtility" });
+        options.Add(new UtilityOption() { actionType = Action.DoNothing, value = DoNothingUtility(), name = "DoNothingUtility" });
+        options.Add(new UtilityOption() { actionType = Action.JumpBack, value = JumpBackUtility(), name = "JumpBackUtility" });
 
         options.Sort((a, b) => b.value.CompareTo(a.value));
 
         UtilityOption selected = options[0];
+        lastUtility.Clear();
+        if (DebugMode)
+        {
+            lastUtility.Add("CalulateRetreatSpaceUtility", new UtilityOption() { value = CalulateRetreatSpaceUtility() } );
+            lastUtility.Add("NormalisedOpponentHorizontalDistance", new UtilityOption() { value = NormalisedOpponentHorizontalDistance(12) });
+            lastUtility.Add("CalculateJumpDodgeUtility", new UtilityOption() { value = CalculateJumpDodgeUtility(DodgeArea.Upper) });
 
-        switch(selected.actionType)
+
+            for (int i = 0; i < options.Count; i++)
+            {
+                var option = options[i];
+                lastUtility[option.name] = option;
+                lastUtility[option.name + "RANK"] = new UtilityOption() { value = i };
+            }
+        }
+
+        switch (selected.actionType)
         {
             case Action.DiveKick:
             case Action.JumpBack:

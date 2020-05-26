@@ -19,7 +19,7 @@ public class EvolvedDropFeetController : AbstractDropFeetController
     public bool everDrop { get; private set; }
     public bool everFeet { get; private set; }
 
-    double[] inputSignals = new double[10];
+    double[] inputSignals = new double[7];
 
     public void Reset()
     {
@@ -84,27 +84,20 @@ public class EvolvedDropFeetController : AbstractDropFeetController
     void OriginalInputs()
     {
 
-        var temp = opponentRigid.position - rb.position;
-        var dist = temp.magnitude;
+        var temp = opponent.GetLocalPhysicsPosition() - self.GetLocalPhysicsPosition();
+        //var dist = temp.magnitude;
         temp.Normalize();
-        inputSignals[0] = temp.x;
-        inputSignals[1] = temp.y;
+        inputSignals[0] = temp.x/0.5f + 0.5f;
+        inputSignals[1] = temp.y/0.5f + 0.5f;
 
-        temp = opponent.velocity.normalized;
-        inputSignals[2] = temp.x;
-        inputSignals[3] = temp.y;
+        inputSignals[2] = opponent.dropping ? 0 : 1;
+        inputSignals[3] = self.dropping ? 0 : 1;
 
-        temp = (Vector2)opponentFoot.transform.position- rb.position;
-        dist = temp.magnitude;
-        temp.Normalize();
-        inputSignals[4] = temp.x;
-        inputSignals[5] = temp.y;
+        inputSignals[4] = opponent.isOnFloor ? 0 : 1;
+        inputSignals[5] = self.isOnFloor ? 0 : 1;
 
-        inputSignals[6] = opponent.dropping ? 0 : 1;
-        inputSignals[7] = self.dropping ? 0 : 1;
 
-        inputSignals[8] = opponent.isOnFloor ? 0 : 1;
-        inputSignals[9] = self.isOnFloor ? 0 : 1;
+        inputSignals[6] = (self.GetLocalPhysicsPosition().y+ gameInstance.vertBorder )/ gameInstance.vertBorder*2;
         brain.InputSignalArray.CopyFrom(inputSignals, 0);
     }
 

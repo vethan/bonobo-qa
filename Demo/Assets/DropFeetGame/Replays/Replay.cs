@@ -25,7 +25,7 @@ namespace Assets.DropFeetGame.Replays
 
 
         [ProtoMember(3)]
-        public Queue<ReplayEntry> entries;
+        public CircularEntryQueue entries;
 
         static bool hasSetup = false;
 
@@ -37,12 +37,14 @@ namespace Assets.DropFeetGame.Replays
             hasSetup = true;
             ProtoBuf.Meta.RuntimeTypeModel.Default.Add(typeof(Vector3), false).SetSurrogate(typeof(ProtoVector3));
             ProtoBuf.Meta.RuntimeTypeModel.Default.Add(typeof(Queue<ReplayEntry>), false).SetSurrogate(typeof(ProtoQueue));
+            ProtoBuf.Meta.RuntimeTypeModel.Default.Add(typeof(CircularEntryQueue), false).SetSurrogate(typeof(ProtoQueue));
+
         }
 
         public readonly static string baseSavePath = Path.Combine(Path.GetDirectoryName(Application.dataPath), "Replays");
         public Replay(int leftStartScore, int rightStartScore)
         {
-            entries = new Queue<ReplayEntry>();
+            entries = new CircularEntryQueue();
             this.leftStartScore = leftStartScore;
             this.rightStartScore = rightStartScore;
         }
@@ -51,7 +53,7 @@ namespace Assets.DropFeetGame.Replays
         {
             Replay result = new Replay(this.leftStartScore, this.rightStartScore);
 
-            result.entries = new Queue<ReplayEntry>(entries);
+            result.entries = new CircularEntryQueue(entries);
             return result;
         }
 
@@ -186,10 +188,75 @@ namespace Assets.DropFeetGame.Replays
 
     [Serializable]
     [ProtoContract(SkipConstructor = true)]
-    public struct ProtoQueue
+    public class CircularEntryQueue
     {
         [ProtoMember(1)]
         List<ReplayEntry> entries;
+        int currentPosition = 0;
+        int loopsDone;
+
+        public CircularEntryQueue()
+        {
+            this.entries = new List<ReplayEntry>();
+        }
+
+        public CircularEntryQueue(CircularEntryQueue entries1)
+        {
+            this.entries = new List<ReplayEntry>(entries1.entries);
+        }
+
+        public int Count { get { return entries.Count; } }
+
+        internal ReplayEntry Dequeue()
+        {
+            var result = entries[currentPosition];
+            result.time += entries[Count - 1].time * loopsDone;
+            currentPosition++;
+            if (currentPosition >= Count)
+            {
+                currentPosition -= Count;
+                loopsDone++;
+            }
+            return result;
+        }
+
+        internal void Enqueue(ReplayEntry replayEntry)
+        {
+            entries.Add(replayEntry);
+        }
+
+        internal ReplayEntry Peek()
+        {
+            var result = entries[currentPosition];
+            result.time += entries[Count-1].time*loopsDone;
+            return result;
+        }
+
+
+        public static implicit operator CircularEntryQueue(ProtoQueue v)
+        {
+            CircularEntryQueue protoQueue = new CircularEntryQueue();
+            protoQueue.entries = new List<ReplayEntry>(v.entries);
+            return protoQueue;
+        }
+
+        public static implicit operator ProtoQueue(CircularEntryQueue v)
+        {
+            if (v == null)
+                return new ProtoQueue();
+            ProtoQueue protoQueue = new ProtoQueue();
+            protoQueue.entries = new List<ReplayEntry>(v.entries);
+            return protoQueue;
+        }
+    }
+
+
+    [Serializable]
+    [ProtoContract(SkipConstructor = true)]
+    public struct ProtoQueue
+    {
+        [ProtoMember(1)]
+        public List<ReplayEntry> entries;
 
         public static implicit operator Queue<ReplayEntry>(ProtoQueue v)
         {

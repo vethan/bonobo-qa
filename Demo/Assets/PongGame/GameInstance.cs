@@ -45,7 +45,7 @@ public class GameInstance : AbstractGameInstance
         };
     }
 
-    public override void SetEvolvedBrain(IBlackBox blackBox)
+    public override void SetEvolvedBrain(IBlackBox blackBox, SharpNeat.Genomes.Neat.NeatGenome birthGeneration)
     {
         evolved.SetBrain(blackBox);
     }

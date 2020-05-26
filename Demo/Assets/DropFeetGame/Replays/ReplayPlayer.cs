@@ -1,4 +1,5 @@
 ﻿using Assets.DropFeetGame.Replays;
+using SharpNeat.Genomes.Neat;
 using SharpNeat.Phenomes;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,9 +27,16 @@ public class ReplayPlayer : AbstractGameInstance
     // Start is called before the first frame update
     override protected void Awake()
     {
-        base.Awake();
-        if (autoLoad)
-            LoadReplay(replayFilePath, serializationStyle);        
+        try
+        {
+            base.Awake();
+            if (autoLoad)
+                LoadReplay(replayFilePath, serializationStyle);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Awake Failed", this);
+        }
     }
 
     
@@ -145,7 +153,7 @@ public class ReplayPlayer : AbstractGameInstance
         //TODO: Change the loaded replays to random new ones;
     }
 
-    public override void SetEvolvedBrain(IBlackBox blackBox)
+    public override void SetEvolvedBrain(IBlackBox blackBox, NeatGenome a)
     {
 
     }

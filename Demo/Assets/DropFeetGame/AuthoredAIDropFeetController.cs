@@ -78,7 +78,7 @@ public class AuthoredAIDropFeetController : AbstractDropFeetController
         RaycastHit2D[] hit = new RaycastHit2D[1];
         Debug.DrawRay(opponentFoot.transform.position, attackVector);
         float radius = opponentFoot.transform.localScale.x * ((CircleCollider2D)opponentFoot).radius * 0.85f;
-        int hits = Physics2D.CircleCast(opponentFoot.transform.position, radius, attackVector, contactFilter2D, hit);
+        int hits = Physics2D.CircleCast(opponentFoot.transform.position, radius, attackVector, contactFilter2D, hit, (self.transform.position - opponentFoot.transform.position).magnitude * 2f);
         hitResult = hit[0];
         return hits > 0 && hit[0].transform == transform;
     }
@@ -90,7 +90,7 @@ public class AuthoredAIDropFeetController : AbstractDropFeetController
         RaycastHit2D[] hit = new RaycastHit2D[1];
         Debug.DrawRay(myFoot.transform.position, attackVector);
         float radius = myFoot.transform.localScale.x * ((CircleCollider2D)myFoot).radius * 0.85f;
-        int hits = Physics2D.CircleCast(myFoot.transform.position, radius, attackVector, contactFilter2D, hit);
+        int hits = Physics2D.CircleCast(myFoot.transform.position, radius, attackVector, contactFilter2D, hit,(myFoot.transform.position-opponent.transform.position).magnitude*2f);
         hitResult = hit[0];
         return hits > 0 && hit[0].transform == opponent.transform;
     }

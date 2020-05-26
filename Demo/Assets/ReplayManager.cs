@@ -9,6 +9,7 @@ public class ReplayManager : MonoBehaviour
     void Awake()
     {
         memoryStore = FindObjectOfType<ReplayMemoryStore>();
+ 
         //foreach(string path in replays)
         //{
         //    Debug.Log("Loaded Replay: " + path);
@@ -17,11 +18,13 @@ public class ReplayManager : MonoBehaviour
 
     public void UpdateReplays()
     {
+        if (memoryStore == null)
+            return;
         memoryStore.replays.Shuffle();
         var players = FindObjectsOfType<ReplayPlayer>();
         for (int i = 0; i < players.Length; i++)
         {
-            players[i].LoadReplay(memoryStore.replays[i]);
+            players[i].LoadReplay(memoryStore.replays[i%memoryStore.replays.Count]);
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using SharpNeat.Genomes.Neat;
 using SharpNeat.Phenomes;
 using UnityEngine;
 
@@ -11,14 +12,14 @@ public class DropFeetGameInstance : AbstractGameInstance
     public PlayerCharacter rightPlayer;
     public Transform floor;
     EvolvedDropFeetController evolvedPlayer;
-    public override int InputCount { get { return 10; } }
+    public override int InputCount { get { return 7; } }
     public override int OutputCount { get { return 2; } }
 
     public int leftScore { get; private set; }
     public int rightScore { get; private set; }
     
     Coroutine killCoroutine = null;
-
+    public float fitness;
     void UpdateScoreImages()
     {
         Vector3 val = leftScoreSprite.transform.localScale;
@@ -122,34 +123,35 @@ public class DropFeetGameInstance : AbstractGameInstance
             case 2:
                 return "Opponent Y Direction";
             case 3:
-                return "Opponent X Velocity";
-            case 4:
-                return "Opponent Y Velocity";
-            case 5:
-                return "Opponent Foot X";
-            case 6:
-                return "Opponent Foot Y";
-            case 7:
                 return "Opponent Diving";
-            case 8:
+            case 4:
                 return "Self Diving";
-            case 9:
+            case 5:
                 return "Opponent On Floor";
-            case 10:
+            case 6:
                 return "Self On Floor";
+            case 7:
+                return "Y position";
         }
         return "Unknown";
+    }
+    private void FixedUpdate()
+    {
+        rightEverDrop |= rightPlayer.dropping;
+        rightEverFeet |= !rightPlayer.dropping && !rightPlayer.isOnFloor;
     }
 
     public override float CalculateFitness()
     {
+        if (evolvedPlayer == null)
+            return 0;
         float fit = 0;
+        
         if(!evolvedPlayer.everDrop && !evolvedPlayer.everFeet)
         {
             fit = -10;
         }
-
-        if((evolvedPlayer.everFeet && !evolvedPlayer.everDrop) || (!evolvedPlayer.everFeet && evolvedPlayer.everDrop))
+        else if((evolvedPlayer.everFeet && !evolvedPlayer.everDrop) || (!evolvedPlayer.everFeet && evolvedPlayer.everDrop))
         {
             fit = 5;
         }
@@ -157,14 +159,45 @@ public class DropFeetGameInstance : AbstractGameInstance
         {
             fit = 30;
         }
-        
-        return (2 * leftScore) - rightScore + fit;
+
+
+        if (!rightEverDrop && !rightEverFeet)
+        {
+            fit += -10;
+        }
+        else if ((rightEverDrop && !rightEverFeet) || (!rightEverDrop && rightEverFeet))
+        {
+            fit += 5;
+        }
+        else if (rightEverDrop && rightEverFeet)
+        {
+            fit += 30;
+        }
+        if(leftScore > 0)
+        {
+            fit += 500;
+        }
+        if(leftScore > rightScore)
+        {
+            fit += 500;
+        }
+        return (10 * leftScore) - rightScore * 1 + fit;
     }
+
+    protected override void Update()
+    {
+        base.Update();
+        fitness = CalculateFitness();
+    }
+    public bool rightEverDrop;
+    public bool rightEverFeet;
 
     public override void FullReset()
     {
         leftScore = 0;
         rightScore = 0;
+        rightEverDrop = false;
+        rightEverFeet = false;
         selected = false;
         UpdateScoreImages();
         if (killCoroutine != null)
@@ -173,8 +206,10 @@ public class DropFeetGameInstance : AbstractGameInstance
         ResetPositions();
     }
 
-    public override void SetEvolvedBrain(IBlackBox blackBox)
+    public NeatGenome genome = null;
+    public override void SetEvolvedBrain(IBlackBox blackBox, NeatGenome genome)
     {
+        this.genome = genome;
         if (evolvedPlayer != null)
             evolvedPlayer.SetBrain(blackBox);
     }
