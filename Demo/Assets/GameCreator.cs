@@ -436,9 +436,12 @@ public class GameCreator : MonoBehaviour
             // TODO: More checks.
             Debug.Assert(genomeList.Count == gamesToCreate);
         }
-        _specieList = _speciationStrategy.InitializeSpeciation(genomeList, _eaParams.SpecieCount);
-        SortSpecieGenomes();
-        UpdateBestGenome();
+        else
+        {
+            _specieList = _speciationStrategy.InitializeSpeciation(genomeList, _eaParams.SpecieCount);
+            SortSpecieGenomes();
+            UpdateBestGenome();
+        }
         // Calculate statistics for each specie (mean fitness, target size, number of offspring to produce etc.)
         int offspringCount;
         SpecieStats[] specieStatsArr = CalcSpecieStats(out offspringCount);
