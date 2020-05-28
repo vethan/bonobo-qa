@@ -275,17 +275,17 @@ PrefabInstance:
     - target: {fileID: 8931451556186507421, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8931451556186507421, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8931451556186507421, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 9008065192087226661, guid: 1e4a59ca24954a94a8dc88e04d9ec9ae, type: 3}
@@ -310,6 +310,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   feetButton: 323
   dropButton: 324
+--- !u!114 &808781932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 808781927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5964c1fa3c1adac4f9cd2d51d3676668, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputSignals:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
 --- !u!1 &862825337
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,6 +361,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   one: {fileID: 0}
   other: {fileID: 0}
+  three: {fileID: 808781932}
+  four: {fileID: 1163689387}
 --- !u!4 &862825339
 Transform:
   m_ObjectHideFlags: 0
@@ -375,6 +397,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   feetButton: 323
   dropButton: 324
+--- !u!114 &1163689387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163689382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5964c1fa3c1adac4f9cd2d51d3676668, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputSignals:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
 --- !u!1 &1653492599
 GameObject:
   m_ObjectHideFlags: 0

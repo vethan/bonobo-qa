@@ -7,6 +7,9 @@ public class ScaleTester : MonoBehaviour
     public UtilityDropFeetController one;
     public UtilityDropFeetController other;
 
+    public EvolvedValueGenerator three;
+    public EvolvedValueGenerator four;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +28,14 @@ public class ScaleTester : MonoBehaviour
             if(Mathf.Abs(oneUtility.value - otherUtility.value) > 0.01f)
             {
                 Debug.LogError(string.Format("{0} should be the same but isnt: {1} vs {2}", kvp.Key,oneUtility.value,otherUtility.value));
+            }
+        }
+
+        for (int i = 0; i < three.inputSignals.Length; i++)
+        {
+            if (System.Math.Abs(three.inputSignals[i] - four.inputSignals[i]) > 0.01f)
+            {
+                Debug.LogError(string.Format("InputIndex {0} should be the same but isnt: {1} vs {2}", i, three.inputSignals[i], four.inputSignals[i]));
             }
         }
     }

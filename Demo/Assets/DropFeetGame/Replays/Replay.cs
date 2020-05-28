@@ -109,6 +109,27 @@ namespace Assets.DropFeetGame.Replays
 
         }
 
+        public static Replay ImportFromTextAsset(TextAsset replay, SerializationStyle serializationStyle = SerializationStyle.DotNet)
+        {
+            SetupModel();
+            using (MemoryStream ms = new MemoryStream(replay.bytes))
+            {
+                if (serializationStyle == SerializationStyle.DotNet)
+                {
+                    return LoadOldStyle(ms);
+                }
+                try
+                {
+                    return Serializer.Deserialize<Replay>(ms);
+                }
+                catch (SerializationException e)
+                {
+                    Debug.Log("Failed to deserialize. Reason: " + e.Message);
+                    throw;
+                }
+            }
+        }
+
         public static Replay ImportFromFile(string filePath, SerializationStyle serializationStyle = SerializationStyle.DotNet)
         {
             SetupModel();
@@ -130,7 +151,7 @@ namespace Assets.DropFeetGame.Replays
             }
         }
 
-        private static Replay LoadOldStyle(FileStream file)
+        private static Replay LoadOldStyle(Stream file)
         {
             BinaryFormatter formatter = new BinaryFormatter();
             SurrogateSelector surrogateSelector = new SurrogateSelector();

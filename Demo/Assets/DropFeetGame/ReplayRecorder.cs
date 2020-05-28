@@ -62,7 +62,7 @@ public class ReplayRecorder : MonoBehaviour
 
     private void WriteReplay()
     {
-        String filename = String.Format("replay{0:yyyy-dd-M--HH-mm-ss}Session{1}", sessionStartTime, sessionNumber++);
+        String filename = String.Format("replay{0:yyyy-dd-M--HH-mm-ss}Session{1}.bytes", sessionStartTime, sessionNumber++);
         currentReplay.Save(filename);
     }
 

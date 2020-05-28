@@ -42,6 +42,11 @@ public abstract class AbstractGameInstance : MonoBehaviour
         }
     }
 
+    public void DisableGraph()
+    {
+        graphRoot.gameObject.SetActive(false);
+    }
+
     private void OnDrawGizmos()
     {
         if (displayCam == null || !displayCam.enabled)

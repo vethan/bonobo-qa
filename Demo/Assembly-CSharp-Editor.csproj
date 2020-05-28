@@ -63,6 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\DropFeetGame\Editor\DropFeetGameInstanceEditor.cs" />
+    <Compile Include="Assets\DropFeetGame\Editor\EvolvedPlayerEditor.cs" />
+    <Compile Include="Assets\Editor\LoadGenomeManagerEditor.cs" />
+    <Compile Include="Assets\Editor\LoadReplayManagerEditor.cs" />
     <Reference Include="UnityEditor.TestRunner">
       <HintPath>C:/Users/vetha/Documents/UniDemo/Demo/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
     </Reference>
