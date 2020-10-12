@@ -1,5 +1,6 @@
 ﻿using ProtoBuf;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -209,7 +210,7 @@ namespace Assets.DropFeetGame.Replays
 
     [Serializable]
     [ProtoContract(SkipConstructor = true)]
-    public class CircularEntryQueue
+    public class CircularEntryQueue : IEnumerable<ReplayEntry>
     {
         [ProtoMember(1)]
         List<ReplayEntry> entries;
@@ -227,6 +228,11 @@ namespace Assets.DropFeetGame.Replays
         }
 
         public int Count { get { return entries.Count; } }
+
+        public IEnumerator<ReplayEntry> GetEnumerator()
+        {
+            return entries.GetEnumerator();
+        }
 
         internal ReplayEntry Dequeue()
         {
@@ -253,6 +259,10 @@ namespace Assets.DropFeetGame.Replays
             return result;
         }
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return entries.GetEnumerator();
+        }
 
         public static implicit operator CircularEntryQueue(ProtoQueue v)
         {

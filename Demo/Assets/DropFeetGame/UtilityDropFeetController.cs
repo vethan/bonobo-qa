@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-public class UtilityDropFeetController : AuthoredAIDropFeetController
+public partial class UtilityDropFeetController : AuthoredAIDropFeetController
 {
     public bool DebugMode = false;
     public struct UtilityOption
@@ -19,6 +19,17 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         DiveKick,
         Jump,
         JumpBack
+    }
+    List<UtilityAction> options;
+    protected override void OnInitialise()
+    {
+        options = new List<UtilityAction>();
+
+        options.Add(new DivekickAction(this));
+        options.Add(new JumpAction(this));
+        options.Add(new DoNothingAction(this));
+        options.Add(new JumpBackAction(this));
+        options.Add(new RandomlyAdvanceAction(this));
     }
 
     float DoNothingUtility()
@@ -292,21 +303,43 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
         return ((CalulateRetreatSpaceUtility() * 1.0f) + 0.0f) * (1-ParabolicOpponentHorizontaldistance(12) + 3*CalculateJumpDodgeUtility(DodgeArea.Upper))/4 ;
     }
 
+
+
     public Dictionary<string, UtilityOption> lastUtility = new Dictionary<string, UtilityOption>();
 
+
+    UtilityAction currentAction = null;
     // Update is called once per frame
     public override void UpdateButtons()
     {
 
-        List<UtilityOption> options = new List<UtilityOption>();
-        options.Add(new UtilityOption() { actionType = Action.DiveKick, value = DiveKickUtility(), name = "Dive Kick Utility" });
-        options.Add(new UtilityOption() { actionType = Action.Jump, value = JumpUtility(), name = "JumpUtility" });
-        options.Add(new UtilityOption() { actionType = Action.DoNothing, value = DoNothingUtility(), name = "DoNothingUtility" });
-        options.Add(new UtilityOption() { actionType = Action.JumpBack, value = JumpBackUtility(), name = "JumpBackUtility" });
+        float highestUtility = currentAction != null ? currentAction.GetContinueUtility() : -1;
+        UtilityAction selectedNextAction = currentAction;
+        foreach (UtilityAction potentialAction in options)
+        {
+            if(currentAction == potentialAction)
+            {
+                continue;
+            }
 
-        options.Sort((a, b) => b.value.CompareTo(a.value));
+            float potUtility = potentialAction.GetStartUtility();
+            if (potUtility > highestUtility)
+            {
+                selectedNextAction = potentialAction;
+                highestUtility = potUtility;
+            }
+        }
 
-        UtilityOption selected = options[0];
+        if (selectedNextAction != currentAction)
+        {
+            if (currentAction != null)
+            {
+                currentAction.EndAction();
+            }
+            selectedNextAction.BeginAction();
+            currentAction = selectedNextAction;
+        }
+
         lastUtility.Clear();
         if (DebugMode)
         {
@@ -315,31 +348,15 @@ public class UtilityDropFeetController : AuthoredAIDropFeetController
             lastUtility.Add("CalculateJumpDodgeUtility", new UtilityOption() { value = CalculateJumpDodgeUtility(DodgeArea.Upper) });
 
 
-            for (int i = 0; i < options.Count; i++)
-            {
-                var option = options[i];
-                lastUtility[option.name] = option;
-                lastUtility[option.name + "RANK"] = new UtilityOption() { value = i };
-            }
+            //for (int i = 0; i < options.Count; i++)
+            //{
+            //    var option = options[i];
+            //    lastUtility[option.name] = option;
+            //    lastUtility[option.name + "RANK"] = new UtilityOption() { value = i };
+            //}
         }
 
-        switch (selected.actionType)
-        {
-            case Action.DiveKick:
-            case Action.JumpBack:
-                shouldDrop = false;
-                shouldFeet = true;
-                break;
-            case Action.Jump:
-                shouldDrop = true;
-                shouldFeet = false;
-                break;
-            default:
-                shouldDrop = false;
-                shouldFeet = false;
-                break;
-        }
-
+        currentAction.UpdateButtonStatus(out shouldDrop, out shouldFeet);
     }
 
 }

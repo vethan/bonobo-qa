@@ -43,7 +43,7 @@ public class SimpleGameCreatorEvaluator : MonoBehaviour
         "Left click on a game to zoom in and view details about the neural network",
         "The left player is controlled by a neural net, the right player is a human authored agent"};
 
-    int automaticGenerationSeconds = 10;
+    const int AUTOMATIC_GEN_SECONDS = 30;
     float generationTimer = 0;
     private void Awake()
     {
@@ -315,7 +315,7 @@ public class SimpleGameCreatorEvaluator : MonoBehaviour
         }
         generationTimer += Time.deltaTime;
         
-        if(generationTimer > automaticGenerationSeconds)
+        if(generationTimer > AUTOMATIC_GEN_SECONDS)
         {
             paused = true;
             Dictionary<int, float> fitnesses = new Dictionary<int, float>();

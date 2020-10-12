@@ -15,7 +15,8 @@ public class AuthoredAIDropFeetController : AbstractDropFeetController
     protected int meOnlyLayerMask;
     protected int opponentOnlyLayerMask;
 
-
+    protected virtual void OnInitialise() {
+    }
     public override bool FixedUpdateController()
     {
         return true;
@@ -63,6 +64,7 @@ public class AuthoredAIDropFeetController : AbstractDropFeetController
                 }
             }
         }
+        OnInitialise();
     }
 
 

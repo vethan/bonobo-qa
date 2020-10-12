@@ -13,10 +13,9 @@ public class ReplayRecorder : MonoBehaviour
     public DropFeetGameInstance gameInstance;
 
     Replay currentReplay;
-    public int secondPerSession = 30;
+    public int secondPerSession = 15;
     float timer = 0;
     int sessionNumber = 0;
-    string basePath;
     DateTime sessionStartTime;
 
     static float replayTargetFPS = 60;
@@ -31,12 +30,21 @@ public class ReplayRecorder : MonoBehaviour
         if(gameInstance == null)
         {
             var instances = FindObjectsOfType<DropFeetGameInstance>();
-            if(instances.Length > 1)
+            if(instances.Length == 1)
+            {
+                gameInstance = instances[0];
+            }
+            else
+            {
+                gameInstance = GetComponent<DropFeetGameInstance>();
+            }
+
+            if(gameInstance == null)
             {
                 this.enabled = false;
                 return;
             }
-            gameInstance = instances[0];
+
             gameInstance.OnNewRound += NewRoundHappened;
         }
         InitialiseReplay();

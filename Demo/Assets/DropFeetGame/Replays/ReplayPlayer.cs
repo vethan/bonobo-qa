@@ -16,7 +16,7 @@ public class ReplayPlayer : AbstractGameInstance
     public ReplayCharacter rightPlayer;
 
     public Replay.SerializationStyle serializationStyle = Replay.SerializationStyle.ProtoBufNet;
-    public string replayFilePath;
+    public TextAsset replayFile;
     Replay replay;
     float timer;
 
@@ -31,19 +31,12 @@ public class ReplayPlayer : AbstractGameInstance
         {
             base.Awake();
             if (autoLoad)
-                LoadReplay(replayFilePath, serializationStyle);
+                LoadReplay(Replay.ImportFromTextAsset(replayFile, serializationStyle));
         }
         catch (System.Exception e)
         {
             Debug.LogError("Awake Failed", this);
         }
-    }
-
-    
-
-    public void LoadReplay(string filePath, Replay.SerializationStyle serializationStyle)
-    {
-        LoadReplay(Replay.ImportFromFile(filePath, serializationStyle));
     }
 
     public void LoadReplay(Replay r)

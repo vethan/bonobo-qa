@@ -211,12 +211,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1752413816, guid: 42f033082ca69e44fb5bb8105681df0c, type: 3}
       propertyPath: replayFilePath
-      value: C:\Users\vetha\Documents\UniDemo\Demo\Replays\NEWreplay2020-04-5--10-56-13Session0
+      value: s\UniDemo\Demo\Replays\NEWreplay2020-04-5--10-56-13Session0-04-5--10-56-13Session0
       objectReference: {fileID: 0}
     - target: {fileID: 1752413816, guid: 42f033082ca69e44fb5bb8105681df0c, type: 3}
       propertyPath: autoLoad
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1752413816, guid: 42f033082ca69e44fb5bb8105681df0c, type: 3}
+      propertyPath: replayFile
+      value: 
+      objectReference: {fileID: 4900000, guid: ee3bd7850f37aca4e9aebf3d018552c3, type: 3}
     - target: {fileID: 6695215080023582314, guid: 42f033082ca69e44fb5bb8105681df0c,
         type: 3}
       propertyPath: m_LocalPosition.x

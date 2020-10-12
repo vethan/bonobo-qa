@@ -17,11 +17,14 @@ public class LoadGenomeManagerEditor : Editor
 
             if (path.Length != 0)
             {
-                string[] files = Directory.GetFiles(path);
                 List<TextAsset> xmlFiles = new List<TextAsset>();
                 var assets = AssetDatabase.FindAssets("t:TextAsset", new[] { path });
                 foreach(var asset in assets)
                 {
+                    if(!AssetDatabase.GUIDToAssetPath(asset).EndsWith("bytes"))
+                    {
+                        continue;
+                    }
                     xmlFiles.Add(AssetDatabase.LoadAssetAtPath<TextAsset>(AssetDatabase.GUIDToAssetPath(asset)));
                 }
                 ((LoadGenomeManager)serializedObject.targetObject).genomesToLoad = xmlFiles.ToArray();

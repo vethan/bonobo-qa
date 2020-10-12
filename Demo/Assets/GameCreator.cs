@@ -93,15 +93,15 @@ public class GameCreator : MonoBehaviour
 
     public System.Func<int> focusGameIndexOverride = null;
     public System.Action focusNextOverride = null;
-    public System.Action focusPrevOverride = null;
 
+    public System.Action focusPrevOverride = null;
 
     string[] proTips = { "The background graphs show the neural networks used by the agents",
         "Left click on a game to zoom in and view details about the neural network",
         "The left player is controlled by a neural net, the right player is a human authored agent"};
 
 
-    int automaticGenerationSeconds = 10;
+    const int AUTOMATIC_GEN_SECONDS = 30;
     float generationTimer = 0;
     private void Awake()
     {
@@ -649,7 +649,7 @@ public class GameCreator : MonoBehaviour
 
         generationTimer += Time.deltaTime;
 
-        if (paused || pauseEvolution.isOn || generationTimer <= automaticGenerationSeconds)
+        if (paused || pauseEvolution.isOn || generationTimer <= AUTOMATIC_GEN_SECONDS)
         {
             return;
         }

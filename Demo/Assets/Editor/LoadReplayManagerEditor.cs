@@ -29,6 +29,10 @@ public class LoadReplayManagerEditor : Editor
                 List<string> fileNemse = new List<string>();
                 foreach (var asset in assets)
                 {
+                    if (!AssetDatabase.GUIDToAssetPath(asset).EndsWith("bytes"))
+                    {
+                        continue;
+                    }
                     replayFiles.Add(AssetDatabase.LoadAssetAtPath<TextAsset>(AssetDatabase.GUIDToAssetPath(asset)));
                     fileNemse.Add(AssetDatabase.GUIDToAssetPath(asset));
                 }

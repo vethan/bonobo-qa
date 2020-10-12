@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -127,10 +128,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4311757449975177175, guid: 16ce59e34a289594285ad81fe676e51e,
+    - target: {fileID: 4311757449833822933, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
-      propertyPath: m_Name
-      value: Game InstantiateRig
+      propertyPath: m_AnchoredPosition.y
+      value: -9.960022
       objectReference: {fileID: 0}
     - target: {fileID: 4311757449975177174, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
@@ -187,10 +188,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4311757449833822933, guid: 16ce59e34a289594285ad81fe676e51e,
+    - target: {fileID: 4311757449975177175, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -9.960022
+      propertyPath: m_Name
+      value: Game InstantiateRig
       objectReference: {fileID: 0}
     - target: {fileID: 4311757449975177177, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
@@ -229,21 +230,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   replaysToLoad:
-  - {fileID: 4900000, guid: ee3bd7850f37aca4e9aebf3d018552c3, type: 3}
-  - {fileID: 4900000, guid: 260222be36d5c4c408c7856e6ec68d66, type: 3}
-  - {fileID: 4900000, guid: 71f08478cae43cf4781b69ee7ae0cc72, type: 3}
-  - {fileID: 4900000, guid: 9d5c7293910517d4087545bed9c88b58, type: 3}
-  - {fileID: 4900000, guid: 071b64fb17590424b93474131fb80346, type: 3}
-  - {fileID: 4900000, guid: 413fb2372f5ce994bab9c448af1338d8, type: 3}
-  - {fileID: 4900000, guid: 93b6329419644604c92df899d75ce492, type: 3}
-  - {fileID: 4900000, guid: c26e032ee9dfa384a9aacc2773e25b81, type: 3}
+  - {fileID: 4900000, guid: 0e688c7dad5a6cc4da4b6ba40abe992a, type: 3}
+  - {fileID: 4900000, guid: 074da2ab02d75c040857ee78662fd6f6, type: 3}
+  - {fileID: 4900000, guid: 55d370d51bb16a84c87a862fea94323a, type: 3}
+  - {fileID: 4900000, guid: 45ce9b407945cda4884dfd32f11c141d, type: 3}
+  - {fileID: 4900000, guid: 3c908d7600b2b2a4ba5d2c3ab0ec3dd2, type: 3}
+  - {fileID: 4900000, guid: f5ae0fcc57a9a4e4e950ac7f432c3b29, type: 3}
+  - {fileID: 4900000, guid: 5a85c4ea8058a0a4d9c2ec83f42320aa, type: 3}
+  - {fileID: 4900000, guid: 633f286ef2c2de345ba3aa2b64bc826f, type: 3}
   replayNames:
-  - Assets/DropFeetGame/Experiment1/Replays/NEWreplay2020-04-5--10-59-24Session5.bytes
-  - Assets/DropFeetGame/Experiment1/Replays/NEWreplay2020-04-5--10-59-24Session6.bytes
-  - Assets/DropFeetGame/Experiment1/Replays/NEWreplay2020-04-5--10-59-24Session8.bytes
-  - Assets/DropFeetGame/Experiment1/Replays/NEWreplay2020-04-5--10-59-24Session9.bytes
-  - Assets/DropFeetGame/Experiment1/Replays/NEWreplay2020-16-4--10-33-31Session10.bytes
-  - Assets/DropFeetGame/Experiment1/Replays/NEWreplay2020-16-4--10-33-31Session13.bytes
-  - Assets/DropFeetGame/Experiment1/Replays/NEWreplay2020-16-4--10-33-31Session17.bytes
-  - Assets/DropFeetGame/Experiment1/Replays/NEWreplay2020-16-4--10-33-31Session20.bytes
+  - Assets/DropFeetGame/Experiment1/ReplaysFinalSet/NEWreplay2020-04-5--10-59-24Session5.bytes
+  - Assets/DropFeetGame/Experiment1/ReplaysFinalSet/NEWreplay2020-04-5--10-59-24Session6.bytes
+  - Assets/DropFeetGame/Experiment1/ReplaysFinalSet/NEWreplay2020-16-4--10-33-31Session4.bytes
+  - Assets/DropFeetGame/Experiment1/ReplaysFinalSet/NEWreplay2020-16-4--10-33-31Session17.bytes
+  - Assets/DropFeetGame/Experiment1/ReplaysFinalSet/replay2020-09-6--22-37-43Session7.bytes
+  - Assets/DropFeetGame/Experiment1/ReplaysFinalSet/replay2020-09-6--22-37-43Session8.bytes
+  - Assets/DropFeetGame/Experiment1/ReplaysFinalSet/replay2020-10-6--17-35-40Session41.bytes
+  - Assets/DropFeetGame/Experiment1/ReplaysFinalSet/replay2020-10-6--17-35-40Session43.bytes
   focusIndex: 0
