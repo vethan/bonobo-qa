@@ -10,7 +10,7 @@ public class PlayerCharacter : MonoBehaviour
         DoubleKill
     }
 
-    public System.Action<PlayerCharacter,KillType> OnKill = (_,__)=>{};
+    public System.Action<PlayerCharacter, KillType> OnKill = (_, __) => { };
 
     public ComponentToggler standSprites;
     public ComponentToggler diveSprites;
@@ -24,9 +24,9 @@ public class PlayerCharacter : MonoBehaviour
     public Transform floor;
     PlayerCharacter opponent;
     public Vector2 velocity { get; private set; }
-    public bool dropping {get; private set; }
+    public bool dropping { get; private set; }
     public Rigidbody2D rigid;
-    float lastInAir;
+    public float lastInAir { get; private set; }
     public bool debug = false;
     const float JUMP_DELAY = 0.1f;
     const float HOP_DELAY = 0.1f;
@@ -85,7 +85,7 @@ public class PlayerCharacter : MonoBehaviour
             return transform.localPosition.y <= floor.localPosition.y + .01f && velocity.y <=0;
         }
     }
-    float lastOnFloor;
+    public float lastOnFloor { get; private set; }
 
     public Vector2 GetAttackVector()
     {

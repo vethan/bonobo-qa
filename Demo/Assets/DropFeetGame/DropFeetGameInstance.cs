@@ -159,7 +159,7 @@ public class DropFeetGameInstance : AbstractGameInstance
         {
             fit = 30;
         }
-
+        /*
 
         if (!rightEverDrop && !rightEverFeet)
         {
@@ -180,8 +180,8 @@ public class DropFeetGameInstance : AbstractGameInstance
         if(leftScore > rightScore)
         {
             fit += 500;
-        }
-        return (10 * leftScore) - rightScore * 1 + fit;
+        }*/
+        return 200 + ((10 * leftScore) - rightScore * 1 + fit);
     }
 
     protected override void Update()

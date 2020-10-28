@@ -102,6 +102,8 @@ public class GameCreator : MonoBehaviour
 
 
     const int AUTOMATIC_GEN_SECONDS = 30;
+    public bool pauseAutoAtTargetGeneration = true;
+    public int targetGeneration = 200;
     float generationTimer = 0;
     private void Awake()
     {
@@ -743,6 +745,11 @@ public class GameCreator : MonoBehaviour
         }
         OnNewGeneration.Invoke();
         generation++;
+        if(pauseAutoAtTargetGeneration && generation == targetGeneration)
+        {
+            pauseAutoAtTargetGeneration = false;
+            pauseEvolution.isOn = true;
+        }
         generationTimer = 0;
     }
     Coroutine update = null;

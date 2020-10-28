@@ -1,0 +1,27 @@
+<Root>
+  <ActivationFunctions>
+    <Fn id="0" name="LeakyReLU" prob="1" />
+  </ActivationFunctions>
+  <Networks>
+    <Network id="13076" birthGen="200" fitness="1058">
+      <Nodes>
+        <Node type="bias" id="0" />
+        <Node type="in" id="1" />
+        <Node type="in" id="2" />
+        <Node type="in" id="3" />
+        <Node type="in" id="4" />
+        <Node type="in" id="5" />
+        <Node type="in" id="6" />
+        <Node type="in" id="7" />
+        <Node type="out" id="8" />
+        <Node type="out" id="9" />
+      </Nodes>
+      <Connections>
+        <Con id="49" src="4" tgt="9" wght="0.69421036566534511" />
+        <Con id="55" src="2" tgt="8" wght="1.8368555072987061" />
+        <Con id="56" src="5" tgt="9" wght="-0.70020703245558047" />
+        <Con id="67" src="4" tgt="8" wght="-1.5604830007657915" />
+      </Connections>
+    </Network>
+  </Networks>
+</Root>

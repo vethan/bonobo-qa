@@ -112,7 +112,6 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
     class RandomlyAdvanceAction : UtilityAction
     {
         float timeScale = -1;
-        float timer;
         bool justSelected = false;
         bool isEmptyJump = false;
         public RandomlyAdvanceAction(UtilityDropFeetController parent) : base(parent)
@@ -121,52 +120,48 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
 
         void SetNewtimescale(float minSecs, float maxSecs)
         {
-            timer = 0;
             timeScale = (Random.value * (maxSecs-minSecs)) + minSecs;
         }
         public override void BeginAction()
         {
             justSelected = true;
-            SetNewtimescale(0.3f, 1.3f);
+            isEmptyJump = Random.value > 0.75;
+            SetNewtimescale(0.1f, 0.99f);
         }
 
         public override void EndAction()
         {
-            SetNewtimescale(1, 5);
+            SetNewtimescale(.3f, 3);
         }
 
         public override float GetStartUtility()
         {
             if(timeScale == -1)
             {
-                SetNewtimescale(1, 4);
+                EndAction();
             }
-            timer = Mathf.Min(timer + Time.deltaTime/timeScale,0.9f);
-            isEmptyJump = Random.value > 0.5;
-            return timer;
+             
+            return Mathf.Min(parent.self.lastInAir / timeScale, 0.9f);
         }
 
         public override float GetContinueUtility()
         {
-
-            return isEmptyJump || (!justSelected && parent.self.isOnFloor) ? 0 : parent.DoNothingUtility() + 0.03f;
+            return isEmptyJump || parent.self.dropping || (!justSelected && parent.self.isOnFloor) ? 0 : parent.DoNothingUtility() + 0.03f;
         }
 
 
         public override void UpdateButtonStatus(out bool shouldJump, out bool shouldKick)
         {
-            timer += Time.deltaTime;
             if (justSelected)
             {
                 shouldJump = true;
                 shouldKick = false;
                 justSelected = false;
             }
-            else if (!isEmptyJump && timer > timeScale)
+            else if (!isEmptyJump && parent.self.lastOnFloor > timeScale)
             {
                 shouldJump = false;
                 shouldKick = true;
-                isEmptyJump = true;
             }            
             else
             {

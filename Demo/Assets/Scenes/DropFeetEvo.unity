@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -127,10 +128,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4311757449975177175, guid: 16ce59e34a289594285ad81fe676e51e,
+    - target: {fileID: 4311757449833822933, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
-      propertyPath: m_Name
-      value: Game InstantiateRig
+      propertyPath: m_AnchoredPosition.y
+      value: -9.960022
       objectReference: {fileID: 0}
     - target: {fileID: 4311757449975177174, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
@@ -187,10 +188,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4311757449833822933, guid: 16ce59e34a289594285ad81fe676e51e,
+    - target: {fileID: 4311757449975177175, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -9.960022
+      propertyPath: m_Name
+      value: Game InstantiateRig
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 16ce59e34a289594285ad81fe676e51e, type: 3}
