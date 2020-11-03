@@ -114,6 +114,10 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
         float timeScale = -1;
         bool justSelected = false;
         bool isEmptyJump = false;
+        float jumpTargetHeightDiff = 0;
+        const float maxHeight = 1.342005f;
+        const float minHeight = -4.489993f;
+        float maxRandomAttackHeight = (maxHeight-minHeight) *.4f;
         public RandomlyAdvanceAction(UtilityDropFeetController parent) : base(parent)
         {
         }
@@ -126,7 +130,8 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
         {
             justSelected = true;
             isEmptyJump = Random.value > 0.75;
-            SetNewtimescale(0.1f, 0.99f);
+            jumpTargetHeightDiff = Mathf.Lerp(-maxRandomAttackHeight, maxRandomAttackHeight, Random.value);
+            //Debug.Log("Target Height: " + jumpTargetHeightDiff);
         }
 
         public override void EndAction()
@@ -152,13 +157,16 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
 
         public override void UpdateButtonStatus(out bool shouldJump, out bool shouldKick)
         {
+            bool attackDistanceReached = ((jumpTargetHeightDiff >= 0 && parent.self.GetLocalPhysicsPosition().y > minHeight+ jumpTargetHeightDiff) ||
+                (jumpTargetHeightDiff < 0 && parent.self.velocity.y < 0 && parent.self.GetLocalPhysicsPosition().y < minHeight+ Mathf.Abs(jumpTargetHeightDiff)));
+
             if (justSelected)
             {
                 shouldJump = true;
                 shouldKick = false;
                 justSelected = false;
             }
-            else if (!isEmptyJump && parent.self.lastOnFloor > timeScale)
+            else if (!isEmptyJump && attackDistanceReached)
             {
                 shouldJump = false;
                 shouldKick = true;

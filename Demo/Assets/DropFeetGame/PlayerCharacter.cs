@@ -219,10 +219,15 @@ public class PlayerCharacter : MonoBehaviour
         velocity = Vector2.zero;
 
     }
-
+    float maxHeight = float.MinValue;
+    float minHeight = float.MaxValue;
     // Update is called once per frame
     void Update()
     {
+        maxHeight = Mathf.Max(maxHeight, transform.localPosition.y);
+        minHeight = Mathf.Min(maxHeight, transform.localPosition.y);
+
+       // Debug.Log("Min: " + minHeight + ". Max: " + maxHeight);
         if (debug)
             Debug.Log("Update Occurred");
         if (!controller.FixedUpdateController())
