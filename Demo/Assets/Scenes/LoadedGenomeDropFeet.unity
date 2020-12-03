@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -127,10 +128,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4311757449975177175, guid: 16ce59e34a289594285ad81fe676e51e,
+    - target: {fileID: 4311757449833822933, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
-      propertyPath: m_Name
-      value: Game InstantiateRig
+      propertyPath: m_AnchoredPosition.y
+      value: -9.960022
       objectReference: {fileID: 0}
     - target: {fileID: 4311757449975177174, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
@@ -187,10 +188,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4311757449833822933, guid: 16ce59e34a289594285ad81fe676e51e,
+    - target: {fileID: 4311757449975177175, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -9.960022
+      propertyPath: m_Name
+      value: Game InstantiateRig
       objectReference: {fileID: 0}
     - target: {fileID: 4311757449975177177, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
@@ -223,11 +224,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   genomesToLoad:
-  - {fileID: 4900000, guid: 7aef51c619c3db447b12f55966e9adde, type: 3}
-  - {fileID: 4900000, guid: 29e795c54da092645803dada71dbb878, type: 3}
-  - {fileID: 4900000, guid: d957e6da3b3ad0c43a7de275aa68675c, type: 3}
-  - {fileID: 4900000, guid: 7b6361a9ace27f0468efc7a25b32b0ae, type: 3}
-  - {fileID: 4900000, guid: 6e8cf6a3c3b8bb2488b73cb4ac359495, type: 3}
-  - {fileID: 4900000, guid: fd08158a2a982b045b3163af6016e3b4, type: 3}
-  - {fileID: 4900000, guid: 116a5e205bab6ac4dbf5230862dd49a7, type: 3}
-  - {fileID: 4900000, guid: d816993508318bc469d9bde2b8e96b14, type: 3}
+  - {fileID: 4900000, guid: 509aa11701f1f10459652a8a4c68f586, type: 3}
+  - {fileID: 4900000, guid: 80c4771787988b844b03b6acea96d936, type: 3}
+  - {fileID: 4900000, guid: 1c335f635a2c74946a455a66876b96da, type: 3}
+  - {fileID: 4900000, guid: 66413040277c6474bac0bd865b8654b3, type: 3}
+  - {fileID: 4900000, guid: 1d04683f3ba4f004a854d00b21f750ce, type: 3}
+  - {fileID: 4900000, guid: 2ea5b5469b55d1f479eea84bc52ba564, type: 3}
+  - {fileID: 4900000, guid: f87e12070c2bb584d90a61f42544f826, type: 3}
+  - {fileID: 4900000, guid: fc1ebbfb09addf74686ff83a49edc7d1, type: 3}

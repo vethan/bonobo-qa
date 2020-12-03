@@ -86,6 +86,7 @@
     <Compile Include="Assets\Graph.cs" />
     <Compile Include="Assets\LoadGenomeManager.cs" />
     <Compile Include="Assets\LoadReplayManager.cs" />
+    <Compile Include="Assets\ManualPhysicsTest.cs" />
     <Compile Include="Assets\PongGame\EnemyAIController.cs" />
     <Compile Include="Assets\PongGame\EvolvedPlayer.cs" />
     <Compile Include="Assets\PongGame\GameInstance.cs" />

@@ -74,7 +74,6 @@ public class GameCreator : MonoBehaviour
     public int gamesToShow = 4;
     public AbstractGameInstance gamePrefab;
     int gameSq = 1;
-    public int gameScale = 3;
     int gameShowSq = 1;
 
     IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder;
@@ -458,10 +457,9 @@ public class GameCreator : MonoBehaviour
                 }
                 if (reposition)
                 {
-                    var x = i % gameSq;
-                    var y = (gamesToCreate - (i + 1)) / gameSq;
-                    instance.transform.localScale = new Vector3(100.0f, 100.0f, 1);
-                    instance.transform.position = new Vector3(xAdj * x, yAdj * y) + offset;
+                    var x = (i) % gameSq;
+                    var y = (gamesToCreate - ((i) + 1)) / gameSq;
+                    PositionGame(instance, xAdj, yAdj, x, y, offset);
                 }
             }
 
@@ -492,10 +490,15 @@ public class GameCreator : MonoBehaviour
             {
                 var x = i % gameSq;
                 var y = (gamesToCreate - (i + 1)) / gameSq;
-                instance.transform.localScale = new Vector3(100.0f, 100.0f, 1);
-                instance.transform.position = new Vector3(xAdj * x, yAdj * y) + offset;
+                PositionGame(instance, xAdj, yAdj, x, y, offset);
             }
         }
+    }
+
+    public void PositionGame(AbstractGameInstance instance, float xAdj, float yAdj, float x, float y, Vector3 offset)
+    {
+        instance.transform.localScale = new Vector3(100.0f, 100.0f, 1);
+        instance.transform.position = new Vector3(xAdj * 2*x, yAdj*2 * y) + offset;
     }
 
     void InitialisePopulation()
