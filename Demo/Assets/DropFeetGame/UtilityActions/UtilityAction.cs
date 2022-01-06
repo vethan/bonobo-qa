@@ -117,7 +117,7 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
         float jumpTargetHeightDiff = 0;
         const float maxHeight = 1.342005f;
         const float minHeight = -4.489993f;
-        float maxRandomAttackHeight = (maxHeight-minHeight) *.4f;
+        float maxRandomAttackHeight = (maxHeight-minHeight);// *.4f;
         public RandomlyAdvanceAction(UtilityDropFeetController parent) : base(parent)
         {
         }

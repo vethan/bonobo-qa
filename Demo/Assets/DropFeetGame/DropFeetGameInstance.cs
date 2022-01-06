@@ -35,9 +35,11 @@ public class DropFeetGameInstance : AbstractGameInstance
     // Start is called before the first frame update
     override protected void Awake()
     {
+        
         Application.targetFrameRate = 60;
         base.Awake();
         evolvedPlayer = GetComponentInChildren<EvolvedDropFeetController>();
+        _isevolvedPlayerNull = evolvedPlayer == null;
         leftPlayer.OnKill += HandleOnKill;
         rightPlayer.OnKill += HandleOnKill;
     }
@@ -143,7 +145,7 @@ public class DropFeetGameInstance : AbstractGameInstance
 
     public override float CalculateFitness()
     {
-        if (evolvedPlayer == null)
+        if (_isevolvedPlayerNull)
             return 0;
         float fit = 0;
         
@@ -207,10 +209,12 @@ public class DropFeetGameInstance : AbstractGameInstance
     }
 
     public NeatGenome genome = null;
+    private bool _isevolvedPlayerNull;
+
     public override void SetEvolvedBrain(IBlackBox blackBox, NeatGenome genome)
     {
         this.genome = genome;
-        if (evolvedPlayer != null)
+        if (!_isevolvedPlayerNull)
             evolvedPlayer.SetBrain(blackBox);
     }
 }

@@ -43,6 +43,9 @@ namespace Assets.DropFeetGame.Replays
         }
 
         public readonly static string baseSavePath = Path.Combine(Path.GetDirectoryName(Application.dataPath), "Replays");
+
+
+
         public Replay(int leftStartScore, int rightStartScore)
         {
             entries = new CircularEntryQueue();
@@ -217,6 +220,13 @@ namespace Assets.DropFeetGame.Replays
         int currentPosition = 0;
         int loopsDone;
 
+        public float lastTime
+        {
+            get
+            {
+                return entries[entries.Count - 1].time;
+            }
+        }
         public CircularEntryQueue()
         {
             this.entries = new List<ReplayEntry>();

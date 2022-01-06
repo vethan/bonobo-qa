@@ -17,7 +17,7 @@ public class ReplayRecorder : MonoBehaviour
     float timer = 0;
     int sessionNumber = 0;
     DateTime sessionStartTime;
-
+    public string filePrefix = "";
     static float replayTargetFPS = 60;
     float replayMaxTick = 1.0f / replayTargetFPS;
     private void Awake()
@@ -70,7 +70,7 @@ public class ReplayRecorder : MonoBehaviour
 
     private void WriteReplay()
     {
-        String filename = String.Format("replay{0:yyyy-dd-M--HH-mm-ss}Session{1}.bytes", sessionStartTime, sessionNumber++);
+        String filename = String.Format(filePrefix+"replay{0:yyyy-dd-M--HH-mm-ss}Session{1}.bytes", sessionStartTime, sessionNumber++);
         currentReplay.Save(filename);
     }
 

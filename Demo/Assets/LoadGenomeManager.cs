@@ -10,7 +10,7 @@ public class LoadGenomeManager : MonoBehaviour
 {
     public TextAsset[] genomesToLoad;
     GameCreator creator;
-
+    public bool recordReplay = false;
 
     int focusIndex = 0;
     // Start is called before the first frame update
@@ -34,6 +34,11 @@ public class LoadGenomeManager : MonoBehaviour
             var genomeList = NeatGenomeXmlIO.LoadCompleteGenomeList(Doc.DocumentElement, false, (NeatGenomeFactory)creator.genomeFactory);
             var g = genomeList[0];
             creator.SetupGame(i, g, true);
+            if (recordReplay)
+            {
+                var replayRecorder = creator.GetGame(i).gameObject.AddComponent<ReplayRecorder>();
+                replayRecorder.filePrefix = "genome" + i;
+            }
         }
     }
 
