@@ -33,20 +33,27 @@ public class PlayerCharacter : MonoBehaviour
 
     const float LAND_DELAY = 0.1f;
     float attackDelay = 0.1f;
-    bool attemptedEarlyDive=  false;
+    bool attemptedEarlyDive = false;
     Collider2D[] colliders;
+
+    public int jumpsMade = 0;
+    public int backhopsMade = 0;
+    public int divekicksMade = 0;
+    public float approachDistance = 0;
+    public float retreatDistance = 0;
+    public float verticalDistacnce = 0;
+    public int headshotsHit = 0;
+    public int kicksHit = 0;
+
 
     public float floorHeight
     {
-        get
-        {
-            return floor.localPosition.y;
-        }
+        get { return floor.localPosition.y; }
     }
 
     public Vector2 GetLocalPhysicsPosition()
     {
-       return (Vector2)transform.parent.InverseTransformPoint(rigid.position);
+        return (Vector2) transform.parent.InverseTransformPoint(rigid.position);
     }
 
     void Awake()
@@ -63,28 +70,28 @@ public class PlayerCharacter : MonoBehaviour
                 controller = gameObject.AddComponent<DoNothingDropFeetController>();
             }
         }
+
         gameInstance = GetComponentInParent<DropFeetGameInstance>();
         floor = gameInstance.floor;
         rigid = GetComponent<Rigidbody2D>();
         var players = gameInstance.GetComponentsInChildren<PlayerCharacter>();
 
-        foreach(var player in players)
+        foreach (var player in players)
         {
-            if(player == this)
+            if (player == this)
             {
                 continue;
             }
+
             opponent = player;
         }
     }
 
     public bool isOnFloor
     {
-        get
-        {
-            return transform.localPosition.y <= floor.localPosition.y + .01f && velocity.y <=0;
-        }
+        get { return transform.localPosition.y <= floor.localPosition.y + .01f && velocity.y <= 0; }
     }
+
     public float lastOnFloor { get; private set; }
 
     public Vector2 GetAttackVector()
@@ -106,25 +113,27 @@ public class PlayerCharacter : MonoBehaviour
             {
                 velocity = new Vector2(0, 22);
                 attackDelay = JUMP_DELAY;
+                jumpsMade++;
             }
             else if (controller.FeetButtonDown() && lastInAir > LAND_DELAY)
             {
                 velocity = new Vector2(3.5f * -flipper.localScale.x, 13);
                 attackDelay = HOP_DELAY;
+                backhopsMade++;
             }
         }
         else
         {
             if (!dropping)
             {
-
                 if (lastOnFloor > attackDelay && (controller.FeetButtonDown() || attemptedEarlyDive))
                 {
                     attemptedEarlyDive = false;
                     velocity = GetAttackVector();
                     dropping = true;
+                    divekicksMade++;
                 }
-                else if(lastOnFloor < attackDelay && controller.FeetButtonDown() && controller.HoldDelayedKick())
+                else if (lastOnFloor < attackDelay && controller.FeetButtonDown() && controller.HoldDelayedKick())
                 {
                     attemptedEarlyDive = true;
                 }
@@ -139,8 +148,9 @@ public class PlayerCharacter : MonoBehaviour
         if (debug)
         {
             Debug.Log(Time.fixedDeltaTime);
-           // Debug.Log("isOnFloor:" + isOnFloor + "::dropping" + dropping + "::yVel" + velocity.y);
+            // Debug.Log("isOnFloor:" + isOnFloor + "::dropping" + dropping + "::yVel" + velocity.y);
         }
+
         if (controller.FixedUpdateController())
         {
             HandleInput();
@@ -154,7 +164,8 @@ public class PlayerCharacter : MonoBehaviour
             velocity = Vector2.zero;
             if (transform.localPosition.y < floor.localPosition.y)
             {
-                transform.localPosition = new Vector3(transform.localPosition.x, floor.localPosition.y, transform.localPosition.z);
+                transform.localPosition = new Vector3(transform.localPosition.x, floor.localPosition.y,
+                    transform.localPosition.z);
             }
         }
         else
@@ -165,13 +176,30 @@ public class PlayerCharacter : MonoBehaviour
             {
                 velocity -= gravity * Time.fixedDeltaTime;
             }
+
             if (dropping)
             {
                 velocity = GetAttackVector();
             }
         }
-        transform.localPosition += (Vector3)velocity*Time.fixedDeltaTime;
-        transform.localPosition = new Vector3(Mathf.Clamp(transform.localPosition.x,-xLimit,xLimit),transform.localPosition.y,transform.localPosition.z);
+
+        if (velocity.y > 0)
+        {
+            verticalDistacnce += velocity.y;
+        }
+
+        if (flipper.localScale.x == Mathf.Sign(velocity.x))
+        {
+            approachDistance += Mathf.Abs(velocity.x);
+        }
+        else
+        {
+            retreatDistance += Mathf.Abs(velocity.x);
+        }
+
+        transform.localPosition += (Vector3) velocity * Time.fixedDeltaTime;
+        transform.localPosition = new Vector3(Mathf.Clamp(transform.localPosition.x, -xLimit, xLimit),
+            transform.localPosition.y, transform.localPosition.z);
 
         standSprites.SetActive(isOnFloor);
         diveSprites.SetActive(dropping && !isOnFloor);
@@ -183,7 +211,7 @@ public class PlayerCharacter : MonoBehaviour
         Collider2D myCollider;
         Collider2D otherCollider;
 
-        if(collision.rigidbody == rigid)
+        if (collision.rigidbody == rigid)
         {
             myCollider = collision.collider;
             otherCollider = collision.otherCollider;
@@ -194,16 +222,16 @@ public class PlayerCharacter : MonoBehaviour
             myCollider = collision.otherCollider;
         }
 
-        if(myCollider.tag != "Foot")
+        if (myCollider.tag != "Foot")
         {
             return;
         }
 
-        if(otherCollider.tag == "Head")
+        if (otherCollider.tag == "Head")
         {
             OnKill(this, KillType.Headshot);
         }
-        else if(otherCollider.tag == "Foot" && myCollider.GetInstanceID() < otherCollider.GetInstanceID())
+        else if (otherCollider.tag == "Foot" && myCollider.GetInstanceID() < otherCollider.GetInstanceID())
         {
             OnKill(this, KillType.DoubleKill);
         }
@@ -211,23 +239,51 @@ public class PlayerCharacter : MonoBehaviour
         {
             OnKill(this, KillType.Normal);
         }
-        
     }
 
-    public void SnapToFloorPosition(float xPoint) {
+    public void ResetStats()
+    {
+        headshotsHit = 0;
+        kicksHit = 0;
+        backhopsMade = 0;
+        jumpsMade = 0;
+        divekicksMade = 0;
+        verticalDistacnce = 0;
+        approachDistance = 0;
+        retreatDistance = 0;
+    }
+
+    public Dictionary<string, float> GetPlayerStats(string side)
+    {
+        return new Dictionary<string, float>()
+        {
+            {side + "Headshots", headshotsHit},
+            {side + "Hits", kicksHit},
+            {side + "Hops",backhopsMade},
+            {side + "Jumps",jumpsMade},
+            {side + "DiveKicks",divekicksMade},
+            {side + "VerticalDistance",verticalDistacnce},
+            {side + "ApproachDistance",approachDistance},
+            {side + "RetreatDistance",retreatDistance},
+        };
+    }
+    public void SnapToFloorPosition(float xPoint)
+    {
         transform.localPosition = new Vector3(xPoint, floor.localPosition.y, transform.localPosition.z);
         velocity = Vector2.zero;
-
     }
+
     float maxHeight = float.MinValue;
+
     float minHeight = float.MaxValue;
+
     // Update is called once per frame
     void Update()
     {
-        maxHeight = Mathf.Max(maxHeight, transform.localPosition.y);
-        minHeight = Mathf.Min(maxHeight, transform.localPosition.y);
+        //maxHeight = Mathf.Max(maxHeight, transform.localPosition.y);
+        //minHeight = Mathf.Min(minHeight, transform.localPosition.y);
 
-       // Debug.Log("Min: " + minHeight + ". Max: " + maxHeight);
+        // Debug.Log("Min: " + minHeight + ". Max: " + maxHeight);
         if (debug)
             Debug.Log("Update Occurred");
         if (!controller.FixedUpdateController())

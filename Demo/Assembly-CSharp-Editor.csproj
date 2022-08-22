@@ -299,6 +299,45 @@
  <Reference Include="UnityEditor.WindowsStandalone.Extensions">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.0f6/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
  </Reference>
+ <Reference Include="Microsoft.ML.Core">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.Core.dll</HintPath>
+ </Reference>
+ <Reference Include="Microsoft.ML.CpuMath">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.CpuMath.dll</HintPath>
+ </Reference>
+ <Reference Include="Microsoft.ML.Data">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.Data.dll</HintPath>
+ </Reference>
+ <Reference Include="Microsoft.ML.DataView">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.DataView.dll</HintPath>
+ </Reference>
+ <Reference Include="Microsoft.ML">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.dll</HintPath>
+ </Reference>
+ <Reference Include="Microsoft.ML.KMeansClustering">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.KMeansClustering.dll</HintPath>
+ </Reference>
+ <Reference Include="Microsoft.ML.PCA">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.PCA.dll</HintPath>
+ </Reference>
+ <Reference Include="Microsoft.ML.StandardTrainers">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.StandardTrainers.dll</HintPath>
+ </Reference>
+ <Reference Include="Microsoft.ML.Transforms">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.Transforms.dll</HintPath>
+ </Reference>
+ <Reference Include="Newtonsoft.Json">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Newtonsoft.Json.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Collections.Immutable">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/System.Collections.Immutable.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Threading.Channels">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/System.Threading.Channels.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Threading.Tasks.Extensions">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/System.Threading.Tasks.Extensions.dll</HintPath>
+ </Reference>
  <Reference Include="protobuf-net">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/MyLibs/protobuf-net.dll</HintPath>
  </Reference>

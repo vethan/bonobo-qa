@@ -52,7 +52,13 @@ public class ReplayPlayer : AbstractGameInstance
         character.transform.localPosition = Vector3.Lerp(previousInfo.position, info.position,t);
     }
     ReplayEntry previousEntry;
+    Dictionary<string,float> stats = new Dictionary<string, float>();
     // Update is called once per frame
+    public override Dictionary<string, float> GetGameStats()
+    {
+        return stats;
+    }
+
     override protected void Update()
     {
         base.Update();

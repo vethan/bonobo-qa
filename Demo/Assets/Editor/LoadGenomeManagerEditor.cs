@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -21,7 +22,7 @@ public class LoadGenomeManagerEditor : Editor
                 var assets = AssetDatabase.FindAssets("t:TextAsset", new[] { path });
                 foreach(var asset in assets)
                 {
-                    if(!AssetDatabase.GUIDToAssetPath(asset).EndsWith("bytes"))
+                    if(!(AssetDatabase.GUIDToAssetPath(asset).EndsWith("bytes") || AssetDatabase.GUIDToAssetPath(asset).EndsWith("xml")))
                     {
                         continue;
                     }

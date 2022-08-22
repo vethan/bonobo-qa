@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using SharpNeat.Genomes.Neat;
 using SharpNeat.Phenomes;
 using UnityEngine;
@@ -70,12 +71,17 @@ public class DropFeetGameInstance : AbstractGameInstance
         switch(killType)
         {
             case PlayerCharacter.KillType.DoubleKill:
+                leftPlayer.kicksHit++;
+                rightPlayer.kicksHit++;
                 //Debug.Log("Double Kill");
                 ++leftScore;
                 ++rightScore;
                 break;
             case PlayerCharacter.KillType.Headshot:
                 //Debug.Log("Headshot");
+                scoringPlayer.kicksHit++;
+                scoringPlayer.headshotsHit++;
+
                 if (scoringPlayer == leftPlayer)
                 {
                     leftScore += 2;
@@ -87,6 +93,7 @@ public class DropFeetGameInstance : AbstractGameInstance
                 break;
             case PlayerCharacter.KillType.Normal:
                 //Debug.Log("Nice Kill");
+                scoringPlayer.kicksHit++;
                 if (scoringPlayer == leftPlayer)
                 {
                     ++leftScore;
@@ -143,6 +150,18 @@ public class DropFeetGameInstance : AbstractGameInstance
         rightEverFeet |= !rightPlayer.dropping && !rightPlayer.isOnFloor;
     }
 
+    public override Dictionary<string, float> GetGameStats()
+    {
+        Dictionary<string, float> results = new Dictionary<string, float>()
+        {
+            {"leftScore", leftScore},
+            {"rightScore", rightScore}
+        };
+
+        results.MergeInPlace(rightPlayer.GetPlayerStats("right")).MergeInPlace(leftPlayer.GetPlayerStats("left"));
+        return results;
+    }
+    
     public override float CalculateFitness()
     {
         if (_isevolvedPlayerNull)
@@ -205,6 +224,8 @@ public class DropFeetGameInstance : AbstractGameInstance
         if (killCoroutine != null)
             StopCoroutine(killCoroutine);
         evolvedPlayer.Reset();
+        rightPlayer.ResetStats();
+        leftPlayer.ResetStats();
         ResetPositions();
     }
 

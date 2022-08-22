@@ -4,10 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class GameInstance : AbstractGameInstance
 {
-
     public Rigidbody2D ball;
     public Goal leftGoal;
     public Goal rightGoal;
@@ -18,8 +18,16 @@ public class GameInstance : AbstractGameInstance
 
     public EvolvedPlayer evolved;
 
-    public override int InputCount { get { return 6; } }
-    public override int OutputCount { get { return 2; } }
+    public override int InputCount
+    {
+        get { return 6; }
+    }
+
+    public override int OutputCount
+    {
+        get { return 2; }
+    }
+
     protected override void Start()
     {
         base.Start();
@@ -50,15 +58,45 @@ public class GameInstance : AbstractGameInstance
         evolved.SetBrain(blackBox);
     }
 
+    private int samples = 0;
+    private float totalBallXVelocity = 0;
+    private float totalBallYVelocity = 0;
+
+    public override Dictionary<string, float> GetGameStats()
+    {
+        var velocityX = totalBallXVelocity / samples;
+        var velocityY = totalBallYVelocity / samples;
+        return new Dictionary<string, float>()
+        {
+            {"leftScore", leftScore},
+            {"rightScore", rightScore},
+            {"avgBallXVelocity", velocityX},
+            {"avgBallYVelocity", velocityY}
+        }.MergeInPlace(GetComponentInChildren<EvolvedPlayer>().GetPlayerStats("Evolved").MergeInPlace(GetComponentInChildren<EnemyAIController>().GetPlayerStats("Authored")));
+    }
+
     private void Reset(int direction = -1)
     {
         ball.position = transform.position;
         ball.velocity = Vector3.right * direction * 3f * transform.lossyScale.x;
     }
 
+    private void FixedUpdate()
+    {
+        samples++;
+        totalBallXVelocity += Math.Abs(ball.velocity.x);
+        totalBallYVelocity += Math.Abs(ball.velocity.y);
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+
+    }
+
     protected override string GetInputLabel(int index)
     {
-        switch(index)
+        switch (index)
         {
             case 0:
                 return "Bias";
@@ -75,6 +113,7 @@ public class GameInstance : AbstractGameInstance
             case 6:
                 return "Enemy Y Direction";
         }
+
         return "Unknown";
     }
 
@@ -87,8 +126,9 @@ public class GameInstance : AbstractGameInstance
             case 1:
                 return "Y Direction";
         }
+
         return "Unknown";
-    }    
+    }
 
     void UpdateScoreImages()
     {
@@ -106,15 +146,19 @@ public class GameInstance : AbstractGameInstance
         leftScore = 0;
         rightScore = 0;
         selected = false;
+        samples = 0;
+        totalBallXVelocity = 0;
+        totalBallYVelocity = 0;
         UpdateScoreImages();
         Reset();
         GetComponentInChildren<EvolvedPlayer>().Reset();
+        GetComponentInChildren<EvolvedPlayer>().ResetStats();
         GetComponentInChildren<EnemyAIController>().Reset();
-
+        GetComponentInChildren<EnemyAIController>().ResetStats();
     }
 
     public override float CalculateFitness()
     {
-        return (2*leftScore) - rightScore;
+        return (2 * leftScore) - rightScore;
     }
 }

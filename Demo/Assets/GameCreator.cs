@@ -1,4 +1,5 @@
-﻿using Redzen.Numerics;
+﻿using System;
+using Redzen.Numerics;
 using Redzen.Numerics.Distributions;
 using Redzen.Random;
 using Redzen.Sorting;
@@ -16,12 +17,17 @@ using SharpNeat.Phenomes;
 using SharpNeat.SpeciationStrategies;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class GameCreator : MonoBehaviour
 {
     #region sharpNEAT variables
+
     ISpeciationStrategy<NeatGenome> _speciationStrategy;
     IList<Specie<NeatGenome>> _specieList;
 
@@ -47,7 +53,7 @@ public class GameCreator : MonoBehaviour
 
     #endregion
 
-    public Rect gameDisplayRect = new Rect(0,0,.87f,.87f);
+    public Rect gameDisplayRect = new Rect(0, 0, .87f, .87f);
 
     public Text proTipText;
     public Text generationLabel;
@@ -69,7 +75,7 @@ public class GameCreator : MonoBehaviour
     public GameObject interactivePanel;
     public GameObject focusPanel;
     public bool inspectionMode;
-    public int gamesToCreate  = 1;
+    public int gamesToCreate = 1;
 
     public int gamesToShow = 4;
     public AbstractGameInstance gamePrefab;
@@ -95,15 +101,19 @@ public class GameCreator : MonoBehaviour
 
     public System.Action focusPrevOverride = null;
 
-    string[] proTips = { "The background graphs show the neural networks used by the agents",
+    string[] proTips =
+    {
+        "The background graphs show the neural networks used by the agents",
         "Left click on a game to zoom in and view details about the neural network",
-        "The left player is controlled by a neural net, the right player is a human authored agent"};
+        "The left player is controlled by a neural net, the right player is a human authored agent"
+    };
 
 
     const int AUTOMATIC_GEN_SECONDS = 30;
     public bool pauseAutoAtTargetGeneration = true;
     public int targetGeneration = 200;
     float generationTimer = 0;
+
     private void Awake()
     {
         if (inspectionMode)
@@ -116,7 +126,7 @@ public class GameCreator : MonoBehaviour
             pauseEvolution.gameObject.SetActive(false);
             focusedView.gameObject.SetActive(false);
             highSpeedMode.gameObject.SetActive(false);
-            proTips = new[] { "Please look through these samples" };
+            proTips = new[] {"Please look through these samples"};
             generationLabel.gameObject.SetActive(false);
             resetButton.gameObject.SetActive(false);
         }
@@ -124,12 +134,13 @@ public class GameCreator : MonoBehaviour
         _speciationStrategy = new KMeansClusteringStrategy<NeatGenome>(new ManhattanDistanceMetric());
 
         _complexityRegulationMode = ComplexityRegulationMode.Complexifying;
-        _complexityRegulationStrategy = new DefaultComplexityRegulationStrategy(ComplexityCeilingType.Absolute,4);
+        //_complexityRegulationStrategy = new DefaultComplexityRegulationStrategy(ComplexityCeilingType.Relative, 4);
+        _complexityRegulationStrategy = new NullComplexityRegulationStrategy();
         _eaParams = new NeatEvolutionAlgorithmParameters();
         _eaParams.SpecieCount = 9;
         _eaParams.ElitismProportion = 0.20;
         _eaParamsSimplifying = _eaParams.CreateSimplifyingParameters();
-        
+
         _eaParamsComplexifying = _eaParams;
 
         _stats = new NeatAlgorithmStats(_eaParams);
@@ -139,10 +150,15 @@ public class GameCreator : MonoBehaviour
         automaticPanel.SetActive(!interactiveMode);
         interactivePanel.SetActive(interactiveMode);
         focusPanel.SetActive(inspectionMode);
-        nextGenerationButton.onClick.AddListener(() => { Debug.Log("NEW GENERATION"); NewGeneration(); });
+        nextGenerationButton.onClick.AddListener(() =>
+        {
+            Debug.Log("NEW GENERATION");
+            NewGeneration();
+        });
         resetButton.onClick.AddListener(() => { InitialisePopulation(); });
 
-        automaticModeSwitch.onValueChanged.AddListener((newValue) => {
+        automaticModeSwitch.onValueChanged.AddListener((newValue) =>
+        {
             automaticPanel.SetActive(!newValue);
             interactivePanel.SetActive(newValue);
             interactiveMode = newValue;
@@ -159,7 +175,8 @@ public class GameCreator : MonoBehaviour
             RepositionGames();
         });
 
-        focussedNext.onClick.AddListener(() => {
+        focussedNext.onClick.AddListener(() =>
+        {
             if (focusNextOverride != null)
             {
                 focusNextOverride();
@@ -168,11 +185,13 @@ public class GameCreator : MonoBehaviour
             {
                 NextSpecies();
             }
+
             RepositionGames();
         });
 
-        focussedPrev.onClick.AddListener(() => {
-            if(focusPrevOverride != null)
+        focussedPrev.onClick.AddListener(() =>
+        {
+            if (focusPrevOverride != null)
             {
                 focusPrevOverride();
             }
@@ -180,14 +199,15 @@ public class GameCreator : MonoBehaviour
             {
                 PrevSpecies();
             }
+
             RepositionGames();
         });
         NeatGenomeParameters _neatGenomeParams = new NeatGenomeParameters();
         NetworkActivationScheme _activationScheme = NetworkActivationScheme.CreateAcyclicScheme();
         _neatGenomeParams.FeedforwardOnly = _activationScheme.AcyclicNetwork;
-        
-        _neatGenomeParams.ActivationFn = SharpNeat.Network.LeakyReLU.__DefaultInstance;// LeakyReLU.__DefaultInstance;
-        
+
+        _neatGenomeParams.ActivationFn = SharpNeat.Network.LeakyReLU.__DefaultInstance; // LeakyReLU.__DefaultInstance;
+        //_neatGenomeParams.InitialInterconnectionsProportion = 0.1;
         //_neatGenomeParams.ConnectionWeightMutationProbability = .3;
         //_neatGenomeParams.AddNodeMutationProbability = .2;
         //_neatGenomeParams.AddConnectionMutationProbability = .4;
@@ -195,7 +215,7 @@ public class GameCreator : MonoBehaviour
         //_neatGenomeParams.DeleteConnectionMutationProbability = .1;
         genomeFactory = new NeatGenomeFactory(gamePrefab.InputCount, gamePrefab.OutputCount, _neatGenomeParams);
 
-        genomeDecoder = new NeatGenomeDecoder(_activationScheme);        
+        genomeDecoder = new NeatGenomeDecoder(_activationScheme);
     }
 
     void SetFocussedSpeciesAsFirst()
@@ -203,9 +223,9 @@ public class GameCreator : MonoBehaviour
         focusSpecies = 0;
         if (_specieList == null)
             return;
-        for(int i = 0; i < _specieList.Count; i++ )
+        for (int i = 0; i < _specieList.Count; i++)
         {
-            if(_specieList[i].GenomeList.Count > 0)
+            if (_specieList[i].GenomeList.Count > 0)
             {
                 focusSpecies = i;
                 return;
@@ -249,18 +269,19 @@ public class GameCreator : MonoBehaviour
         int i = 0;
         while (processedNodes.Count < genome.NodeList.Count)
         {
-            var node = genome.NodeList[i++%genome.NodeList.Count] as NeuronGene;
+            var node = genome.NodeList[i++ % genome.NodeList.Count] as NeuronGene;
             if (processedNodes.Contains(node.Id))
                 continue;
 
-            if (node.NodeType == NodeType.Bias ){
+            if (node.NodeType == NodeType.Bias)
+            {
                 layers[0].Add(node.Id);
 
                 processedNodes.Add(node.Id);
                 continue;
             }
 
-           if(node.NodeType == NodeType.Input)
+            if (node.NodeType == NodeType.Input)
             {
                 processedNodes.Add(node.Id);
                 layers[0].Add(node.Id);
@@ -273,6 +294,7 @@ public class GameCreator : MonoBehaviour
                 {
                     connections.Add(new System.Tuple<uint, uint>(nodeId, node.Id));
                 }
+
                 processedNodes.Add(node.Id);
                 outputLayer.Add(node.Id);
                 continue;
@@ -280,39 +302,45 @@ public class GameCreator : MonoBehaviour
 
             int highestSourceLayer = 0;
             bool shouldSkip = false;
-            foreach(var nodeId in node.SourceNeurons)
+            foreach (var nodeId in node.SourceNeurons)
             {
-                if(!processedNodes.Contains(nodeId))
+                if (!processedNodes.Contains(nodeId))
                 {
                     shouldSkip = true;
                     break;
                 }
-                for(int j = 0; j < layers.Count; j++)
+
+                for (int j = 0; j < layers.Count; j++)
                 {
-                    if(layers[j].Contains(nodeId))
+                    if (layers[j].Contains(nodeId))
                     {
                         if (j > highestSourceLayer)
                             highestSourceLayer = j;
                     }
                 }
             }
+
             foreach (var nodeId in node.SourceNeurons)
             {
                 connections.Add(new System.Tuple<uint, uint>(nodeId, node.Id));
             }
+
             if (shouldSkip)
             {
                 continue;
             }
-            if(highestSourceLayer+1 >= layers.Count)
+
+            if (highestSourceLayer + 1 >= layers.Count)
             {
                 layers.Add(new List<uint>());
             }
+
             layers[highestSourceLayer + 1].Add(node.Id);
             processedNodes.Add(node.Id);
         }
+
         layers.Add(outputLayer);
-        return new Graph() { layers = layers, connections = connections };
+        return new Graph() {layers = layers, connections = connections};
     }
 
     // Start is called before the first frame update
@@ -320,9 +348,9 @@ public class GameCreator : MonoBehaviour
     {
         games = new List<AbstractGameInstance>();
         bool done = false;
-        while(!done)
+        while (!done)
         {
-            if(gameSq * gameSq < gamesToCreate)
+            if (gameSq * gameSq < gamesToCreate)
             {
                 gameSq++;
             }
@@ -346,14 +374,13 @@ public class GameCreator : MonoBehaviour
         }
 
 
-
-        for(int i = 0; i < gamesToCreate; i++)
+        for (int i = 0; i < gamesToCreate; i++)
         {
             games.Add(GameObject.Instantiate<AbstractGameInstance>(gamePrefab));
         }
+
         InitialisePopulation();
         RepositionGames(true);
-        
     }
 
     class SpeciesRecord : System.IComparable<SpeciesRecord>
@@ -364,10 +391,11 @@ public class GameCreator : MonoBehaviour
 
         public int CompareTo(object obj)
         {
-            if(obj is SpeciesRecord)
+            if (obj is SpeciesRecord)
             {
-                CompareTo((SpeciesRecord)obj);
+                CompareTo((SpeciesRecord) obj);
             }
+
             return bestFitness.CompareTo(obj);
         }
 
@@ -391,11 +419,12 @@ public class GameCreator : MonoBehaviour
             record.speciesIndex = i;
             speciesRecords.Add(record);
         }
+
         speciesRecords.Sort();
 
         List<NeatGenome> gameIndexes = new List<NeatGenome>();
         int addition = 0;
-        for(int i = 0; i + addition < gamesToShow && i < speciesRecords.Count; i++)
+        for (int i = 0; i + addition < gamesToShow && i < speciesRecords.Count; i++)
         {
             var record = speciesRecords[i];
             if (record.bestFitness == -1)
@@ -403,15 +432,17 @@ public class GameCreator : MonoBehaviour
                 addition -= 1;
                 continue;
             }
+
             gameIndexes.Add(record.genome);
         }
 
 
         displayedGames.Clear();
-        for(int i = 0; i < gameIndexes.Count; i++)
+        for (int i = 0; i < gameIndexes.Count; i++)
         {
             displayedGames[gameIndexes[i]] = i;
         }
+
         RepositionGames();
     }
 
@@ -433,7 +464,7 @@ public class GameCreator : MonoBehaviour
             NeatGenome focusGenome;
             if (focusGameIndexOverride != null)
             {
-                focusGenome = genomeList[focusGameIndexOverride()];
+                focusGenome = genomeList[focusGameIndexOverride() % genomeList.Count];
             }
             else
             {
@@ -442,10 +473,11 @@ public class GameCreator : MonoBehaviour
 
                 focusGenome = _specieList[focusSpecies].GenomeList[0];
             }
+
             for (int i = 0; i < gamesToCreate; i++)
             {
                 var instance = games[i];
-                if(focusGenome.Equals(genomeList[i]))
+                if (focusGenome.Equals(genomeList[i]))
                 {
                     instance.displayCam.rect = gameDisplayRect;
                     instance.displayCam.enabled = true;
@@ -455,6 +487,7 @@ public class GameCreator : MonoBehaviour
                     instance.displayCam.enabled = false;
                     instance.zoomCam.enabled = false;
                 }
+
                 if (reposition)
                 {
                     var x = (i) % gameSq;
@@ -465,7 +498,7 @@ public class GameCreator : MonoBehaviour
 
             return;
         }
-        
+
         //Not in focus mode
 
 
@@ -478,7 +511,7 @@ public class GameCreator : MonoBehaviour
                 var x = index % gameShowSq;
                 var y = (gamesToShow - (index + 1)) / gameShowSq;
 
-                instance.displayCam.rect = new Rect(xDisplayAdj * x, yDisplayAdj * y,xDisplayAdj,yDisplayAdj);
+                instance.displayCam.rect = new Rect(xDisplayAdj * x, yDisplayAdj * y, xDisplayAdj, yDisplayAdj);
                 instance.displayCam.enabled = true;
             }
             else
@@ -486,7 +519,8 @@ public class GameCreator : MonoBehaviour
                 instance.displayCam.enabled = false;
                 instance.zoomCam.enabled = false;
             }
-            if(reposition)
+
+            if (reposition)
             {
                 var x = i % gameSq;
                 var y = (gamesToCreate - (i + 1)) / gameSq;
@@ -498,12 +532,12 @@ public class GameCreator : MonoBehaviour
     public void PositionGame(AbstractGameInstance instance, float xAdj, float yAdj, float x, float y, Vector3 offset)
     {
         instance.transform.localScale = new Vector3(100.0f, 100.0f, 1);
-        instance.transform.position = new Vector3(xAdj * 2*x, yAdj*2 * y) + offset;
+        instance.transform.position = new Vector3(xAdj * 2 * x, yAdj * 2 * y) + offset;
     }
 
     void InitialisePopulation()
     {
-        if(update != null)
+        if (update != null)
             StopCoroutine(update);
         generationTimer = 0;
         generation = 0;
@@ -513,57 +547,59 @@ public class GameCreator : MonoBehaviour
         {
             displayedGames[genomeList[i]] = i;
         }
+
         for (int i = 0; i < gamesToCreate; i++)
         {
             SetupGame(i);
         }
+
         OnNewGeneration.Invoke();
     }
 
     public void NewGeneration()
     {
-        
         generationTimer = 0;
         paused = false;
         List<NeatGenome> selected = new List<NeatGenome>();
-        for(int i = 0; i < genomeList.Count; i++)
+        for (int i = 0; i < genomeList.Count; i++)
         {
             if (games[i].selected)
                 selected.Add(genomeList[i]);
         }
 
-         if(selected.Count == 0)
+        if (selected.Count == 0)
         {
             return;
         }
+
         generation++;
         genomeList.Clear();
         genomeList.AddRange(selected);
-        while(genomeList.Count < gamesToCreate)
+        while (genomeList.Count < gamesToCreate)
         {
-            int a  = Random.Range(0, selected.Count);
+            int a = Random.Range(0, selected.Count);
             int b = Random.Range(0, selected.Count);
-            if(a==b)
+            if (a == b)
             {
-                genomeList.Add(selected[a].CreateOffspring(generation));                
+                genomeList.Add(selected[a].CreateOffspring(generation));
             }
             else
             {
-                genomeList.Add(selected[a].CreateOffspring(selected[b],generation));
+                genomeList.Add(selected[a].CreateOffspring(selected[b], generation));
             }
         }
+
         for (int i = 0; i < gamesToCreate; i++)
         {
             SetupGame(i);
         }
-
     }
 
-    public  void SetupGame(int i, NeatGenome genome, bool hideGraph = false)
+    public void SetupGame(int i, NeatGenome genome, bool hideGraph = false)
     {
         games[i].SetEvolvedBrain(genomeDecoder.Decode(genome), genome);
 
-        
+
         games[i].SetGraph(GenerateGraph(genome));
 
         if (hideGraph)
@@ -603,7 +639,7 @@ public class GameCreator : MonoBehaviour
 
     IEnumerator AnimateAutomaticSelectionProcess(List<int> gamesToBeSelected)
     {
-        foreach(int gameIndex in gamesToBeSelected)
+        foreach (int gameIndex in gamesToBeSelected)
         {
             games[gameIndex].ToggleSelect();
 
@@ -613,21 +649,24 @@ public class GameCreator : MonoBehaviour
                 yield break;
             }
         }
+
         yield return new WaitForSeconds(2);
-        if(interactiveMode)
+        if (interactiveMode)
         {
             yield break;
         }
+
         NewGeneration();
     }
 
     int[] CreateRandomIndexOrder(int count)
     {
         int[] ts = new int[count];
-        for(int i= 0; i< count; i++)
+        for (int i = 0; i < count; i++)
         {
             ts[i] = i;
         }
+
         var last = count - 1;
         for (var i = 0; i < last; ++i)
         {
@@ -636,40 +675,47 @@ public class GameCreator : MonoBehaviour
             ts[i] = ts[r];
             ts[r] = tmp;
         }
+
         return ts;
     }
 
+    private string statFolder;
+    private StreamWriter dataCsvStream;
+    private List<string> headers;
+    private HashSet<uint> recordedGenomeIds;
     bool emptySpeciesFlag;
     List<NeatGenome> offspringList;
+
     void HandleAutomaticUpdate()
     {
         Time.timeScale = highSpeedMode.isOn ? 3 : 1;
-        foreach(var game in games)
+        bool allFinished = true;
+        foreach (var game in games)
         {
-            if(game.interesting != game.selected)
+            allFinished &= game.GameDone;
+            if (game.interesting != game.selected)
             {
                 game.ToggleSelect();
             }
         }
 
         generationTimer += Time.deltaTime;
-
-        if (paused || pauseEvolution.isOn || generationTimer <= AUTOMATIC_GEN_SECONDS)
+        
+        if (paused || pauseEvolution.isOn || (generationTimer <= AUTOMATIC_GEN_SECONDS && !allFinished))
         {
             return;
         }
         //paused = true;
-        
+
         //Calculate the fitnesses of each game instance
         for (int i = 0; i < games.Count; i++)
         {
             AbstractGameInstance gi = games[i];
-            genomeList[i].EvaluationInfo.SetFitness(Mathf.Max(1000+gi.CalculateFitness(),0));
+            genomeList[i].EvaluationInfo.SetFitness(Mathf.Max(1000 + gi.CalculateFitness(), 0));
         }
 
         if (generation > 0 && _specieList != null)
         {
-
             //TODO: EVALUATE USED TO BE HERE
             // Integrate offspring into species.
             if (emptySpeciesFlag)
@@ -679,7 +725,7 @@ public class GameCreator : MonoBehaviour
 
                 // Clear all genomes from species (we still have the elite genomes in _genomeList).
                 ClearAllSpecies();
-
+                Debug.Log("Clearing All Species.");
                 // Speciate genomeList.
                 _speciationStrategy.SpeciateGenomes(genomeList, _specieList);
             }
@@ -688,6 +734,7 @@ public class GameCreator : MonoBehaviour
                 // Integrate offspring into the existing species. 
                 _speciationStrategy.SpeciateOffspring(offspringList, _specieList);
             }
+
             Debug.Assert(!TestForEmptySpecies(_specieList), "Speciation resulted in one or more empty species.");
 
             // Sort the genomes in each specie. Fittest first (secondary sort - youngest first).
@@ -697,11 +744,12 @@ public class GameCreator : MonoBehaviour
             UpdateBestGenome();
             UpdateStats();
             avgComplexity = _stats._meanComplexity;
+            Debug.Log(_stats._maxFitness + ":::" + _stats._meanFitness);
             // Determine the complexity regulation mode and switch over to the appropriate set of evolution
             // algorithm parameters. Also notify the genome factory to allow it to modify how it creates genomes
             // (e.g. reduce or disable additive mutations).
             _complexityRegulationMode = _complexityRegulationStrategy.DetermineMode(_stats);
-            genomeFactory.SearchMode = (int)_complexityRegulationMode;
+            genomeFactory.SearchMode = (int) _complexityRegulationMode;
             switch (_complexityRegulationMode)
             {
                 case ComplexityRegulationMode.Complexifying:
@@ -721,9 +769,61 @@ public class GameCreator : MonoBehaviour
             SortSpecieGenomes();
             UpdateBestGenome();
         }
+
         // Calculate statistics for each specie (mean fitness, target size, number of offspring to produce etc.)
         int offspringCount;
         SpecieStats[] specieStatsArr = CalcSpecieStats(out offspringCount);
+        if (false)
+        {
+            //Write data for current
+            for (int i = 0; i < games.Count; i++)
+            {
+                AbstractGameInstance gi = games[i];
+                var stats = gi.GetGameStats();
+                stats["_genomeID"] = genomeList[i].Id;
+                stats["_birthGeneration"] = genomeList[i].BirthGeneration;
+                stats["_genomeSpecies"] = genomeList[i].SpecieIdx;
+
+                if (dataCsvStream == null)
+                {
+                    string baseMetricSavePath =
+                        Path.Combine(Path.GetDirectoryName(Application.dataPath), "MetricStats");
+                    if (!Directory.Exists(baseMetricSavePath))
+                    {
+                        Directory.CreateDirectory(baseMetricSavePath);
+                    }
+
+                    statFolder = Path.Combine(baseMetricSavePath,
+                        string.Format(gamePrefab.name + "metrics{0:yyyy-dd-M--HH-mm-ss}", DateTime.Now));
+                    if (!Directory.Exists(statFolder))
+                    {
+                        Directory.CreateDirectory(statFolder);
+                    }
+
+                    string filepath = Path.Combine(statFolder, "statistics.csv");
+                    recordedGenomeIds = new HashSet<uint>();
+                    headers = stats.Keys.ToList();
+                    dataCsvStream = new StreamWriter(new FileStream(filepath, FileMode.Create,
+                        FileAccess.Write, FileShare.ReadWrite));
+                    dataCsvStream.WriteLine(String.Join(",", headers));
+                }
+
+                if (!recordedGenomeIds.Contains(genomeList[i].Id))
+                {
+                    recordedGenomeIds.Add(genomeList[i].Id);
+                    dataCsvStream.WriteLine(String.Join(",", headers.Select(x => stats[x])));
+
+                    //Write the genome
+                    string filename = string.Format("Genome{0}.xml", genomeList[i].Id);
+                    var xmlDoc = NeatGenomeXmlIO.SaveComplete(genomeList[i], false);
+                    xmlDoc.Save(Path.Combine(statFolder, filename));
+                }
+
+                //print(gi.GetGameStats().PrettyPrint());
+            }
+
+            dataCsvStream.Flush();
+        }
 
         // Create offspring.
         offspringList = CreateOffspring(specieStatsArr, offspringCount);
@@ -741,20 +841,23 @@ public class GameCreator : MonoBehaviour
 
 
         SelectDisplayedGamesBasedOnSpecies();
-        
+
         for (int i = 0; i < gamesToCreate; i++)
         {
             SetupGame(i);
         }
+
         OnNewGeneration.Invoke();
         generation++;
-        if(pauseAutoAtTargetGeneration && generation == targetGeneration)
+        if (pauseAutoAtTargetGeneration && generation == targetGeneration)
         {
             pauseAutoAtTargetGeneration = false;
             pauseEvolution.isOn = true;
         }
+
         generationTimer = 0;
     }
+
     Coroutine update = null;
 
     public ulong EvaluationCount => throw new System.NotImplementedException();
@@ -764,18 +867,19 @@ public class GameCreator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         focusedView.isOn &= _specieList != null || focusGameIndexOverride != null;
         focusedView.interactable = _specieList != null || focusGameIndexOverride != null;
         if (_specieList != null || focusGameIndexOverride != null)
         {
-            focussedSpeciesText.text = "Sample: " + (focusGameIndexOverride!=null ? focusGameIndexOverride().ToString(): _specieList[focusSpecies].Id.ToString());
+            focussedSpeciesText.text = "Sample: " + (focusGameIndexOverride != null
+                ? focusGameIndexOverride().ToString()
+                : _specieList[focusSpecies].Id.ToString());
         }
 
         generationLabel.text = "Generation: " + generation;
-        proTipText.color = new Color(1,1,1,0.8f+0.2f*    Mathf.Sin(3*Time.unscaledTime));
+        proTipText.color = new Color(1, 1, 1, 0.8f + 0.2f * Mathf.Sin(3 * Time.unscaledTime));
         textChangeTimer += Time.unscaledDeltaTime;
-        if(textChangeTimer > textChangeSeconds)
+        if (textChangeTimer > textChangeSeconds)
         {
             currentTextIndex = (currentTextIndex + 1) % proTips.Length;
             proTipText.text = proTips[currentTextIndex];
@@ -787,6 +891,7 @@ public class GameCreator : MonoBehaviour
         {
             InitialisePopulation();
         }
+
         if (interactiveMode)
         {
             HandleInteractiveUpdate();
@@ -795,8 +900,6 @@ public class GameCreator : MonoBehaviour
         {
             HandleAutomaticUpdate();
         }
-
-
     }
 
 
@@ -832,9 +935,10 @@ public class GameCreator : MonoBehaviour
         int totalTargetSizeInt = 0;
 
         if (0.0 == totalMeanFitness)
-        {   // Handle specific case where all genomes/species have a zero fitness. 
+        {
+            // Handle specific case where all genomes/species have a zero fitness. 
             // Assign all species an equal targetSize.
-            double targetSizeReal = (double)gamesToCreate / (double)specieCount;
+            double targetSizeReal = (double) gamesToCreate / (double) specieCount;
 
             for (int i = 0; i < specieCount; i++)
             {
@@ -843,7 +947,7 @@ public class GameCreator : MonoBehaviour
 
                 // Stochastic rounding will result in equal allocation if targetSizeReal is a whole
                 // number, otherwise it will help to distribute allocations evenly.
-                inst._targetSizeInt = (int)NumericsUtils.ProbabilisticRound(targetSizeReal, _rng);
+                inst._targetSizeInt = (int) NumericsUtils.ProbabilisticRound(targetSizeReal, _rng);
 
                 // Total up discretized target sizes.
                 totalTargetSizeInt += inst._targetSizeInt;
@@ -855,10 +959,10 @@ public class GameCreator : MonoBehaviour
             for (int i = 0; i < specieCount; i++)
             {
                 SpecieStats inst = specieStatsArr[i];
-                inst._targetSizeReal = (inst._meanFitness / totalMeanFitness) * (double)gamesToCreate;
+                inst._targetSizeReal = (inst._meanFitness / totalMeanFitness) * (double) gamesToCreate;
 
                 // Discretize targetSize (stochastic rounding).
-                inst._targetSizeInt = (int)NumericsUtils.ProbabilisticRound(inst._targetSizeReal, _rng);
+                inst._targetSizeInt = (int) NumericsUtils.ProbabilisticRound(inst._targetSizeReal, _rng);
 
                 // Total up discretized target sizes.
                 totalTargetSizeInt += inst._targetSizeInt;
@@ -899,7 +1003,7 @@ public class GameCreator : MonoBehaviour
                 for (int i = 0; i < specieCount; i++)
                 {
                     SpecieStats inst = specieStatsArr[i];
-                    probabilities[i] = System.Math.Max(0.0, inst._targetSizeReal - (double)inst._targetSizeInt);
+                    probabilities[i] = System.Math.Max(0.0, inst._targetSizeReal - (double) inst._targetSizeInt);
                 }
 
                 // Use a built in class for choosing an item based on a list of relative probabilities.
@@ -925,7 +1029,7 @@ public class GameCreator : MonoBehaviour
             for (int i = 0; i < specieCount; i++)
             {
                 SpecieStats inst = specieStatsArr[i];
-                probabilities[i] = System.Math.Max(0.0, (double)inst._targetSizeInt - inst._targetSizeReal);
+                probabilities[i] = System.Math.Max(0.0, (double) inst._targetSizeInt - inst._targetSizeReal);
             }
 
             // Use a built in class for choosing an item based on a list of relative probabilities.
@@ -968,7 +1072,8 @@ public class GameCreator : MonoBehaviour
                 specieStatsArr[idx]._targetSizeInt--;
             }
             else
-            {   // Scan forward from this specie to find a suitable one.
+            {
+                // Scan forward from this specie to find a suitable one.
                 bool done = false;
                 idx++;
                 for (; idx < specieCount; idx++)
@@ -993,9 +1098,11 @@ public class GameCreator : MonoBehaviour
                             break;
                         }
                     }
+
                     if (!done)
                     {
-                        throw new SharpNeatException("CalcSpecieStats(). Error adjusting target population size down. Is the population size less than or equal to the number of species?");
+                        throw new SharpNeatException(
+                            "CalcSpecieStats(). Error adjusting target population size down. Is the population size less than or equal to the number of species?");
                     }
                 }
             }
@@ -1010,13 +1117,14 @@ public class GameCreator : MonoBehaviour
             // Special case - zero target size.
             if (0 == specieStatsArr[i]._targetSizeInt)
             {
+                print("Target size was zero. Elite size became zero");
                 specieStatsArr[i]._eliteSizeInt = 0;
                 continue;
             }
 
             // Discretize the real size with a probabilistic handling of the fractional part.
             double eliteSizeReal = _specieList[i].GenomeList.Count * _eaParams.ElitismProportion;
-            int eliteSizeInt = (int)NumericsUtils.ProbabilisticRound(eliteSizeReal, _rng);
+            int eliteSizeInt = (int) NumericsUtils.ProbabilisticRound(eliteSizeReal, _rng);
 
             // Ensure eliteSizeInt is no larger than the current target size (remember it was calculated 
             // against the current size of the specie not its new target size).
@@ -1038,14 +1146,15 @@ public class GameCreator : MonoBehaviour
 
             // While we're here we determine the split between asexual and sexual reproduction. Again using 
             // some probabilistic logic to compensate for any rounding bias.
-            double offspringAsexualCountReal = (double)inst._offspringCount * _eaParams.OffspringAsexualProportion;
-            inst._offspringAsexualCount = (int)NumericsUtils.ProbabilisticRound(offspringAsexualCountReal, _rng);
+            double offspringAsexualCountReal = (double) inst._offspringCount * _eaParams.OffspringAsexualProportion;
+            inst._offspringAsexualCount = (int) NumericsUtils.ProbabilisticRound(offspringAsexualCountReal, _rng);
             inst._offspringSexualCount = inst._offspringCount - inst._offspringAsexualCount;
 
             // Also while we're here we calculate the selectionSize. The number of the specie's fittest genomes
             // that are selected from to create offspring. This should always be at least 1.
             double selectionSizeReal = _specieList[i].GenomeList.Count * _eaParams.SelectionProportion;
-            inst._selectionSizeInt = System.Math.Max(1, (int)NumericsUtils.ProbabilisticRound(selectionSizeReal, _rng));
+            inst._selectionSizeInt =
+                System.Math.Max(1, (int) NumericsUtils.ProbabilisticRound(selectionSizeReal, _rng));
         }
 
         return specieStatsArr;
@@ -1092,6 +1201,7 @@ public class GameCreator : MonoBehaviour
             {
                 probabilities[j] = genomeList[j].EvaluationInfo.Fitness;
             }
+
             distArr[i] = new DiscreteDistribution(probabilities);
         }
 
@@ -1115,23 +1225,26 @@ public class GameCreator : MonoBehaviour
                 NeatGenome offspring = genomeList[genomeIdx].CreateOffspring(generation);
                 offspringList.Add(offspring);
             }
-            _stats._asexualOffspringCount += (ulong)inst._offspringAsexualCount;
+
+            _stats._asexualOffspringCount += (ulong) inst._offspringAsexualCount;
 
             // --- Produce the required number of offspring from sexual reproduction.
             // Cross-specie mating.
             // If nonZeroSpecieCount is exactly 1 then we skip inter-species mating. One is a special case because
             // for 0 the  species all get an even chance of selection, and for >1 we can just select species normally.
-            int crossSpecieMatings = nonZeroSpecieCount == 1 ? 0 :
-                                        (int)NumericsUtils.ProbabilisticRound(_eaParams.InterspeciesMatingProportion
-                                                                        * inst._offspringSexualCount, _rng);
-            _stats._sexualOffspringCount += (ulong)(inst._offspringSexualCount - crossSpecieMatings);
-            _stats._interspeciesOffspringCount += (ulong)crossSpecieMatings;
+            int crossSpecieMatings = nonZeroSpecieCount == 1
+                ? 0
+                : (int) NumericsUtils.ProbabilisticRound(_eaParams.InterspeciesMatingProportion
+                                                         * inst._offspringSexualCount, _rng);
+            _stats._sexualOffspringCount += (ulong) (inst._offspringSexualCount - crossSpecieMatings);
+            _stats._interspeciesOffspringCount += (ulong) crossSpecieMatings;
 
             // An index that keeps track of how many offspring have been produced in total.
             int matingsCount = 0;
             for (; matingsCount < crossSpecieMatings; matingsCount++)
             {
-                NeatGenome offspring = CreateOffspring_CrossSpecieMating(dist, distArr, rwlSpecies, specieIdx, genomeList);
+                NeatGenome offspring =
+                    CreateOffspring_CrossSpecieMating(dist, distArr, rwlSpecies, specieIdx, genomeList);
                 offspringList.Add(offspring);
             }
 
@@ -1161,14 +1274,16 @@ public class GameCreator : MonoBehaviour
 
                     // Test for existence of at least one more parent to select.
                     if (0 != distTmp.Probabilities.Length)
-                    {   // Get the two parents to mate.
+                    {
+                        // Get the two parents to mate.
                         int parent2Idx = DiscreteDistribution.Sample(_rng, distTmp);
                         NeatGenome parent2 = genomeList[parent2Idx];
                         NeatGenome offspring = parent1.CreateOffspring(parent2, generation);
                         offspringList.Add(offspring);
                     }
                     else
-                    {   // No other parent has a non-zero selection probability (they all have zero fitness).
+                    {
+                        // No other parent has a non-zero selection probability (they all have zero fitness).
                         // Fall back to asexual reproduction of the single genome with a non-zero fitness.
                         NeatGenome offspring = parent1.CreateOffspring(generation);
                         offspringList.Add(offspring);
@@ -1177,7 +1292,7 @@ public class GameCreator : MonoBehaviour
             }
         }
 
-        _stats._totalOffspringCount += (ulong)offspringCount;
+        _stats._totalOffspringCount += (ulong) offspringCount;
         return offspringList;
     }
 
@@ -1190,10 +1305,10 @@ public class GameCreator : MonoBehaviour
     /// <param name="currentSpecieIdx">Current specie's index in _specieList</param>
     /// <param name="genomeList">Current specie's genome list.</param>
     private NeatGenome CreateOffspring_CrossSpecieMating(DiscreteDistribution dist,
-                                                      DiscreteDistribution[] distArr,
-                                                      DiscreteDistribution rwlSpecies,
-                                                      int currentSpecieIdx,
-                                                      IList<NeatGenome> genomeList)
+        DiscreteDistribution[] distArr,
+        DiscreteDistribution rwlSpecies,
+        int currentSpecieIdx,
+        IList<NeatGenome> genomeList)
     {
         // Select parent from current specie.
         int parent1Idx = DiscreteDistribution.Sample(_rng, dist);
@@ -1256,7 +1371,7 @@ public class GameCreator : MonoBehaviour
         lock (_stats)
         {
             _stats._generation = generation;
-            _stats._totalEvaluationCount = (generation + 1)  * (uint)gamesToCreate;
+            _stats._totalEvaluationCount = (generation + 1) * (uint) gamesToCreate;
 
             // Evaluation per second.
             System.DateTime now = System.DateTime.Now;
@@ -1266,11 +1381,11 @@ public class GameCreator : MonoBehaviour
             // since it was last updated.
             if (duration.Ticks > 9999)
             {
-                long evalsSinceLastUpdate = (long)(_stats._totalEvaluationCount - _stats._evalsCountAtLastUpdate);
-                _stats._evaluationsPerSec = (int)((evalsSinceLastUpdate * 1e7) / duration.Ticks);
+                long evalsSinceLastUpdate = (long) (_stats._totalEvaluationCount - _stats._evalsCountAtLastUpdate);
+                _stats._evaluationsPerSec = (int) ((evalsSinceLastUpdate * 1e7) / duration.Ticks);
 
                 // Reset working variables.
-                _stats._evalsCountAtLastUpdate = (generation + 1)  *(uint)gamesToCreate; 
+                _stats._evalsCountAtLastUpdate = (generation + 1) * (uint) gamesToCreate;
                 _stats._evalsPerSecLastSampleTime = now;
             }
 
@@ -1300,6 +1415,7 @@ public class GameCreator : MonoBehaviour
             {
                 totalSpecieChampFitness += _specieList[i].GenomeList[0].EvaluationInfo.Fitness;
             }
+
             _stats._meanSpecieChampFitness = totalSpecieChampFitness / specieCount;
 
             // Moving averages.
@@ -1379,6 +1495,7 @@ public class GameCreator : MonoBehaviour
                 emptySpeciesFlag = true;
             }
         }
+
         return emptySpeciesFlag;
     }
 
@@ -1398,6 +1515,7 @@ public class GameCreator : MonoBehaviour
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1409,6 +1527,7 @@ public class GameCreator : MonoBehaviour
         {
             total += inst._targetSizeInt;
         }
+
         return total;
     }
 

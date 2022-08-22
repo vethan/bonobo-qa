@@ -58,6 +58,10 @@ public abstract class AbstractGameInstance : MonoBehaviour
 
     }
 
+    public bool GameDone { get; protected set; } = false;
+        
+    
+    
     public void AlignCameras()
     {
         var trueVert = transform.TransformVector(horizBorder, vertBorder, 1).y;
@@ -103,6 +107,10 @@ public abstract class AbstractGameInstance : MonoBehaviour
     public abstract float CalculateFitness();
     public abstract void FullReset();
     public abstract void SetEvolvedBrain(IBlackBox blackBox, NeatGenome genome);
+    
+    public abstract Dictionary<string, float> GetGameStats();
+
+    
     protected virtual void Update()
     {
 

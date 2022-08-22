@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class EnemyAIController : MonoBehaviour
 {
@@ -22,6 +24,41 @@ public class EnemyAIController : MonoBehaviour
         myGame = GetComponentInParent<GameInstance>();
         Puck = myGame.ball;
     }
+    
+    public void ResetStats()
+    {
+        totalVelocity = Vector2.zero;
+        ballTaps = 0;
+        samples = 0;
+        ballDistances = 0;
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag.Equals("Ball"))
+        {
+            ballTaps += 1;
+        }
+    }
+
+
+    public Dictionary<string, float> GetPlayerStats(string side)
+    {
+        return new Dictionary<string, float>()
+        {
+            {side + "AverageXVelocity", totalVelocity.x/samples},
+            {side + "AverageYVelocity", totalVelocity.y/samples},
+            {side + "BallTaps",ballTaps},
+            {side + "AvgDistToBall",ballDistances/samples}
+        };
+    }
+
+    private float ballDistances = 0;
+    private int ballTaps = 0;
+    private Vector2 totalVelocity = Vector2.zero;
+
+    private int samples;
+    
     public void Reset()
     {
         rb.transform.localPosition = startingPosition;
@@ -56,7 +93,13 @@ public class EnemyAIController : MonoBehaviour
             targetPosition += (Vector2)(myGame.transform.position);
         }
 
-        rb.MovePosition(Vector2.MoveTowards(rb.position, targetPosition,
-                movementSpeed * Time.fixedDeltaTime));
+        var endPos = Vector2.MoveTowards(rb.position, targetPosition,
+            movementSpeed * Time.fixedDeltaTime);
+        var velocity = (endPos-rb.position ) / Time.fixedDeltaTime;
+        rb.MovePosition(endPos);
+        
+        totalVelocity += velocity;
+        ballDistances += (rb.position-Puck.position).magnitude;
+        samples++;
     }
 }

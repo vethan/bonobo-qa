@@ -1,4 +1,5 @@
-﻿using SharpNeat.Phenomes;
+﻿using System;
+using SharpNeat.Phenomes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +13,9 @@ public class EvolvedPlayer : MonoBehaviour
     GameInstance parent;
     Rigidbody2D rb;
     float MaxMovementSpeed = 15.0f;
+
     Vector3 startingPosition;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -20,7 +23,6 @@ public class EvolvedPlayer : MonoBehaviour
         parent = transform.parent.GetComponent<GameInstance>();
         ball = parent.ball;
         opponent = parent.GetComponentInChildren<EnemyAIController>().GetComponent<Rigidbody2D>();
-
     }
 
     private void OnEnable()
@@ -38,12 +40,14 @@ public class EvolvedPlayer : MonoBehaviour
         brain = newBrain;
     }
 
+    private float lastDistanceToBall;
+
     void OriginalInputs()
     {
         //First two: Normalised direction to ball
 
         var temp = ball.position - rb.position;
-        var dist = temp.magnitude;
+        lastDistanceToBall = temp.magnitude;
         temp.Normalize();
         inputSignals[0] = temp.x;
         inputSignals[1] = temp.y;
@@ -56,13 +60,46 @@ public class EvolvedPlayer : MonoBehaviour
 
         //Next: Direction to enemy
         temp = opponent.position - rb.position;
-        dist = temp.magnitude;
+        var dist = temp.magnitude;
         temp.Normalize();
         inputSignals[4] = temp.x;
         inputSignals[5] = temp.y;
         brain.InputSignalArray.CopyFrom(inputSignals, 0);
-
     }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag.Equals("Ball"))
+        {
+            ballTaps += 1;
+        }
+    }
+
+
+    public void ResetStats()
+    {
+        totalVelocity = Vector2.zero;
+        ballTaps = 0;
+        samples = 0;
+        ballDistances = 0;
+    }
+
+    public Dictionary<string, float> GetPlayerStats(string side)
+    {
+        return new Dictionary<string, float>()
+        {
+            {side + "AverageXVelocity", totalVelocity.x / samples},
+            {side + "AverageYVelocity", totalVelocity.y / samples},
+            {side + "BallTaps", ballTaps},
+            {side + "AvgDistToBall", ballDistances / samples}
+        };
+    }
+
+    private float ballDistances = 0;
+    private int ballTaps = 0;
+    private Vector2 totalVelocity = Vector2.zero;
+
+    private int samples;
 
     // Update is called once per frame
     void FixedUpdate()
@@ -98,17 +135,23 @@ public class EvolvedPlayer : MonoBehaviour
         OriginalInputs();
         brain.Activate();
 
-        float xDirection = Mathf.Clamp((float)(brain.OutputSignalArray[0]-0.5) * 2,-1,1);
-        float yDirection = Mathf.Clamp((float)(brain.OutputSignalArray[1]-0.5) * 2,-1,1);
-        if(Mathf.Abs(xDirection) < 0.2f)
+        float xDirection = Mathf.Clamp((float) (brain.OutputSignalArray[0] - 0.5) * 2, -1, 1);
+        float yDirection = Mathf.Clamp((float) (brain.OutputSignalArray[1] - 0.5) * 2, -1, 1);
+        if (Mathf.Abs(xDirection) < 0.2f)
         {
             xDirection = 0;
         }
+
         if (Mathf.Abs(yDirection) < 0.2f)
         {
             yDirection = 0;
         }
-        Vector2 targetTranslation = (Vector2)(parent.transform.localToWorldMatrix * new Vector3(xDirection,yDirection));
-        rb.velocity = ((targetTranslation* MaxMovementSpeed));
+
+        Vector2 targetTranslation =
+            (Vector2) (parent.transform.localToWorldMatrix * new Vector3(xDirection, yDirection));
+        rb.velocity = ((targetTranslation * MaxMovementSpeed));
+        totalVelocity += rb.velocity;
+        ballDistances += lastDistanceToBall;
+        samples++;
     }
 }
