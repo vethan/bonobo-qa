@@ -71,8 +71,23 @@
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
+ <Reference Include="Unity.Burst">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Burst.dll</HintPath>
+ </Reference>
  <Reference Include="Unity.VSCode.Editor">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.Jobs">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Jobs.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.Jobs.Editor">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Jobs.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.Burst.Editor">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Burst.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.Collections">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Recorder.Editor">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Recorder.Editor.dll</HintPath>
@@ -101,11 +116,20 @@
  <Reference Include="Unity.Rider.Editor">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
  </Reference>
+ <Reference Include="KNN">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/KNN.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.Mathematics">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Mathematics.dll</HintPath>
+ </Reference>
  <Reference Include="Unity.2D.Sprite.Editor">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Postprocessing.Runtime">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.Mathematics.Editor">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Mathematics.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
@@ -352,6 +376,9 @@
  </Reference>
  <Reference Include="System.Memory">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/SharpNEAT/System.Memory.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.Burst.Unsafe">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/PackageCache/com.unity.burst@1.1.2/Unity.Burst.Unsafe.dll</HintPath>
  </Reference>
  <Reference Include="System.Runtime.CompilerServices.Unsafe">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/SharpNEAT/System.Runtime.CompilerServices.Unsafe.dll</HintPath>

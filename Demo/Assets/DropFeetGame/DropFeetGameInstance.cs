@@ -13,14 +13,23 @@ public class DropFeetGameInstance : AbstractGameInstance
     public PlayerCharacter rightPlayer;
     public Transform floor;
     EvolvedDropFeetController evolvedPlayer;
-    public override int InputCount { get { return 7; } }
-    public override int OutputCount { get { return 2; } }
+
+    public override int InputCount
+    {
+        get { return 7; }
+    }
+
+    public override int OutputCount
+    {
+        get { return 2; }
+    }
 
     public int leftScore { get; private set; }
     public int rightScore { get; private set; }
-    
+
     Coroutine killCoroutine = null;
     public float fitness;
+
     void UpdateScoreImages()
     {
         Vector3 val = leftScoreSprite.transform.localScale;
@@ -36,7 +45,6 @@ public class DropFeetGameInstance : AbstractGameInstance
     // Start is called before the first frame update
     override protected void Awake()
     {
-        
         Application.targetFrameRate = 60;
         base.Awake();
         evolvedPlayer = GetComponentInChildren<EvolvedDropFeetController>();
@@ -47,14 +55,15 @@ public class DropFeetGameInstance : AbstractGameInstance
 
 
     void ResetPositions()
-    {        
+    {
         leftPlayer.SnapToFloorPosition(-4);
         rightPlayer.SnapToFloorPosition(4);
         isPausedForKill = false;
         OnNewRound();
     }
-    public bool isPausedForKill  { get; private set;}
-    
+
+    public bool isPausedForKill { get; private set; }
+
     IEnumerator PauseThenReset()
     {
         yield return new WaitForSeconds(0.5f);
@@ -64,11 +73,12 @@ public class DropFeetGameInstance : AbstractGameInstance
 
     void HandleOnKill(PlayerCharacter scoringPlayer, PlayerCharacter.KillType killType)
     {
-        if(isPausedForKill)
+        if (isPausedForKill)
         {
             return;
         }
-        switch(killType)
+
+        switch (killType)
         {
             case PlayerCharacter.KillType.DoubleKill:
                 leftPlayer.kicksHit++;
@@ -90,6 +100,7 @@ public class DropFeetGameInstance : AbstractGameInstance
                 {
                     rightScore += 2;
                 }
+
                 break;
             case PlayerCharacter.KillType.Normal:
                 //Debug.Log("Nice Kill");
@@ -102,8 +113,10 @@ public class DropFeetGameInstance : AbstractGameInstance
                 {
                     ++rightScore;
                 }
+
                 break;
         }
+
         isPausedForKill = true;
         UpdateScoreImages();
         killCoroutine = StartCoroutine(PauseThenReset());
@@ -118,6 +131,7 @@ public class DropFeetGameInstance : AbstractGameInstance
             case 1:
                 return "DiveKick/Hop Back";
         }
+
         return "Unknown";
     }
 
@@ -142,8 +156,10 @@ public class DropFeetGameInstance : AbstractGameInstance
             case 7:
                 return "Y position";
         }
+
         return "Unknown";
     }
+
     private void FixedUpdate()
     {
         rightEverDrop |= rightPlayer.dropping;
@@ -161,18 +177,19 @@ public class DropFeetGameInstance : AbstractGameInstance
         results.MergeInPlace(rightPlayer.GetPlayerStats("right")).MergeInPlace(leftPlayer.GetPlayerStats("left"));
         return results;
     }
-    
+
     public override float CalculateFitness()
     {
         if (_isevolvedPlayerNull)
             return 0;
         float fit = 0;
-        
-        if(!evolvedPlayer.everDrop && !evolvedPlayer.everFeet)
+
+        if (!evolvedPlayer.everDrop && !evolvedPlayer.everFeet)
         {
             fit = -10;
         }
-        else if((evolvedPlayer.everFeet && !evolvedPlayer.everDrop) || (!evolvedPlayer.everFeet && evolvedPlayer.everDrop))
+        else if ((evolvedPlayer.everFeet && !evolvedPlayer.everDrop) ||
+                 (!evolvedPlayer.everFeet && evolvedPlayer.everDrop))
         {
             fit = 5;
         }
@@ -180,6 +197,7 @@ public class DropFeetGameInstance : AbstractGameInstance
         {
             fit = 30;
         }
+
         /*
 
         if (!rightEverDrop && !rightEverFeet)
@@ -210,6 +228,7 @@ public class DropFeetGameInstance : AbstractGameInstance
         base.Update();
         fitness = CalculateFitness();
     }
+
     public bool rightEverDrop;
     public bool rightEverFeet;
 
@@ -227,6 +246,17 @@ public class DropFeetGameInstance : AbstractGameInstance
         rightPlayer.ResetStats();
         leftPlayer.ResetStats();
         ResetPositions();
+        var utilController = leftPlayer.GetComponent<UtilityDropFeetController>();
+        if (utilController != null)
+        {
+            utilController.ResetRandomness();
+        }
+
+        utilController = rightPlayer.GetComponent<UtilityDropFeetController>();
+        if (utilController != null)
+        {
+            utilController.ResetRandomness();
+        }
     }
 
     public NeatGenome genome = null;

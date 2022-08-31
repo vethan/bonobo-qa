@@ -118,19 +118,20 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
         const float maxHeight = 1.342005f;
         const float minHeight = -4.489993f;
         float maxRandomAttackHeight = (maxHeight-minHeight);// *.4f;
+        
         public RandomlyAdvanceAction(UtilityDropFeetController parent) : base(parent)
         {
         }
 
         void SetNewtimescale(float minSecs, float maxSecs)
         {
-            timeScale = (Random.value * (maxSecs-minSecs)) + minSecs;
+            timeScale = ((float)parent.pseudoRandom.NextDouble() * (maxSecs-minSecs)) + minSecs;
         }
         public override void BeginAction()
         {
             justSelected = true;
-            isEmptyJump = Random.value > 0.75;
-            jumpTargetHeightDiff = Mathf.Lerp(-maxRandomAttackHeight, maxRandomAttackHeight, Random.value);
+            isEmptyJump = parent.pseudoRandom.NextDouble() > 0.75;
+            jumpTargetHeightDiff = Mathf.Lerp(-maxRandomAttackHeight, maxRandomAttackHeight, (float)parent.pseudoRandom.NextDouble());
             //Debug.Log("Target Height: " + jumpTargetHeightDiff);
         }
 

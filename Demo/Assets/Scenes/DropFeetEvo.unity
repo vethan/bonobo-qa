@@ -128,10 +128,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4311757448465232261, guid: 16ce59e34a289594285ad81fe676e51e,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -34.19995
+      objectReference: {fileID: 0}
     - target: {fileID: 4311757449833822933, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -9.960022
+      value: -9.959961
       objectReference: {fileID: 0}
     - target: {fileID: 4311757449975177174, guid: 16ce59e34a289594285ad81fe676e51e,
         type: 3}
@@ -192,6 +197,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Game InstantiateRig
+      objectReference: {fileID: 0}
+    - target: {fileID: 4311757449975177177, guid: 16ce59e34a289594285ad81fe676e51e,
+        type: 3}
+      propertyPath: pauseAutoAtTargetGeneration
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4311757450015983948, guid: 16ce59e34a289594285ad81fe676e51e,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -4.040039
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 16ce59e34a289594285ad81fe676e51e, type: 3}

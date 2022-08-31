@@ -20,6 +20,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using KNN;
+using KNN.Jobs;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+using Microsoft.ML.Transforms;
+using Unity.Collections;
+using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -38,9 +46,11 @@ public class GameCreator : MonoBehaviour
     NeatEvolutionAlgorithmParameters _eaParamsComplexifying;
     NeatEvolutionAlgorithmParameters _eaParamsSimplifying;
 
-
+    MLContext mlContext = new MLContext();
+    private HashSet<string> columnNames;
     ComplexityRegulationMode _complexityRegulationMode;
     IComplexityRegulationStrategy _complexityRegulationStrategy;
+    private List<GenomeMetric> genomeRepertoire;
 
     internal AbstractGameInstance GetGame(int i)
     {
@@ -114,8 +124,14 @@ public class GameCreator : MonoBehaviour
     public int targetGeneration = 200;
     float generationTimer = 0;
 
+    private ScatterPlot scatterPlot;
+
     private void Awake()
     {
+        scatterPlot = new GameObject("ScatterPlot").AddComponent<ScatterPlot>();
+        scatterPlot.transform.position = new Vector3(-2000, -2000, 0);
+        repositoryPoints = new NativeArray<float3>(MAX_REPOSITORY_SIZE, Allocator.Persistent);
+        knnContainer = new KnnContainer(repositoryPoints, false, Allocator.Persistent);
         if (inspectionMode)
         {
             interactiveMode = false;
@@ -407,40 +423,10 @@ public class GameCreator : MonoBehaviour
 
     void SelectDisplayedGamesBasedOnSpecies()
     {
-        List<SpeciesRecord> speciesRecords = new List<SpeciesRecord>();
-        for (var i = 0; i < _specieList.Count; i++)
-        {
-            Specie<NeatGenome> species = _specieList[i];
-            SpeciesRecord record = new SpeciesRecord();
-            if (species.GenomeList.Count == 0)
-                continue;
-            record.bestFitness = species.GenomeList[0].EvaluationInfo.Fitness;
-            record.genome = species.GenomeList[0];
-            record.speciesIndex = i;
-            speciesRecords.Add(record);
-        }
-
-        speciesRecords.Sort();
-
-        List<NeatGenome> gameIndexes = new List<NeatGenome>();
-        int addition = 0;
-        for (int i = 0; i + addition < gamesToShow && i < speciesRecords.Count; i++)
-        {
-            var record = speciesRecords[i];
-            if (record.bestFitness == -1)
-            {
-                addition -= 1;
-                continue;
-            }
-
-            gameIndexes.Add(record.genome);
-        }
-
-
         displayedGames.Clear();
-        for (int i = 0; i < gameIndexes.Count; i++)
+        for (int i = 0; i < gamesToShow; i++)
         {
-            displayedGames[gameIndexes[i]] = i;
+            displayedGames[genomeList[i]] = i;
         }
 
         RepositionGames();
@@ -537,11 +523,17 @@ public class GameCreator : MonoBehaviour
 
     void InitialisePopulation()
     {
+        genomeRepertoire = new List<GenomeMetric>();
         if (update != null)
             StopCoroutine(update);
         generationTimer = 0;
         generation = 0;
         paused = false;
+        for (int i = 0; i < MAX_REPOSITORY_SIZE; i++)
+        {
+            repositoryPoints[i] = new float3(float.MinValue, float.MinValue, float.MinValue);
+        }
+
         genomeList = genomeFactory.CreateGenomeList(gamesToCreate, 0);
         for (int i = 0; i < gamesToShow; i++)
         {
@@ -685,10 +677,175 @@ public class GameCreator : MonoBehaviour
     private HashSet<uint> recordedGenomeIds;
     bool emptySpeciesFlag;
     List<NeatGenome> offspringList;
+    private int nextModelUpdateGeneration = 0;
+    private int nextModelUpdateGapIncrease = 10;
+    private IEstimator<ITransformer> dataPrepEstimator;
+    private ITransformer dataPrepTransformer;
+    private PrincipalComponentAnalysisTransformer pcaTranformer;
+    private const int MAX_REPOSITORY_SIZE = 100000;
+    private NativeArray<float3> repositoryPoints;
+    private KnnContainer knnContainer;
+    private JobHandle rebuildHandle;
+
+    void UpdatePCAModel()
+    {
+        IDataView inData = new GenomeMetricDataView(genomeRepertoire);
+        dataPrepTransformer = dataPrepEstimator.Fit(inData);
+        IDataView normalisedData = dataPrepTransformer.Transform(inData);
+
+        var pcaEstimator = mlContext.Transforms.ProjectToPrincipalComponents("FeaturesPCA", "Features", null, 3);
+        pcaTranformer = pcaEstimator.Fit(normalisedData);
+        var pcaData = pcaTranformer.Transform(normalisedData);
+        DataViewSchema columns = pcaData.Schema;
+
+        pcaBounds = new Bounds();
+        using (DataViewRowCursor cursor = pcaData.GetRowCursor(columns))
+        {
+            VBuffer<float> pcaVector = default;
+            DataViewRowId rowId = default;
+            var pcaGetter = cursor.GetGetter<VBuffer<float>>(columns.GetColumnOrNull("FeaturesPCA").Value);
+            var idGetter = cursor.GetIdGetter();
+            int index = 0;
+            while (cursor.MoveNext())
+            {
+                //Get values from respective columns
+                pcaGetter.Invoke(ref pcaVector);
+                idGetter.Invoke(ref rowId);
+
+                Debug.Assert(genomeRepertoire[index].genome.Id == rowId.Low);
+
+                repositoryPoints[index] = new float3(pcaVector.GetItemOrDefault(0), pcaVector.GetItemOrDefault(1),
+                    pcaVector.GetItemOrDefault(2));
+                pcaBounds.Encapsulate(repositoryPoints[index]);
+                index++;
+            }
+        }
+
+        rebuildHandle.Complete();
+        rebuildHandle = new KnnRebuildJob(knnContainer).Schedule();
+
+        UpdateThreshold();
+        PruneRepositoryOfClosePoints();
+    }
+
+    private void OnDestroy()
+    {
+        rebuildHandle.Complete();
+
+        knnContainer.Dispose();
+        repositoryPoints.Dispose();
+    }
+
+    void UpdateThreshold()
+    {
+        thresholdSq = (pcaBounds.size.x * pcaBounds.size.x + pcaBounds.size.y * pcaBounds.size.y +
+                       pcaBounds.size.z * pcaBounds.size.z) /
+                      (targetRepositorySize * 2.0f);
+    }
+
+    public float thresholdSq = 0.2f;
+    public Bounds pcaBounds = new Bounds();
+    private int targetRepositorySize = 300;
+
+    NativeArray<float3> GetPCAPoints(List<GenomeMetric> tempRepository, bool updateBounds)
+    {
+        IDataView inData = new GenomeMetricDataView(tempRepository);
+        IDataView normalisedData = dataPrepTransformer.Transform(inData);
+        var pcaData = pcaTranformer.Transform(normalisedData);
+        DataViewSchema columns = pcaData.Schema;
+        NativeArray<float3> queryPoints = new NativeArray<float3>(tempRepository.Count(), Allocator.TempJob);
+
+        using (DataViewRowCursor cursor = pcaData.GetRowCursor(columns))
+        {
+            VBuffer<float> pcaVector = default;
+            DataViewRowId rowId = default;
+            var pcaGetter = cursor.GetGetter<VBuffer<float>>(columns.GetColumnOrNull("FeaturesPCA").Value);
+            var idGetter = cursor.GetIdGetter();
+            int index = 0;
+            while (cursor.MoveNext())
+            {
+                //Get values from respective columns
+                pcaGetter.Invoke(ref pcaVector);
+                idGetter.Invoke(ref rowId);
+
+                Debug.Assert(tempRepository[index].genome.Id == rowId.Low);
+
+                queryPoints[index] = new float3(pcaVector.GetItemOrDefault(0), pcaVector.GetItemOrDefault(1),
+                    pcaVector.GetItemOrDefault(2));
+                if (updateBounds)
+                {
+                    pcaBounds.Encapsulate(queryPoints[index]);
+                }
+
+                index++;
+            }
+        }
+
+        return queryPoints;
+    }
+
+    void PruneRepositoryOfClosePoints()
+    {
+        List<int> toBePruned = new List<int>();
+        for (int i = 0; i < genomeRepertoire.Count(); i++)
+        {
+            if (toBePruned.Contains(i))
+            {
+                continue;
+            }
+
+            HashSet<int> possiblyClose = new HashSet<int>();
+            possiblyClose.Add(i);
+            int toKeepIndex = i;
+            for (int j = i + 1; j < genomeRepertoire.Count(); j++)
+            {
+                if (toBePruned.Contains(j))
+                {
+                    continue;
+                }
+
+                var dist = Vector3.SqrMagnitude(repositoryPoints[i] - repositoryPoints[j]);
+                if (dist < thresholdSq)
+                {
+                    possiblyClose.Add(j);
+
+                    if ((genomeRepertoire[j].curiosityScore > genomeRepertoire[toKeepIndex].curiosityScore) ||
+                        (genomeRepertoire[j].curiosityScore == genomeRepertoire[toKeepIndex].curiosityScore &&
+                         genomeRepertoire[j].genome.BirthGeneration >
+                         genomeRepertoire[toKeepIndex].genome.BirthGeneration))
+                    {
+                        toKeepIndex = j;
+                    }
+                }
+            }
+
+            possiblyClose.Remove(toKeepIndex);
+            toBePruned.AddRange(possiblyClose);
+        }
+
+
+        int insertionIndex = 0;
+        for (int i = 0; i < genomeRepertoire.Count(); i++)
+        {
+            if (toBePruned.Contains(i))
+            {
+                continue;
+            }
+
+            repositoryPoints[insertionIndex++] = repositoryPoints[i];
+        }
+
+        toBePruned.Sort();
+        toBePruned.Reverse();
+        foreach (int prunedPoint in toBePruned)
+        {
+            genomeRepertoire.RemoveAt(prunedPoint);
+        }
+    }
 
     void HandleAutomaticUpdate()
     {
-        Time.timeScale = highSpeedMode.isOn ? 3 : 1;
+        Time.timeScale = highSpeedMode.isOn ? 6 : 1;
         bool allFinished = true;
         foreach (var game in games)
         {
@@ -700,7 +857,7 @@ public class GameCreator : MonoBehaviour
         }
 
         generationTimer += Time.deltaTime;
-        
+
         if (paused || pauseEvolution.isOn || (generationTimer <= AUTOMATIC_GEN_SECONDS && !allFinished))
         {
             return;
@@ -716,9 +873,133 @@ public class GameCreator : MonoBehaviour
 
         if (generation > 0 && _specieList != null)
         {
-            //TODO: EVALUATE USED TO BE HERE
+            var tempRepository = new List<GenomeMetric>(gamesToCreate);
+            for (int i = 0; i < games.Count; i++)
+            {
+                var game = games[i];
+                var genome = genomeList[i];
+                tempRepository.Add(new GenomeMetric() {metrics = game.GetGameStats(), genome = genome});
+            }
+
+            var queryPoints = GetPCAPoints(tempRepository, false);
+            //Find Nearest Neighbour for each.
+            const int kNeighbours = 1;
+            rebuildHandle.Complete();
+            var result = new NativeArray<int>(kNeighbours * tempRepository.Count, Allocator.TempJob);
+            var batchQueryJob = new QueryKNearestBatchJob(knnContainer, queryPoints, result);
+            batchQueryJob.ScheduleBatch(queryPoints.Length, queryPoints.Length / 32).Complete();
+            float maxDist = 0;
+            List<int> interestingIndexes = new List<int>();
+            for (int i = 0; i < games.Count(); i++)
+            {
+                var dist = Vector3.SqrMagnitude(queryPoints[i] - repositoryPoints[result[i]]);
+                maxDist = Mathf.Max(maxDist, dist);
+                if (dist > thresholdSq)
+                {
+                    interestingIndexes.Add(i);
+                }
+            }
+
+            float maxInternalDist = 0;
+            //Remove "overlapping"
+            for (int i = 0; i < interestingIndexes.Count(); i++)
+            {
+                int pos = i + 1;
+                while (pos < interestingIndexes.Count())
+                {
+                    var dist = Vector3.SqrMagnitude(queryPoints[interestingIndexes[i]] -
+                                                    queryPoints[interestingIndexes[pos]]);
+                    maxInternalDist = Mathf.Max(maxDist, dist);
+                    if (dist < thresholdSq)
+                    {
+                        interestingIndexes.RemoveAt(pos);
+                    }
+                    else
+                    {
+                        pos++;
+                    }
+                }
+            }
+
+            //Draw Graph
+            scatterPlot.ClearGraph();
+            Vector3[] drawPoints = new Vector3[genomeRepertoire.Count()];
+            for (int i = 0; i < genomeRepertoire.Count(); i++)
+            {
+                drawPoints[i] = repositoryPoints[i];
+            }
+
+            scatterPlot.DrawLayer(drawPoints, 0);
+            Vector3[] thisGeneration = new Vector3[queryPoints.Length - interestingIndexes.Count];
+            Vector3[] thisGenInteresting = new Vector3[interestingIndexes.Count];
+            int interestingPointer = 0;
+            int normalPointer = 0;
+            for (int i = 0; i < queryPoints.Length; i++)
+            {
+                if (interestingIndexes.Contains(i))
+                {
+                    thisGenInteresting[interestingPointer++] = (Vector3) queryPoints[i];
+                }
+                else
+                {
+                    thisGeneration[normalPointer++] = ((Vector3) queryPoints[i]);
+                }
+            }
+
+            scatterPlot.DrawLayer(thisGeneration.ToArray(), 1);
+            scatterPlot.DrawLayer(thisGenInteresting.ToArray(), 2);
+            //Update parents curiosity!
+            foreach (var potentialParent in genomeRepertoire)
+            {
+                if (potentialParent.hasHadChildren == false)
+                {
+                    potentialParent.curiosityScore += 0.5f;
+                    continue;
+                }
+                bool successfulProcreation = false;
+                for (int i = 0; i < interestingIndexes.Count(); i++)
+                {
+                    successfulProcreation |=
+                        potentialParent.childrenThisGen.Contains(tempRepository[interestingIndexes[i]].genome.Id);
+                }  
+
+                if (successfulProcreation)
+                {
+                    potentialParent.curiosityScore = GenomeMetric.STARTING_CURIOSITY_SCORE;
+                }
+                else
+                {
+                    potentialParent.curiosityScore = Mathf.Max(0,
+                        potentialParent.curiosityScore - (0.5f * potentialParent.childrenThisGen.Count()));
+                }
+            }
+
+            //Add new ones to repository
+            for (int i = 0; i < interestingIndexes.Count(); i++)
+            {
+                repositoryPoints[genomeRepertoire.Count] = queryPoints[interestingIndexes[i]];
+                genomeRepertoire.Add(tempRepository[interestingIndexes[i]]);
+                pcaBounds.Encapsulate(queryPoints[interestingIndexes[i]]);
+            }
+
+            if (interestingIndexes.Count() > 0)
+            {
+                rebuildHandle = new KnnRebuildJob(knnContainer).Schedule();
+                UpdateThreshold();
+            }
+
+
+            Debug.Log("Added to repertoire: " + interestingIndexes.Count() + ". Max dist: " + maxDist);
+            result.Dispose();
+            queryPoints.Dispose();
+            if (generation == nextModelUpdateGeneration)
+            {
+                UpdatePCAModel();
+                nextModelUpdateGeneration = nextModelUpdateGapIncrease + nextModelUpdateGeneration;
+                nextModelUpdateGapIncrease += 10;
+            }
             // Integrate offspring into species.
-            if (emptySpeciesFlag)
+            /*if (emptySpeciesFlag)
             {
                 // We have one or more terminated species. Therefore we need to fully re-speciate all genomes to divide them
                 // evenly between the required number of species.
@@ -738,10 +1019,10 @@ public class GameCreator : MonoBehaviour
             Debug.Assert(!TestForEmptySpecies(_specieList), "Speciation resulted in one or more empty species.");
 
             // Sort the genomes in each specie. Fittest first (secondary sort - youngest first).
-            SortSpecieGenomes();
+            SortSpecieGenomes();*/
 
             // Update stats and store reference to best genome.
-            UpdateBestGenome();
+            //UpdateBestGenome();
             UpdateStats();
             avgComplexity = _stats._meanComplexity;
             Debug.Log(_stats._maxFitness + ":::" + _stats._meanFitness);
@@ -765,14 +1046,83 @@ public class GameCreator : MonoBehaviour
         }
         else
         {
+            //First!
+            var tempRepertoire = new List<GenomeMetric>();
+            for (int i = 0; i < games.Count; i++)
+            {
+                var game = games[i];
+                var genome = genomeList[i];
+                tempRepertoire.Add(new GenomeMetric() {metrics = game.GetGameStats(), genome = genome});
+            }
+
+            columnNames = new HashSet<string>(tempRepertoire[0].metrics.Keys);
+            dataPrepEstimator = mlContext.Transforms.Concatenate("Features", columnNames.ToArray())
+                .Append(mlContext.Transforms.NormalizeMinMax("Features"));
+            //Early setup of PCA estimator
+
+            IDataView inData = new GenomeMetricDataView(tempRepertoire);
+            dataPrepTransformer = dataPrepEstimator.Fit(inData);
+            IDataView normalisedData = dataPrepTransformer.Transform(inData);
+            var pcaEstimator = mlContext.Transforms.ProjectToPrincipalComponents("FeaturesPCA", "Features", null, 3);
+            pcaTranformer = pcaEstimator.Fit(normalisedData);
+            pcaBounds = new Bounds();
+            using (var queryPoints = GetPCAPoints(tempRepertoire, true))
+            {
+                UpdateThreshold();
+                Debug.Log("Initial Threshold: " + thresholdSq);
+                HashSet<int> indexesToSkip = new HashSet<int>();
+
+                //Remove "overlapping"
+                for (int i = 0; i < queryPoints.Count(); i++)
+                {
+                    for (int j = i + 1; j < queryPoints.Count(); j++)
+                    {
+                        if (indexesToSkip.Contains(j))
+                        {
+                            continue;
+                        }
+
+                        var dist = Vector3.SqrMagnitude(queryPoints[i] -
+                                                        queryPoints[j]);
+                        if (dist < thresholdSq)
+                        {
+                            indexesToSkip.Add(j);
+                        }
+                    }
+                }
+
+                genomeRepertoire = new List<GenomeMetric>();
+                for (int i = 0; i < tempRepertoire.Count(); i++)
+                {
+                    if (indexesToSkip.Contains(i))
+                    {
+                        continue;
+                    }
+
+                    genomeRepertoire.Add(tempRepertoire[i]);
+                }
+            }
+
+            Debug.Log("Initial repertoire size: " + genomeRepertoire.Count());
+
             _specieList = _speciationStrategy.InitializeSpeciation(genomeList, _eaParams.SpecieCount);
-            SortSpecieGenomes();
+            //SortSpecieGenomes();
             UpdateBestGenome();
+            UpdatePCAModel();
+            scatterPlot.ClearGraph();
+            Vector3[] drawPoints = new Vector3[genomeRepertoire.Count()];
+            for (int i = 0; i < genomeRepertoire.Count(); i++)
+            {
+                drawPoints[i] = repositoryPoints[i];
+            }
+
+            scatterPlot.DrawLayer(drawPoints, 0);
+            nextModelUpdateGeneration = nextModelUpdateGapIncrease + nextModelUpdateGeneration;
+            nextModelUpdateGapIncrease += 10;
         }
 
+
         // Calculate statistics for each specie (mean fitness, target size, number of offspring to produce etc.)
-        int offspringCount;
-        SpecieStats[] specieStatsArr = CalcSpecieStats(out offspringCount);
         if (false)
         {
             //Write data for current
@@ -826,18 +1176,11 @@ public class GameCreator : MonoBehaviour
         }
 
         // Create offspring.
-        offspringList = CreateOffspring(specieStatsArr, offspringCount);
-
-        // Trim species back to their elite genomes.
-        emptySpeciesFlag = TrimSpeciesBackToElite(specieStatsArr);
-
-        // Rebuild _genomeList. It will now contain just the elite genomes.
-        RebuildGenomeList();
+        genomeList = CreateOffspring(gamesToCreate);
 
         // Append offspring genomes to the elite genomes in _genomeList. We do this before calling the
         // _genomeListEvaluator.Evaluate because some evaluation schemes re-evaluate the elite genomes 
         // (otherwise we could just evaluate offspringList).
-        genomeList.AddRange(offspringList);
 
 
         SelectDisplayedGamesBasedOnSpecies();
@@ -1164,133 +1507,80 @@ public class GameCreator : MonoBehaviour
     /// Create the required number of offspring genomes, using specieStatsArr as the basis for selecting how
     /// many offspring are produced from each species.
     /// </summary>
-    private List<NeatGenome> CreateOffspring(SpecieStats[] specieStatsArr, int offspringCount)
+    private List<NeatGenome> CreateOffspring(int offspringCount)
     {
-        // Build a DiscreteDistribution for selecting species for cross-species reproduction.
-        // While we're in the loop we also pre-build a DiscreteDistribution for each specie;
-        // Doing this before the main loop means we have DiscreteDistributions available for
-        // all species when performing cross-specie matings.
-        int specieCount = specieStatsArr.Length;
-        double[] specieFitnessArr = new double[specieCount];
-        DiscreteDistribution[] distArr = new DiscreteDistribution[specieCount];
-
-        // Count of species with non-zero selection size.
-        // If this is exactly 1 then we skip inter-species mating. One is a special case because for 0 the 
-        // species all get an even chance of selection, and for >1 we can just select normally.
-        int nonZeroSpecieCount = 0;
-        for (int i = 0; i < specieCount; i++)
+        foreach (var genomeMetric in genomeRepertoire)
         {
-            // Array of probabilities for specie selection. Note that some of these probabilities can be zero, but at least one of them won't be.
-            SpecieStats inst = specieStatsArr[i];
-            specieFitnessArr[i] = inst._selectionSizeInt;
-
-            if (0 == inst._selectionSizeInt)
-            {
-                // Skip building a DiscreteDistribution for species that won't be selected from.
-                distArr[i] = null;
-                continue;
-            }
-
-            nonZeroSpecieCount++;
-
-            // For each specie we build a DiscreteDistribution for genome selection within 
-            // that specie. Fitter genomes have higher probability of selection.
-            List<NeatGenome> genomeList = _specieList[i].GenomeList;
-            double[] probabilities = new double[inst._selectionSizeInt];
-            for (int j = 0; j < inst._selectionSizeInt; j++)
-            {
-                probabilities[j] = genomeList[j].EvaluationInfo.Fitness;
-            }
-
-            distArr[i] = new DiscreteDistribution(probabilities);
+            genomeMetric.childrenThisGen.Clear();
         }
 
-        // Complete construction of DiscreteDistribution for specie selection.
-        DiscreteDistribution rwlSpecies = new DiscreteDistribution(specieFitnessArr);
+        double[] genomeProbabilities = genomeRepertoire.Select(x=>(double)x.curiosityScore).ToArray();
+        double meanProb = genomeProbabilities.Average();
+        double maxProb = genomeProbabilities.Max();
+        double minProb = genomeProbabilities.Min();
+        Debug.Log(string.Format("Curiosity Score Stats - Mean: {0} Min: {1} Max {2}",meanProb,minProb,maxProb));
+        DiscreteDistribution dist = new DiscreteDistribution(genomeProbabilities);
+        double offspringAsexualCountReal = (double) offspringCount * _eaParams.OffspringAsexualProportion;
+        double offspringAsexualCount = (int) NumericsUtils.ProbabilisticRound(offspringAsexualCountReal, _rng);
+        double offspringSexualCount = offspringCount - offspringAsexualCount;
 
         // Produce offspring from each specie in turn and store them in offspringList.
         List<NeatGenome> offspringList = new List<NeatGenome>(offspringCount);
-        for (int specieIdx = 0; specieIdx < specieCount; specieIdx++)
+
+        // --- Produce the required number of offspring from asexual reproduction.
+        for (int i = 0; i < offspringAsexualCount; i++)
         {
-            SpecieStats inst = specieStatsArr[specieIdx];
-            List<NeatGenome> genomeList = _specieList[specieIdx].GenomeList;
+            int genomeIdx = DiscreteDistribution.Sample(_rng, dist);
+            NeatGenome offspring = genomeRepertoire[genomeIdx].genome.CreateOffspring(generation);
+            offspringList.Add(offspring);
+            genomeRepertoire[genomeIdx].childrenThisGen.Add(offspring.Id);
+            genomeRepertoire[genomeIdx].hasHadChildren = true;
+        }
 
-            // Get DiscreteDistribution for genome selection.
-            DiscreteDistribution dist = distArr[specieIdx];
+        _stats._asexualOffspringCount += (ulong) offspringAsexualCount;
 
-            // --- Produce the required number of offspring from asexual reproduction.
-            for (int i = 0; i < inst._offspringAsexualCount; i++)
+        _stats._sexualOffspringCount += (ulong) (offspringSexualCount);
+
+        // An index that keeps track of how many offspring have been produced in total.
+        int matingsCount = 0;
+        // For the remainder we use normal intra-specie mating.
+        // Test for special case - we only have one genome to select from in the current specie. 
+        {
+            // Remainder of matings are normal within-specie.
+            for (; matingsCount < offspringSexualCount; matingsCount++)
             {
-                int genomeIdx = DiscreteDistribution.Sample(_rng, dist);
-                NeatGenome offspring = genomeList[genomeIdx].CreateOffspring(generation);
-                offspringList.Add(offspring);
-            }
+                // Select parent 1.
+                int parent1Idx = DiscreteDistribution.Sample(_rng, dist);
+                NeatGenome parent1 = genomeRepertoire[parent1Idx].genome;
 
-            _stats._asexualOffspringCount += (ulong) inst._offspringAsexualCount;
+                // Remove selected parent from set of possible outcomes.
+                DiscreteDistribution distTmp = dist.RemoveOutcome(parent1Idx);
 
-            // --- Produce the required number of offspring from sexual reproduction.
-            // Cross-specie mating.
-            // If nonZeroSpecieCount is exactly 1 then we skip inter-species mating. One is a special case because
-            // for 0 the  species all get an even chance of selection, and for >1 we can just select species normally.
-            int crossSpecieMatings = nonZeroSpecieCount == 1
-                ? 0
-                : (int) NumericsUtils.ProbabilisticRound(_eaParams.InterspeciesMatingProportion
-                                                         * inst._offspringSexualCount, _rng);
-            _stats._sexualOffspringCount += (ulong) (inst._offspringSexualCount - crossSpecieMatings);
-            _stats._interspeciesOffspringCount += (ulong) crossSpecieMatings;
-
-            // An index that keeps track of how many offspring have been produced in total.
-            int matingsCount = 0;
-            for (; matingsCount < crossSpecieMatings; matingsCount++)
-            {
-                NeatGenome offspring =
-                    CreateOffspring_CrossSpecieMating(dist, distArr, rwlSpecies, specieIdx, genomeList);
-                offspringList.Add(offspring);
-            }
-
-            // For the remainder we use normal intra-specie mating.
-            // Test for special case - we only have one genome to select from in the current specie. 
-            if (1 == inst._selectionSizeInt)
-            {
-                // Fall-back to asexual reproduction.
-                for (; matingsCount < inst._offspringSexualCount; matingsCount++)
+                // Test for existence of at least one more parent to select.
+                if (0 != distTmp.Probabilities.Length)
                 {
-                    int genomeIdx = DiscreteDistribution.Sample(_rng, dist);
-                    NeatGenome offspring = genomeList[genomeIdx].CreateOffspring(generation);
+                    // Get the two parents to mate.
+                    int parent2Idx = DiscreteDistribution.Sample(_rng, distTmp);
+                    NeatGenome parent2 = genomeRepertoire[parent2Idx].genome;
+                    NeatGenome offspring = parent1.CreateOffspring(parent2, generation);
+                    offspringList.Add(offspring);
+                    genomeRepertoire[parent1Idx].childrenThisGen.Add(offspring.Id);
+                    genomeRepertoire[parent2Idx].childrenThisGen.Add(offspring.Id);
+                    genomeRepertoire[parent1Idx].hasHadChildren = true;
+                    genomeRepertoire[parent2Idx].hasHadChildren = true;
+                }
+                else
+                {
+                    // No other parent has a non-zero selection probability (they all have zero fitness).
+                    // Fall back to asexual reproduction of the single genome with a non-zero fitness.
+                    NeatGenome offspring = parent1.CreateOffspring(generation);
+                    genomeRepertoire[parent1Idx].childrenThisGen.Add(offspring.Id);
+                    genomeRepertoire[parent1Idx].hasHadChildren = true;
                     offspringList.Add(offspring);
                 }
             }
-            else
-            {
-                // Remainder of matings are normal within-specie.
-                for (; matingsCount < inst._offspringSexualCount; matingsCount++)
-                {
-                    // Select parent 1.
-                    int parent1Idx = DiscreteDistribution.Sample(_rng, dist);
-                    NeatGenome parent1 = genomeList[parent1Idx];
-
-                    // Remove selected parent from set of possible outcomes.
-                    DiscreteDistribution distTmp = dist.RemoveOutcome(parent1Idx);
-
-                    // Test for existence of at least one more parent to select.
-                    if (0 != distTmp.Probabilities.Length)
-                    {
-                        // Get the two parents to mate.
-                        int parent2Idx = DiscreteDistribution.Sample(_rng, distTmp);
-                        NeatGenome parent2 = genomeList[parent2Idx];
-                        NeatGenome offspring = parent1.CreateOffspring(parent2, generation);
-                        offspringList.Add(offspring);
-                    }
-                    else
-                    {
-                        // No other parent has a non-zero selection probability (they all have zero fitness).
-                        // Fall back to asexual reproduction of the single genome with a non-zero fitness.
-                        NeatGenome offspring = parent1.CreateOffspring(generation);
-                        offspringList.Add(offspring);
-                    }
-                }
-            }
         }
+
 
         _stats._totalOffspringCount += (ulong) offspringCount;
         return offspringList;
@@ -1409,21 +1699,21 @@ public class GameCreator : MonoBehaviour
             _stats._meanComplexity = totalComplexity / count;
 
             // Specie champs mean fitness.
-            double totalSpecieChampFitness = _specieList[0].GenomeList[0].EvaluationInfo.Fitness;
-            int specieCount = _specieList.Count;
-            for (int i = 1; i < specieCount; i++)
-            {
-                totalSpecieChampFitness += _specieList[i].GenomeList[0].EvaluationInfo.Fitness;
-            }
-
-            _stats._meanSpecieChampFitness = totalSpecieChampFitness / specieCount;
+            /* double totalSpecieChampFitness = _specieList[0].GenomeList[0].EvaluationInfo.Fitness;
+             int specieCount = _specieList.Count;
+             for (int i = 1; i < specieCount; i++)
+             {
+                 totalSpecieChampFitness += _specieList[i].GenomeList[0].EvaluationInfo.Fitness;
+             }
+ 
+             _stats._meanSpecieChampFitness = totalSpecieChampFitness / specieCount;*/
 
             // Moving averages.
             _stats._prevBestFitnessMA = _stats._bestFitnessMA.Mean;
             _stats._bestFitnessMA.Enqueue(_stats._maxFitness);
 
-            _stats._prevMeanSpecieChampFitnessMA = _stats._meanSpecieChampFitnessMA.Mean;
-            _stats._meanSpecieChampFitnessMA.Enqueue(_stats._meanSpecieChampFitness);
+            //  _stats._prevMeanSpecieChampFitnessMA = _stats._meanSpecieChampFitnessMA.Mean;
+            // _stats._meanSpecieChampFitnessMA.Enqueue(_stats._meanSpecieChampFitness);
 
             _stats._prevComplexityMA = _stats._complexityMA.Mean;
             _stats._complexityMA.Enqueue(_stats._meanComplexity);
@@ -1459,18 +1749,6 @@ public class GameCreator : MonoBehaviour
         foreach (Specie<NeatGenome> specie in _specieList)
         {
             specie.GenomeList.Clear();
-        }
-    }
-
-    /// <summary>
-    /// Rebuild _genomeList from genomes held within the species.
-    /// </summary>
-    private void RebuildGenomeList()
-    {
-        genomeList.Clear();
-        foreach (Specie<NeatGenome> specie in _specieList)
-        {
-            genomeList.AddRange(specie.GenomeList);
         }
     }
 

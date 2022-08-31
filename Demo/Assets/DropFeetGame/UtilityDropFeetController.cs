@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -6,12 +7,19 @@ using UnityEngine;
 public partial class UtilityDropFeetController : AuthoredAIDropFeetController
 {
     public bool DebugMode = false;
+    private System.Random pseudoRandom = new System.Random();
     public struct UtilityOption
     {
         public string name;
         public Action actionType;
         public float value;
     }
+
+    public void ResetRandomness()
+    {
+        pseudoRandom = new System.Random(84902);
+    }
+    
     float characterHeight = 2.3f;
     public enum Action
     {
@@ -21,6 +29,7 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
         JumpBack
     }
     List<UtilityAction> options;
+    
     protected override void OnInitialise()
     {
         options = new List<UtilityAction>();

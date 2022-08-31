@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.akb.knn": "https://github.com/ArthurBrussee/KNN.git",
     "com.elringus.spriteglow": "https://github.com/Elringus/SpriteGlow.git#package",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.collab-proxy": "1.2.16",
@@ -48,6 +49,10 @@
     "com.elringus.spriteglow": {
       "revision": "package",
       "hash": "44d7999fb4494b35e2a227a53c70b6d4e9ac5306"
+    },
+    "com.akb.knn": {
+      "revision": "HEAD",
+      "hash": "e5efc6375802d3a87a729aedc25dc79fa7b51a23"
     }
   }
 }

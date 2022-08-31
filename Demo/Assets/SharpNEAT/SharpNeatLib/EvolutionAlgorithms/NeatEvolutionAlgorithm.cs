@@ -204,7 +204,7 @@ namespace SharpNeat.EvolutionAlgorithms
             // Evaluate genomes.
             _genomeListEvaluator.Evaluate(_genomeList);
 
-            // Integrate offspring into species.
+           /* // Integrate offspring into species.
             if(emptySpeciesFlag)
             {   
                 // We have one or more terminated species. Therefore we need to fully re-speciate all genomes to divide them
@@ -221,13 +221,13 @@ namespace SharpNeat.EvolutionAlgorithms
                 // Integrate offspring into the existing species. 
                 _speciationStrategy.SpeciateOffspring(offspringList, _specieList);            
             }
-            Debug.Assert(!TestForEmptySpecies(_specieList), "Speciation resulted in one or more empty species.");
+            Debug.Assert(!TestForEmptySpecies(_specieList), "Speciation resulted in one or more empty species.");*/
 
             // Sort the genomes in each specie. Fittest first (secondary sort - youngest first).
-            SortSpecieGenomes();
+            //SortSpecieGenomes();
              
             // Update stats and store reference to best genome.
-            UpdateBestGenome();
+            //UpdateBestGenome();
             UpdateStats();
 
             // Determine the complexity regulation mode and switch over to the appropriate set of evolution
@@ -737,19 +737,19 @@ namespace SharpNeat.EvolutionAlgorithms
                 _stats._meanComplexity = totalComplexity / count;
 
                 // Specie champs mean fitness.
-                double totalSpecieChampFitness = _specieList[0].GenomeList[0].EvaluationInfo.Fitness;
-                int specieCount = _specieList.Count;
+               // double totalSpecieChampFitness = _specieList[0].GenomeList[0].EvaluationInfo.Fitness;
+                /*int specieCount = _specieList.Count;
                 for(int i=1; i<specieCount; i++) {
                     totalSpecieChampFitness += _specieList[i].GenomeList[0].EvaluationInfo.Fitness;
                 }
-                _stats._meanSpecieChampFitness = totalSpecieChampFitness / specieCount;
+                _stats._meanSpecieChampFitness = totalSpecieChampFitness / specieCount;*/
 
                 // Moving averages.
                 _stats._prevBestFitnessMA = _stats._bestFitnessMA.Mean;
                 _stats._bestFitnessMA.Enqueue(_stats._maxFitness);
 
-                _stats._prevMeanSpecieChampFitnessMA = _stats._meanSpecieChampFitnessMA.Mean;
-                _stats._meanSpecieChampFitnessMA.Enqueue(_stats._meanSpecieChampFitness);
+                //_stats._prevMeanSpecieChampFitnessMA = _stats._meanSpecieChampFitnessMA.Mean;
+                //_stats._meanSpecieChampFitnessMA.Enqueue(_stats._meanSpecieChampFitness);
 
                 _stats._prevComplexityMA = _stats._complexityMA.Mean;
                 _stats._complexityMA.Enqueue(_stats._meanComplexity);
