@@ -13351,9 +13351,6 @@
  <Reference Include="Unity.Burst.Editor">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Burst.Editor.dll</HintPath>
  </Reference>
- <Reference Include="Unity.Collections">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
- </Reference>
  <Reference Include="Unity.Recorder.Editor">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Recorder.Editor.dll</HintPath>
  </Reference>
@@ -13633,11 +13630,11 @@
  <Reference Include="System.Memory">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/SharpNEAT/System.Memory.dll</HintPath>
  </Reference>
- <Reference Include="Unity.Burst.Unsafe">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/PackageCache/com.unity.burst@1.1.2/Unity.Burst.Unsafe.dll</HintPath>
- </Reference>
  <Reference Include="System.Runtime.CompilerServices.Unsafe">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/SharpNEAT/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.Burst.Unsafe">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/PackageCache/com.unity.burst@1.1.2/Unity.Burst.Unsafe.dll</HintPath>
  </Reference>
  <Reference Include="mscorlib">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.0f6/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -13993,6 +13990,12 @@
  <Reference Include="Boo.Lang">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.0f6/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
  </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Unity.Collections.csproj">
+      <Project>{57B0F3DE-D1D9-E05C-BFAE-9CEE53DAD136}</Project>
+      <Name>Unity.Collections</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

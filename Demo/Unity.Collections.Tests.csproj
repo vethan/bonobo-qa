@@ -12,10 +12,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{DB0005D0-E46F-236E-2F57-76542FED5F47}</ProjectGuid>
+    <ProjectGuid>{18D07A5C-EAF0-D95E-5550-1DDB90ABA297}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
+    <AssemblyName>Unity.Collections.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -29,7 +29,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -39,7 +39,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
@@ -58,81 +58,45 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\DropFeetGame\Editor\DropFeetGameInstanceEditor.cs" />
-     <Compile Include="Assets\Editor\LoadGenomeManagerEditor.cs" />
-     <Compile Include="Assets\Editor\LoadReplayManagerEditor.cs" />
-     <Compile Include="Assets\Editor\ReplayAnalysis.cs" />
- <Reference Include="UnityEditor.TestRunner">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.TestRunner">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Timeline.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\GcAllocRecorderTest.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeArraySOATests.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeArraySortTests.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeContainerTests_ValidateTypes.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeContainerTests_ValidateTypesFixture.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeContainerTests_ValidateTypes_JobDebugger.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeHashMapTests.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeHashMapTestsFixture.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeHashMapTests_InJobs.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeHashMapTests_NativeChecks.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeListTests.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeListTests_JobDebugger.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeMultiHashMapTestsFixture.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeMultiHashMapTests_InJobs.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeMultiHashMapTests_JobDebugger.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeQueueTests.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeQueueTests_InJobs.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\NativeStreamTests.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\ResizableArrayTests.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\UnsafeAppendBufferTests.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\UnsafeListTests.cs" />
+     <Compile Include="C:\Users\vetha\Documents\bonobo-qa\Demo\Packages\com.unity.collections@0.1.1-preview\Unity.Collections.Tests\UnsafeUtilityTests.cs" />
+ <Reference Include="Unity.PerformanceTesting">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.PerformanceTesting.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Burst">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Burst.dll</HintPath>
  </Reference>
- <Reference Include="Unity.VSCode.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ <Reference Include="UnityEngine.TestRunner">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
  </Reference>
- <Reference Include="Unity.Jobs">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Jobs.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Jobs.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Jobs.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Burst.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Burst.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Recorder.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Recorder.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Recorder">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Recorder.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.UI">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Timeline">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
- </Reference>
- <Reference Include="Unity.CollabProxy.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Postprocessing.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Postprocessing.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Elringus.SpriteGlow.Runtime">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Elringus.SpriteGlow.Runtime.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Rider.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
- </Reference>
- <Reference Include="KNN">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/KNN.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Mathematics">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Mathematics.dll</HintPath>
- </Reference>
- <Reference Include="Unity.2D.Sprite.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Postprocessing.Runtime">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Mathematics.Editor">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.Mathematics.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.TextMeshPro">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ <Reference Include="UnityEditor.TestRunner">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.UI">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.UI">
+ <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.0f6/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -319,66 +283,6 @@
  </Reference>
  <Reference Include="UnityEditor.WindowsStandalone.Extensions">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.0f6/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
- </Reference>
- <Reference Include="Microsoft.ML.Core">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.Core.dll</HintPath>
- </Reference>
- <Reference Include="Microsoft.ML.CpuMath">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.CpuMath.dll</HintPath>
- </Reference>
- <Reference Include="Microsoft.ML.Data">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.Data.dll</HintPath>
- </Reference>
- <Reference Include="Microsoft.ML.DataView">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.DataView.dll</HintPath>
- </Reference>
- <Reference Include="Microsoft.ML">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.dll</HintPath>
- </Reference>
- <Reference Include="Microsoft.ML.KMeansClustering">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.KMeansClustering.dll</HintPath>
- </Reference>
- <Reference Include="Microsoft.ML.PCA">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.PCA.dll</HintPath>
- </Reference>
- <Reference Include="Microsoft.ML.StandardTrainers">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.StandardTrainers.dll</HintPath>
- </Reference>
- <Reference Include="Microsoft.ML.Transforms">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Microsoft.ML.Transforms.dll</HintPath>
- </Reference>
- <Reference Include="Newtonsoft.Json">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/Newtonsoft.Json.dll</HintPath>
- </Reference>
- <Reference Include="System.Collections.Immutable">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/System.Collections.Immutable.dll</HintPath>
- </Reference>
- <Reference Include="System.Threading.Channels">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/System.Threading.Channels.dll</HintPath>
- </Reference>
- <Reference Include="System.Threading.Tasks.Extensions">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/Microsoft.ML/System.Threading.Tasks.Extensions.dll</HintPath>
- </Reference>
- <Reference Include="protobuf-net">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/MyLibs/protobuf-net.dll</HintPath>
- </Reference>
- <Reference Include="VethanUnityUtility">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/MyLibs/VethanUnityUtility.dll</HintPath>
- </Reference>
- <Reference Include="Redzen">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/SharpNEAT/Redzen.dll</HintPath>
- </Reference>
- <Reference Include="System.Buffers">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/SharpNEAT/System.Buffers.dll</HintPath>
- </Reference>
- <Reference Include="System.Memory">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/SharpNEAT/System.Memory.dll</HintPath>
- </Reference>
- <Reference Include="System.Runtime.CompilerServices.Unsafe">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Assets/SharpNEAT/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Burst.Unsafe">
- <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/PackageCache/com.unity.burst@1.1.2/Unity.Burst.Unsafe.dll</HintPath>
  </Reference>
  <Reference Include="nunit.framework">
  <HintPath>C:/Users/vetha/Documents/bonobo-qa/Demo/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
@@ -739,10 +643,6 @@
  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{A77DEB61-50BA-3D2B-BA85-CD07C2DB2C66}</Project>
-      <Name>Assembly-CSharp</Name>
-    </ProjectReference>
     <ProjectReference Include="Unity.Collections.csproj">
       <Project>{57B0F3DE-D1D9-E05C-BFAE-9CEE53DAD136}</Project>
       <Name>Unity.Collections</Name>
