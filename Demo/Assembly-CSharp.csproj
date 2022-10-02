@@ -70,6 +70,7 @@
      <Compile Include="Assets\DropFeetGame\DoNothingDropFeetController.cs" />
      <Compile Include="Assets\DropFeetGame\DropFeetGameInstance.cs" />
      <Compile Include="Assets\DropFeetGame\EvolvedDropFeetController.cs" />
+     <Compile Include="Assets\DropFeetGame\ExperimentTimer.cs" />
      <Compile Include="Assets\DropFeetGame\KeyboardDropFeetController.cs" />
      <Compile Include="Assets\DropFeetGame\MultiDropFeetController.cs" />
      <Compile Include="Assets\DropFeetGame\PlayerCharacter.cs" />
@@ -86,6 +87,7 @@
      <Compile Include="Assets\GameCreator.cs" />
      <Compile Include="Assets\GenomeMetric.cs" />
      <Compile Include="Assets\GenomeMetricDataView.cs" />
+     <Compile Include="Assets\GenomeRepository.cs" />
      <Compile Include="Assets\Graph.cs" />
      <Compile Include="Assets\InspectGenomeManager.cs" />
      <Compile Include="Assets\LoadGenomeManager.cs" />
@@ -102,6 +104,7 @@
      <Compile Include="Assets\ReplayMemoryStore.cs" />
      <Compile Include="Assets\ScaleTester.cs" />
      <Compile Include="Assets\ScatterPlot.cs" />
+     <Compile Include="Assets\ScatterPlotPoint.cs" />
      <Compile Include="Assets\SceneLoader.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatDomains\ExperimentUtils.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatDomains\INeatExperiment.cs" />

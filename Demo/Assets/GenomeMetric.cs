@@ -11,4 +11,6 @@ public class GenomeMetric
     public HashSet<uint> childrenThisGen = new HashSet<uint>();
     public Vector2 PcaPosition;
     public bool hasHadChildren = false;
+    //Starts at 1, aka self
+    public ulong nearTally = 1;
 }

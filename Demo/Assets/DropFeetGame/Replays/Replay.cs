@@ -11,22 +11,22 @@ using UnityEngine;
 
 namespace Assets.DropFeetGame.Replays
 {
-
     [Serializable]
     [ProtoContract(SkipConstructor = true)]
     public class Replay
     {
-        public enum SerializationStyle { DotNet, ProtoBufNet }
+        public enum SerializationStyle
+        {
+            DotNet,
+            ProtoBufNet
+        }
 
-        [ProtoMember(1)]
-        public int leftStartScore;
+        [ProtoMember(1)] public int leftStartScore;
 
-        [ProtoMember(2)]
-        public int rightStartScore;
+        [ProtoMember(2)] public int rightStartScore;
 
 
-        [ProtoMember(3)]
-        public CircularEntryQueue entries;
+        [ProtoMember(3)] public CircularEntryQueue entries;
 
         static bool hasSetup = false;
 
@@ -37,13 +37,14 @@ namespace Assets.DropFeetGame.Replays
 
             hasSetup = true;
             ProtoBuf.Meta.RuntimeTypeModel.Default.Add(typeof(Vector3), false).SetSurrogate(typeof(ProtoVector3));
-            ProtoBuf.Meta.RuntimeTypeModel.Default.Add(typeof(Queue<ReplayEntry>), false).SetSurrogate(typeof(ProtoQueue));
-            ProtoBuf.Meta.RuntimeTypeModel.Default.Add(typeof(CircularEntryQueue), false).SetSurrogate(typeof(ProtoQueue));
-
+            ProtoBuf.Meta.RuntimeTypeModel.Default.Add(typeof(Queue<ReplayEntry>), false)
+                .SetSurrogate(typeof(ProtoQueue));
+            ProtoBuf.Meta.RuntimeTypeModel.Default.Add(typeof(CircularEntryQueue), false)
+                .SetSurrogate(typeof(ProtoQueue));
         }
 
-        public readonly static string baseSavePath = Path.Combine(Path.GetDirectoryName(Application.dataPath), "Replays");
-
+        public readonly static string baseSavePath =
+            Path.Combine(Path.GetDirectoryName(Application.dataPath), "Replays");
 
 
         public Replay(int leftStartScore, int rightStartScore)
@@ -61,21 +62,41 @@ namespace Assets.DropFeetGame.Replays
             return result;
         }
 
-        void SaveOldStyle(FileStream fileStream, string filepath)
+        void SaveOldStyle(Stream fileStream)
         {
-            
             BinaryFormatter formatter = new BinaryFormatter();
             SurrogateSelector surrogateSelector = new SurrogateSelector();
             Vector3SerializationSurrogate vector3SS = new Vector3SerializationSurrogate();
 
-            surrogateSelector.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All), vector3SS);
+            surrogateSelector.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All),
+                vector3SS);
             formatter.SurrogateSelector = surrogateSelector;
             try
-            {                
+            {
                 formatter.Serialize(fileStream, this);
-                Debug.Log("Wrote out file to " + filepath);
+                Debug.Log("Wrote out file");
             }
             catch (SerializationException e)
+            {
+                Debug.LogError("Failed to serialize. Reason: " + e.Message);
+                throw;
+            }
+        }
+
+        public void Save(Stream outputStream, SerializationStyle serializationStyle = SerializationStyle.ProtoBufNet)
+        {
+            SetupModel();
+            try
+            {
+                if (serializationStyle == SerializationStyle.DotNet)
+                {
+                    SaveOldStyle(outputStream);
+                    return;
+                }
+
+                Serializer.Serialize<Replay>(outputStream, this);
+            }
+            catch (Exception e)
             {
                 Debug.LogError("Failed to serialize. Reason: " + e.Message);
                 throw;
@@ -91,29 +112,15 @@ namespace Assets.DropFeetGame.Replays
             }
 
             string filepath = Path.Combine(baseSavePath, filename);
-            try
+
+            using (FileStream fileStream = File.Create(filepath))
             {
-                using (FileStream fileStream = File.Create(filepath))
-                {
-
-                    if (serializationStyle == SerializationStyle.DotNet)
-                    {
-                        SaveOldStyle(fileStream, filepath);
-                        return;
-                    }
-
-                    Serializer.Serialize<Replay>(fileStream, this);
-                }
+                Save(fileStream, serializationStyle);
             }
-            catch(Exception e)
-            {
-                Debug.LogError("Failed to serialize. Reason: " + e.Message);
-                throw;
-            }
-
         }
 
-        public static Replay ImportFromTextAsset(TextAsset replay, SerializationStyle serializationStyle = SerializationStyle.DotNet)
+        public static Replay ImportFromTextAsset(TextAsset replay,
+            SerializationStyle serializationStyle = SerializationStyle.DotNet)
         {
             SetupModel();
             using (MemoryStream ms = new MemoryStream(replay.bytes))
@@ -122,6 +129,7 @@ namespace Assets.DropFeetGame.Replays
                 {
                     return LoadOldStyle(ms);
                 }
+
                 try
                 {
                     return Serializer.Deserialize<Replay>(ms);
@@ -134,7 +142,8 @@ namespace Assets.DropFeetGame.Replays
             }
         }
 
-        public static Replay ImportFromFile(string filePath, SerializationStyle serializationStyle = SerializationStyle.DotNet)
+        public static Replay ImportFromFile(string filePath,
+            SerializationStyle serializationStyle = SerializationStyle.DotNet)
         {
             SetupModel();
             using (var file = File.Open(filePath, FileMode.Open))
@@ -143,6 +152,7 @@ namespace Assets.DropFeetGame.Replays
                 {
                     return LoadOldStyle(file);
                 }
+
                 try
                 {
                     return Serializer.Deserialize<Replay>(file);
@@ -161,7 +171,8 @@ namespace Assets.DropFeetGame.Replays
             SurrogateSelector surrogateSelector = new SurrogateSelector();
             Vector3SerializationSurrogate vector3SS = new Vector3SerializationSurrogate();
 
-            surrogateSelector.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All), vector3SS);
+            surrogateSelector.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All),
+                vector3SS);
             formatter.SurrogateSelector = surrogateSelector;
 
             try
@@ -180,34 +191,26 @@ namespace Assets.DropFeetGame.Replays
     [ProtoContract(SkipConstructor = true)]
     public struct ReplayEntry
     {
-        [ProtoMember(1)]
-        public ReplayPlayerInfo leftPlayerData;
+        [ProtoMember(1)] public ReplayPlayerInfo leftPlayerData;
 
-        [ProtoMember(2)]
-        public ReplayPlayerInfo rightPlayerData;
+        [ProtoMember(2)] public ReplayPlayerInfo rightPlayerData;
 
-        [ProtoMember(3)]
-        public int leftScore;
+        [ProtoMember(3)] public int leftScore;
 
-        [ProtoMember(4)]
-        public int rightScore;
+        [ProtoMember(4)] public int rightScore;
 
-        [ProtoMember(5)]
-        public float time;
+        [ProtoMember(5)] public float time;
     }
 
     [Serializable]
     [ProtoContract(SkipConstructor = true)]
     public struct ReplayPlayerInfo
     {
-        [ProtoMember(1)]
-        public Vector3 position;
+        [ProtoMember(1)] public Vector3 position;
 
-        [ProtoMember(2)]
-        public bool dropping;
+        [ProtoMember(2)] public bool dropping;
 
-        [ProtoMember(3)]
-        public bool onFloor;
+        [ProtoMember(3)] public bool onFloor;
     }
 
 
@@ -215,18 +218,15 @@ namespace Assets.DropFeetGame.Replays
     [ProtoContract(SkipConstructor = true)]
     public class CircularEntryQueue : IEnumerable<ReplayEntry>
     {
-        [ProtoMember(1)]
-        List<ReplayEntry> entries;
+        [ProtoMember(1)] List<ReplayEntry> entries;
         int currentPosition = 0;
         int loopsDone;
 
         public float lastTime
         {
-            get
-            {
-                return entries[entries.Count - 1].time;
-            }
+            get { return entries[entries.Count - 1].time; }
         }
+
         public CircularEntryQueue()
         {
             this.entries = new List<ReplayEntry>();
@@ -237,7 +237,10 @@ namespace Assets.DropFeetGame.Replays
             this.entries = new List<ReplayEntry>(entries1.entries);
         }
 
-        public int Count { get { return entries.Count; } }
+        public int Count
+        {
+            get { return entries.Count; }
+        }
 
         public IEnumerator<ReplayEntry> GetEnumerator()
         {
@@ -254,6 +257,7 @@ namespace Assets.DropFeetGame.Replays
                 currentPosition -= Count;
                 loopsDone++;
             }
+
             return result;
         }
 
@@ -265,7 +269,7 @@ namespace Assets.DropFeetGame.Replays
         internal ReplayEntry Peek()
         {
             var result = entries[currentPosition];
-            result.time += entries[Count-1].time*loopsDone;
+            result.time += entries[Count - 1].time * loopsDone;
             return result;
         }
 
@@ -296,8 +300,7 @@ namespace Assets.DropFeetGame.Replays
     [ProtoContract(SkipConstructor = true)]
     public struct ProtoQueue
     {
-        [ProtoMember(1)]
-        public List<ReplayEntry> entries;
+        [ProtoMember(1)] public List<ReplayEntry> entries;
 
         public static implicit operator Queue<ReplayEntry>(ProtoQueue v)
         {
@@ -318,14 +321,11 @@ namespace Assets.DropFeetGame.Replays
     [ProtoContract(SkipConstructor = true)]
     public struct ProtoVector3
     {
-        [ProtoMember(1)]
-        public float x;
+        [ProtoMember(1)] public float x;
 
-        [ProtoMember(2)]
-        public float y;
+        [ProtoMember(2)] public float y;
 
-        [ProtoMember(3)]
-        public float z;
+        [ProtoMember(3)] public float z;
 
         public static implicit operator Vector3(ProtoVector3 v)
         {

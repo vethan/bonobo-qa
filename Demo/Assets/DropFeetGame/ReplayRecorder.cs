@@ -11,7 +11,7 @@ public class ReplayRecorder : MonoBehaviour
 {
     // Start is called before the first frame update
     public DropFeetGameInstance gameInstance;
-
+    public bool autoEndReplay = false;
     Replay currentReplay;
     public int secondPerSession = 15;
     float timer = 0;
@@ -27,6 +27,7 @@ public class ReplayRecorder : MonoBehaviour
 
     void OnEnable()
     {
+        
         if(gameInstance == null)
         {
             var instances = FindObjectsOfType<DropFeetGameInstance>();
@@ -68,6 +69,13 @@ public class ReplayRecorder : MonoBehaviour
         InitialiseReplay(gameInstance.leftScore,gameInstance.rightScore);
     }
 
+    public Stream GetReplayStream()
+    {
+        var memoryStream = new MemoryStream();
+        currentReplay.Save(memoryStream);
+        memoryStream.Seek(0,SeekOrigin.Begin);
+        return memoryStream;
+    }
     private void WriteReplay()
     {
         String filename = String.Format(filePrefix+"replay{0:yyyy-dd-M--HH-mm-ss}Session{1}.bytes", sessionStartTime, sessionNumber++);
