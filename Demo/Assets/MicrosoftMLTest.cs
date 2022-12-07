@@ -31,7 +31,7 @@ public class MicrosoftMLTest : MonoBehaviour
             data.Add(new GenomeMetric() {metrics = entry});
         }
 
-        IDataView inData = new GenomeMetricDataView(data);
+        IDataView inData = new GenomeMetricDataView(data, new HashSet<string>());
 
         print(inData.Preview().ToString());
 

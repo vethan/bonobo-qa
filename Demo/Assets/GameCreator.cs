@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CommandLine;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -107,6 +108,15 @@ public partial class GameCreator : MonoBehaviour
         "The left player is controlled by a neural net, the right player is a human authored agent"
     };
 
+    public class Options
+    {
+        [Option(Required = false, HelpText = "Set maximum generations.", Default = (int) 400)]
+        public int gens { get; set; }
+
+        [Option(Required = false, HelpText = "Set population.", Default = (int) 32)]
+        public int population { get; set; }
+    }
+
 
     const int AUTOMATIC_GEN_SECONDS = 30;
     public bool pauseAutoAtTargetGeneration = true;
@@ -115,12 +125,66 @@ public partial class GameCreator : MonoBehaviour
 
     private ScatterPlot scatterPlot;
     private GenomeRepository repository;
-
+    private DateTime startTime;
+    private float topSpeedScale = 25;
     private void Awake()
     {
+        string[] args = System.Environment.GetCommandLineArgs();
+        var parser = new Parser(with =>
+        {
+            with.IgnoreUnknownArguments = true;
+            with.AllowMultiInstance = true;
+        });
+        var result = parser.ParseArguments<Options>(args)
+            .WithParsed(options =>
+            {
+                {
+                    targetGeneration = (int) options.gens;
+                    Debug.Log("Setting gens to " + targetGeneration);
+                }
+
+                {
+                    gamesToCreate = (int) options.population;
+                    if (gamesToCreate <= 4)
+                    {
+                        topSpeedScale = 80;
+                    }
+                    else if (gamesToCreate <= 8)
+                    {
+                        topSpeedScale = 50;
+                    }
+                    else if (gamesToCreate <= 16)
+                    {
+                        topSpeedScale = 25;
+                    }
+                    else if (gamesToCreate <= 32)
+                    {
+                        topSpeedScale = 16;
+                    }
+                    else
+                    {
+                        topSpeedScale = 10;
+                    }
+                    Debug.Log("Setting population to " + gamesToCreate);
+                }
+                this.highSpeedMode.isOn = true;
+            }) // options is an instance of Options type
+            .WithNotParsed(errors =>
+            {
+                Debug.Log("FAILED PARSE");
+                foreach (var error in errors)
+                {
+                    print(error.ToString());
+                }
+            });
+
+        if (gamesToShow > gamesToCreate)
+        {
+            gamesToShow = gamesToCreate;
+        }
         scatterPlot = new GameObject("ScatterPlot").AddComponent<ScatterPlot>();
         scatterPlot.transform.position = new Vector3(-2000, -2000, 0);
-
+        startTime = DateTime.Now;
         if (inspectionMode)
         {
             interactiveMode = false;
@@ -142,7 +206,7 @@ public partial class GameCreator : MonoBehaviour
         //_complexityRegulationStrategy = new DefaultComplexityRegulationStrategy(ComplexityCeilingType.Relative, 4);
         _complexityRegulationStrategy = new NullComplexityRegulationStrategy();
         _eaParams = new NeatEvolutionAlgorithmParameters();
-        _eaParams.SpecieCount = 9;
+        _eaParams.SpecieCount = 1;
         _eaParams.ElitismProportion = 0.20;
         _eaParamsSimplifying = _eaParams.CreateSimplifyingParameters();
 
@@ -513,8 +577,10 @@ public partial class GameCreator : MonoBehaviour
     void InitialisePopulation()
     {
         repository?.Dispose();
-        repository = new GenomeRepository(300, scatterPlot, _rng, true, "DropFeet" + currentSelectionType,
-            runNumberForType);
+        repository = new GenomeRepository(300, scatterPlot, _rng, true,
+            "DropFeet p" + gamesToCreate.ToString() + " g" + targetGeneration.ToString() + " " +
+            currentSelectionType.ToString(),
+            runNumberForType, startTime);
 
 
         if (update != null)
@@ -677,7 +743,7 @@ public partial class GameCreator : MonoBehaviour
 
     void HandleAutomaticUpdate()
     {
-        Time.timeScale = highSpeedMode.isOn ? 6 : 1;
+        Time.timeScale = highSpeedMode.isOn ? topSpeedScale : 1;
         bool allFinished = true;
         foreach (var game in games)
         {
@@ -852,25 +918,22 @@ public partial class GameCreator : MonoBehaviour
         generation++;
         if (pauseAutoAtTargetGeneration && generation == targetGeneration)
         {
-            runNumberForType++;
-            if (runNumberForType == 3)
+            if (currentSelectionType == GenomeRepository.SelectionType.Curisoity)
             {
-                runNumberForType = 0;
-                if (currentSelectionType == GenomeRepository.SelectionType.Curisoity)
+                currentSelectionType = GenomeRepository.SelectionType.Novelty;
+            }
+            else if (currentSelectionType == GenomeRepository.SelectionType.Novelty)
+            {
+                currentSelectionType = GenomeRepository.SelectionType.Uniform;
+            }
+            else
+            {
+                runNumberForType++;
                 {
-                    currentSelectionType = GenomeRepository.SelectionType.Novelty;
-                }
-                else if (currentSelectionType == GenomeRepository.SelectionType.Novelty)
-                {
-                    currentSelectionType = GenomeRepository.SelectionType.Uniform;
-                }
-                else
-                {
-                    pauseAutoAtTargetGeneration = false;
-                    pauseEvolution.isOn = true;
-                    Application.Quit();
+                    currentSelectionType = GenomeRepository.SelectionType.Curisoity;
                 }
             }
+
 
             InitialisePopulation();
             //pauseAutoAtTargetGeneration = false;

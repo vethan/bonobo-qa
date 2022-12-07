@@ -45,19 +45,25 @@ public class PlayerCharacter : MonoBehaviour
     public int headshotsHit = 0;
     public int kicksHit = 0;
 
-
+    public Transform _transform;
     public float floorHeight
     {
         get { return floor.localPosition.y; }
     }
 
+    private Vector2 localPhysicsPos;
     public Vector2 GetLocalPhysicsPosition()
     {
-        return (Vector2) transform.parent.InverseTransformPoint(rigid.position);
+        return localPhysicsPos;
     }
 
+    void UpdateLocalPhysicsPosition()
+    {
+        localPhysicsPos = _transform.parent.InverseTransformPoint(rigid.position);
+    }
     void Awake()
     {
+        _transform = transform;
         colliders = GetComponentsInChildren<Collider2D>(true);
 
         controller = GetComponent<MultiDropFeetController>();
@@ -87,26 +93,34 @@ public class PlayerCharacter : MonoBehaviour
         }
     }
 
+    private bool _isOnFloor = false;
+
+    void UpdateIsOnFloor()
+    {
+        _isOnFloor = _transform.localPosition.y <= floor.localPosition.y + .01f && velocity.y <= 0;
+    }
+
     public bool isOnFloor
     {
-        get { return transform.localPosition.y <= floor.localPosition.y + .01f && velocity.y <= 0; }
+        get { return _isOnFloor; }
     }
 
     public float lastOnFloor { get; private set; }
 
     public Vector2 GetAttackVector()
     {
-        return new Vector2(15 * flipper.localScale.x, -15);
+        return new Vector2(15 * facingVector, -15);
     }
 
+    private int facingVector = 1;
     void HandleInput()
     {
         controller.UpdateButtons();
         if (isOnFloor)
         {
             attemptedEarlyDive = false;
-            float xScale = transform.localPosition.x - opponent.transform.localPosition.x > 0 ? -1 : 1;
-            flipper.localScale = new Vector3(xScale, 1, 1);
+            facingVector = _transform.localPosition.x - opponent._transform.localPosition.x > 0 ? -1 : 1;
+            flipper.localScale = new Vector3(facingVector, 1, 1);
 
 
             if (controller.DropButtonDown() && lastInAir > LAND_DELAY)
@@ -117,7 +131,7 @@ public class PlayerCharacter : MonoBehaviour
             }
             else if (controller.FeetButtonDown() && lastInAir > LAND_DELAY)
             {
-                velocity = new Vector2(3.5f * -flipper.localScale.x, 13);
+                velocity = new Vector2(3.5f * -facingVector, 13);
                 attackDelay = HOP_DELAY;
                 backhopsMade++;
             }
@@ -143,6 +157,8 @@ public class PlayerCharacter : MonoBehaviour
 
     private void FixedUpdate()
     {
+        UpdateIsOnFloor();
+        UpdateLocalPhysicsPosition();
         if (gameInstance.isPausedForKill)
             return;
         if (debug)
@@ -156,16 +172,20 @@ public class PlayerCharacter : MonoBehaviour
             HandleInput();
         }
 
+        UpdateIsOnFloor();
+        UpdateLocalPhysicsPosition();
         if (isOnFloor)
         {
             lastInAir += Time.fixedDeltaTime;
             lastOnFloor = 0;
             dropping = false;
             velocity = Vector2.zero;
-            if (transform.localPosition.y < floor.localPosition.y)
+            var lp = _transform.localPosition;
+            if (lp.y < floor.localPosition.y)
             {
-                transform.localPosition = new Vector3(transform.localPosition.x, floor.localPosition.y,
-                    transform.localPosition.z);
+                
+                _transform.localPosition = new Vector3(lp.x, floor.localPosition.y,
+                    lp.z);
             }
         }
         else
@@ -188,7 +208,7 @@ public class PlayerCharacter : MonoBehaviour
             verticalDistacnce += velocity.y;
         }
 
-        if (flipper.localScale.x == Mathf.Sign(velocity.x))
+        if (facingVector == Mathf.Sign(velocity.x))
         {
             approachDistance += Mathf.Abs(velocity.x);
         }
@@ -197,10 +217,11 @@ public class PlayerCharacter : MonoBehaviour
             retreatDistance += Mathf.Abs(velocity.x);
         }
 
-        transform.localPosition += (Vector3) velocity * Time.fixedDeltaTime;
-        transform.localPosition = new Vector3(Mathf.Clamp(transform.localPosition.x, -xLimit, xLimit),
-            transform.localPosition.y, transform.localPosition.z);
-
+        _transform.localPosition += (Vector3) velocity * Time.fixedDeltaTime;
+        _transform.localPosition = new Vector3(Mathf.Clamp(_transform.localPosition.x, -xLimit, xLimit),
+            _transform.localPosition.y, _transform.localPosition.z);
+        UpdateIsOnFloor();
+        UpdateLocalPhysicsPosition();
         standSprites.SetActive(isOnFloor);
         diveSprites.SetActive(dropping && !isOnFloor);
         jumpSprites.SetActive(!isOnFloor && !dropping);
@@ -259,17 +280,18 @@ public class PlayerCharacter : MonoBehaviour
         {
             {side + "Headshots", headshotsHit},
             {side + "Hits", kicksHit},
-            {side + "Hops",backhopsMade},
-            {side + "Jumps",jumpsMade},
-            {side + "DiveKicks",divekicksMade},
-            {side + "VerticalDistance",verticalDistacnce},
-            {side + "ApproachDistance",approachDistance},
-            {side + "RetreatDistance",retreatDistance},
+            {side + "Hops", backhopsMade},
+            {side + "Jumps", jumpsMade},
+            {side + "DiveKicks", divekicksMade},
+            {side + "VerticalDistance", verticalDistacnce},
+            {side + "ApproachDistance", approachDistance},
+            {side + "RetreatDistance", retreatDistance},
         };
     }
+
     public void SnapToFloorPosition(float xPoint)
     {
-        transform.localPosition = new Vector3(xPoint, floor.localPosition.y, transform.localPosition.z);
+        _transform.localPosition = new Vector3(xPoint, floor.localPosition.y, _transform.localPosition.z);
         velocity = Vector2.zero;
     }
 

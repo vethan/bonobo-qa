@@ -42,7 +42,8 @@ public class GenomeRepository : IDisposable
     private int nextModelUpdateGapIncrease = 10;
     private List<string> outputHeaders;
 
-    public const bool RETRAIN_BASED_ON_REPO_SIZE = true;
+    public const bool RETRAIN_BASED_ON_REPO_SIZE = false;
+    private DateTime beginTime;
 
     void UpdateThreshold()
     {
@@ -51,9 +52,21 @@ public class GenomeRepository : IDisposable
                       (targetSize * 2.0f);
     }
 
+
     public GenomeRepository(int targetSize, ScatterPlot scatterPlot, IRandomSource rng, bool writeData = false,
-        string gameType = null, int runNumber = 0)
+        string gameType = null, int runNumber = 0, DateTime? startTime = null)
     {
+        columnsToIgnore = new HashSet<string>();
+
+        columnsToIgnore.Add("leftHeadshots");
+        columnsToIgnore.Add("leftHits");
+        columnsToIgnore.Add("leftHops");
+        columnsToIgnore.Add("leftJumps");
+        columnsToIgnore.Add("leftDiveKicks");
+        columnsToIgnore.Add("leftVerticalDistance");
+        columnsToIgnore.Add("leftApproachDistance");
+        columnsToIgnore.Add("leftRetreatDistance");
+
         metricRepository = new List<GenomeMetric>();
         repositoryPoints = new NativeArray<float3>(MAX_REPOSITORY_SIZE, Allocator.Persistent);
         for (int i = 0; i < MAX_REPOSITORY_SIZE; i++)
@@ -68,6 +81,14 @@ public class GenomeRepository : IDisposable
         this.writeData = writeData;
         this.runNumber = runNumber;
         this.gameType = gameType ?? "Unknown";
+        if (startTime.HasValue)
+        {
+            beginTime = startTime.Value;
+        }
+        else
+        {
+            beginTime = DateTime.Now;
+        }
     }
 
 
@@ -77,11 +98,29 @@ public class GenomeRepository : IDisposable
 
         repositoryPoints.Dispose();
         knnContainer.Dispose();
+
+        if (metricDataStream != null)
+        {
+            metricDataStream.Flush();
+            repoContentDataStream.Flush();
+            metricDataStream.Dispose();
+            repoContentDataStream.Dispose();
+        }
     }
+
+    private float GetStableValue(float value)
+    {
+        if (float.IsNaN(value))
+            return 0;
+
+        return value;
+    }
+
+    private HashSet<string> columnsToIgnore;
 
     public NativeArray<float3> GetPCAPoints(List<GenomeMetric> tempRepository, bool updateBounds)
     {
-        IDataView inData = new GenomeMetricDataView(tempRepository);
+        IDataView inData = new GenomeMetricDataView(tempRepository, columnsToIgnore);
         IDataView normalisedData = dataPrepTransformer.Transform(inData);
         var pcaData = pcaTranformer.Transform(normalisedData);
         DataViewSchema columns = pcaData.Schema;
@@ -101,9 +140,10 @@ public class GenomeRepository : IDisposable
                 idGetter.Invoke(ref rowId);
 
                 Debug.Assert(tempRepository[index].genome.Id == rowId.Low);
+                queryPoints[index] = new float3(GetStableValue(pcaVector.GetItemOrDefault(0)),
+                    GetStableValue(pcaVector.GetItemOrDefault(1)),
+                    GetStableValue(pcaVector.GetItemOrDefault(2)));
 
-                queryPoints[index] = new float3(pcaVector.GetItemOrDefault(0), pcaVector.GetItemOrDefault(1),
-                    pcaVector.GetItemOrDefault(2));
                 if (updateBounds)
                 {
                     pcaBounds.Encapsulate(queryPoints[index]);
@@ -121,7 +161,7 @@ public class GenomeRepository : IDisposable
         var start = testCases != null ? GetPCAPoints(testCases, false) : default;
 
         Debug.Log("Retraining model");
-        IDataView inData = new GenomeMetricDataView(metricRepository);
+        IDataView inData = new GenomeMetricDataView(metricRepository, columnsToIgnore);
         dataPrepTransformer = dataPrepEstimator.Fit(inData);
         IDataView normalisedData = dataPrepTransformer.Transform(inData);
 
@@ -146,8 +186,10 @@ public class GenomeRepository : IDisposable
 
                 Debug.Assert(metricRepository[index].genome.Id == rowId.Low);
 
-                repositoryPoints[index] = new float3(pcaVector.GetItemOrDefault(0), pcaVector.GetItemOrDefault(1),
-                    pcaVector.GetItemOrDefault(2));
+                repositoryPoints[index] = new float3(
+                    GetStableValue(pcaVector.GetItemOrDefault(0)),
+                    GetStableValue(pcaVector.GetItemOrDefault(1)),
+                    GetStableValue(pcaVector.GetItemOrDefault(2)));
                 pcaBounds.Encapsulate(repositoryPoints[index]);
                 index++;
             }
@@ -157,7 +199,7 @@ public class GenomeRepository : IDisposable
         rebuildHandle = new KnnRebuildJob(knnContainer).Schedule();
 
         UpdateThreshold();
-        PruneClosePoints();
+        //PruneClosePoints();
         if (start.IsCreated)
         {
             var end = GetPCAPoints(testCases, false);
@@ -241,11 +283,12 @@ public class GenomeRepository : IDisposable
     public void Initialise(List<GenomeMetric> tempRepertoire)
     {
         columnNames = new HashSet<string>(tempRepertoire[0].metrics.Keys);
+        columnNames.ExceptWith(columnsToIgnore);
         dataPrepEstimator = mlContext.Transforms.Concatenate("Features", columnNames.ToArray())
             .Append(mlContext.Transforms.NormalizeMinMax("Features"));
         //Early setup of PCA estimator
 
-        IDataView inData = new GenomeMetricDataView(tempRepertoire);
+        IDataView inData = new GenomeMetricDataView(tempRepertoire, columnsToIgnore);
         dataPrepTransformer = dataPrepEstimator.Fit(inData);
         IDataView normalisedData = dataPrepTransformer.Transform(inData);
         var pcaEstimator = mlContext.Transforms.ProjectToPrincipalComponents("FeaturesPCA", "Features", null, 3);
@@ -264,12 +307,13 @@ public class GenomeRepository : IDisposable
                 {
                     if (indexesToSkip.Contains(j))
                     {
+                        Debug.Log("Skipping one");
                         continue;
                     }
 
                     var dist = Vector3.SqrMagnitude(queryPoints[i] -
                                                     queryPoints[j]);
-                    if (dist < thresholdSq)
+                    if ((tempRepertoire.Count - (indexesToSkip.Count + 1) >= 5) && dist < thresholdSq)
                     {
                         indexesToSkip.Add(j);
                         tempRepertoire[i].nearTally++;
@@ -291,6 +335,7 @@ public class GenomeRepository : IDisposable
 
         Debug.Log("Initial repertoire size: " + metricRepository.Count());
         UpdatePCAModel();
+
         scatterPlot.ClearGraph();
         Vector3[] drawPoints = new Vector3[metricRepository.Count()];
         for (int i = 0; i < metricRepository.Count(); i++)
@@ -321,16 +366,17 @@ public class GenomeRepository : IDisposable
     {
         var queryPoints = GetPCAPoints(tempRepository, false);
         //Find Nearest Neighbour for each.
-        const int kNeighbours = 1;
         WaitForTree();
 
-        var result = new NativeArray<int>(kNeighbours * tempRepository.Count, Allocator.TempJob);
+        var result = new NativeArray<int>(tempRepository.Count, Allocator.TempJob);
         var batchQueryJob = new QueryKNearestBatchJob(knnContainer, queryPoints, result);
-        batchQueryJob.ScheduleBatch(queryPoints.Length, queryPoints.Length / 32).Complete();
+        batchQueryJob.ScheduleBatch(queryPoints.Length, Mathf.Max(1, queryPoints.Length / 32)).Complete();
         float maxDist = 0;
         List<int> interestingIndexes = new List<int>();
         for (int i = 0; i < tempRepository.Count(); i++)
         {
+            Debug.Assert(result[i] < metricRepository.Count,
+                "result[i] < metricRepository.Count i=" + i + "&result[i]=" + result[i]);
             var dist = Vector3.SqrMagnitude(queryPoints[i] - repositoryPoints[result[i]]);
             maxDist = Mathf.Max(maxDist, dist);
             if (dist > thresholdSq)
@@ -389,7 +435,7 @@ public class GenomeRepository : IDisposable
         Vector3[] thisGeneration = new Vector3[queryPoints.Length - interestingIndexes.Count];
         Vector3[] thisGenInteresting = new Vector3[interestingIndexes.Count];
         GenomeMetric[] thisGenData = new GenomeMetric[queryPoints.Length - interestingIndexes.Count];
-        GenomeMetric[] thisGenInterestingData = new GenomeMetric[queryPoints.Length - interestingIndexes.Count];
+        GenomeMetric[] thisGenInterestingData = new GenomeMetric[interestingIndexes.Count];
         int interestingPointer = 0;
         int normalPointer = 0;
         for (int i = 0; i < queryPoints.Length; i++)
@@ -471,6 +517,7 @@ public class GenomeRepository : IDisposable
                 UpdatePCAModel();
                 nextModelUpdateValue = nextModelUpdateGapIncrease + nextModelUpdateValue;
                 nextModelUpdateGapIncrease += 10;
+                nextModelUpdateGapIncrease = Mathf.Min(nextModelUpdateGapIncrease, 20);
             }
         }
 
@@ -486,7 +533,7 @@ public class GenomeRepository : IDisposable
                 }
 
                 statFolder = Path.Combine(baseMetricSavePath,
-                    string.Format("{2:yyyy-dd-M--HH-mm} {0} Run {1} Metrics", gameType, runNumber, DateTime.Now));
+                    string.Format("{2:yyyy-M-dd--HH-mm} {0} Run {1} Metrics", gameType, runNumber, beginTime));
                 if (!Directory.Exists(statFolder))
                 {
                     Directory.CreateDirectory(statFolder);
@@ -496,6 +543,9 @@ public class GenomeRepository : IDisposable
                 string filepath2 = Path.Combine(statFolder, "repositoryContents.csv");
                 recordedGenomeIds = new HashSet<uint>();
                 outputHeaders = metricRepository[0].metrics.Keys.ToList();
+                outputHeaders.Add("__birthGeneration__");
+                outputHeaders.Add("__genomeId__");
+                outputHeaders.Add("__nearbyTally__");
                 metricDataStream = new StreamWriter(new FileStream(filepath, FileMode.Create,
                     FileAccess.Write, FileShare.ReadWrite));
                 repoContentDataStream = new StreamWriter(new FileStream(filepath2, FileMode.Create,
@@ -510,13 +560,35 @@ public class GenomeRepository : IDisposable
                 if (!recordedGenomeIds.Contains(genomeMetric.genome.Id))
                 {
                     recordedGenomeIds.Add(genomeMetric.genome.Id);
-                    metricDataStream.WriteLine(String.Join(",", outputHeaders.Select(x => genomeMetric.metrics[x])));
+                    metricDataStream.WriteLine(String.Join(",", outputHeaders.Select(x =>
+                    {
+                        if (x.Equals("__birthGeneration__"))
+                        {
+                            return genomeMetric.genome.BirthGeneration;
+                        }
+                        else if (x.Equals("__genomeId__"))
+                        {
+                            return genomeMetric.genome.Id;
+                        }
+                        else if (x.Equals("__nearbyTally__"))
+                        {
+                            return genomeMetric.nearTally;
+                        }
+                        else
+                        {
+                            return genomeMetric.metrics[x];
+                        }
+                    })));
+
                     //Write the genome
-                    string filename = string.Format("Genome{0}.xml", genomeMetric.genome.Id);
+                    /*string filename = string.Format("Genome{0}.xml", genomeMetric.genome.Id);
                     var xmlDoc = NeatGenomeXmlIO.SaveComplete(genomeMetric.genome, false);
-                    xmlDoc.Save(Path.Combine(statFolder, filename));
+                    xmlDoc.Save(Path.Combine(statFolder, filename));*/
                 }
             }
+
+            metricDataStream.Flush();
+            repoContentDataStream.Flush();
         }
     }
 
@@ -534,10 +606,12 @@ public class GenomeRepository : IDisposable
     {
         rebuildHandle.Complete();
         kNeighbours = Mathf.Min(kNeighbours, metricRepository.Count());
+        Debug.Assert(kNeighbours > 0, "kNeighbours is 0 or less");
+        Debug.Assert(kNeighbours < metricRepository.Count, "kNeighbours is massive");
         var result = new NativeArray<int>(kNeighbours * metricRepository.Count, Allocator.TempJob);
         var batchQueryJob = new QueryKNearestBatchJob(knnContainer,
             repositoryPoints.GetSubArray(0, metricRepository.Count), result);
-        batchQueryJob.ScheduleBatch(metricRepository.Count(), metricRepository.Count() / 32).Complete();
+        batchQueryJob.ScheduleBatch(metricRepository.Count(), Mathf.Max(1, metricRepository.Count() / 32)).Complete();
         float maxDist = 0;
         GenomeDistance[] distances = new GenomeDistance[metricRepository.Count];
 
@@ -547,7 +621,10 @@ public class GenomeRepository : IDisposable
             int startIndex = i * kNeighbours;
             for (int j = startIndex; j < startIndex + kNeighbours; j++)
             {
-                totalDistSq += Vector3.SqrMagnitude(repositoryPoints[i] - repositoryPoints[result[i]]);
+                Debug.Assert(i < repositoryPoints.Length, "i<repositoryPoints.Length");
+                Debug.Assert(result[j] < repositoryPoints.Length,
+                    "result[j]<repositoryPoints.Length: j=" + j + " result[j]=" + result[j]);
+                totalDistSq += Vector3.SqrMagnitude(repositoryPoints[i] - repositoryPoints[result[j]]);
             }
 
             maxDist = Mathf.Max(maxDist, totalDistSq);
@@ -591,13 +668,13 @@ public class GenomeRepository : IDisposable
                 genomeProbabilities = metricRepository.Select(x => (double) x.curiosityScore).ToArray();
                 break;
             case SelectionType.Novelty:
-                genomeProbabilities = GenerateNearestNeighbourNovelty(5);
+                genomeProbabilities = GenerateNearestNeighbourNovelty(Mathf.Min(metricRepository.Count - 1, 5));
                 break;
             case SelectionType.Uniform:
                 genomeProbabilities = metricRepository.Select(x => 1.0).ToArray();
                 break;
             default:
-                genomeProbabilities = GenerateNearestNeighbourNovelty(5);
+                genomeProbabilities = GenerateNearestNeighbourNovelty(Mathf.Min(metricRepository.Count - 1, 5));
                 break;
         }
 

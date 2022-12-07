@@ -14,6 +14,7 @@ public class ScatterPlot : MonoBehaviour
     public int layer1Size;
 
     public int layer2Size;
+    public int layer3Size;
 
     private bool showHotspots = false;
 
@@ -65,6 +66,10 @@ public class ScatterPlot : MonoBehaviour
             layer2Size = layerPoints.Count();
         }
 
+        if (layer == 3)
+        {
+            layer3Size = layerPoints.Count();
+        }
 
         //Do we need to update the min/max values
         if (layer != 1)

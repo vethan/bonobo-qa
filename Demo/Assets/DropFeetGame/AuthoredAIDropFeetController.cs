@@ -80,7 +80,9 @@ public class AuthoredAIDropFeetController : AbstractDropFeetController
         RaycastHit2D[] hit = new RaycastHit2D[1];
         Debug.DrawRay(opponentFoot.transform.position, attackVector);
         float radius = opponentFoot.transform.localScale.x * ((CircleCollider2D)opponentFoot).radius * 0.85f;
+        
         int hits = Physics2D.CircleCast(opponentFoot.transform.position, radius, attackVector, contactFilter2D, hit, (self.transform.position - opponentFoot.transform.position).magnitude * 2f);
+        //int hits = Physics2D.Raycast(opponentFoot.transform.position,  attackVector, contactFilter2D, hit, (self.transform.position - opponentFoot.transform.position).magnitude * 2f);
         hitResult = hit[0];
         return hits > 0 && hit[0].transform == transform;
     }

@@ -29,7 +29,7 @@ public sealed class GenomeMetricDataView : IDataView
     public DataViewSchema Schema { get; }
     public bool CanShuffle => false;
 
-    public GenomeMetricDataView(IEnumerable<GenomeMetric> data)
+    public GenomeMetricDataView(IEnumerable<GenomeMetric> data, HashSet<string> columnsToIgnore)
     {
         _data = data;
 
@@ -37,6 +37,8 @@ public sealed class GenomeMetricDataView : IDataView
         var firstData = data.First().metrics;
         foreach (KeyValuePair<string, float> keyValuePair in firstData)
         {
+            if (columnsToIgnore.Contains(keyValuePair.Key))
+                continue;
             builder.AddColumn(keyValuePair.Key, NumberDataViewType.Single);
         }
 

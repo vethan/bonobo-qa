@@ -1299,8 +1299,7 @@ namespace Unity.Collections
             public static IntPtr Initialize()
             {
                 if (jobReflectionData == IntPtr.Zero)
-                    jobReflectionData = JobsUtility.CreateJobReflectionData(typeof(NativeMultiHashMapUniqueHashJobStruct<TJob>), typeof(TJob),
-                        JobType.ParallelFor, (ExecuteJobFunction)Execute);
+                    { jobReflectionData = JobsUtility.CreateJobReflectionData(typeof(NativeMultiHashMapUniqueHashJobStruct<TJob>), typeof(TJob), (ExecuteJobFunction)Execute); }
                 return jobReflectionData;
             }
 
@@ -1379,7 +1378,7 @@ namespace Unity.Collections
             };
 
             var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref fullData),
-                NativeMultiHashMapUniqueHashJobStruct<TJob>.Initialize(), dependsOn, ScheduleMode.Batched);
+                NativeMultiHashMapUniqueHashJobStruct<TJob>.Initialize(), dependsOn, ScheduleMode.Parallel);
             return JobsUtility.ScheduleParallelFor(ref scheduleParams, hashMap.m_Buffer->bucketCapacityMask + 1,
                 minIndicesPerJobCount);
         }
@@ -1408,8 +1407,7 @@ namespace Unity.Collections
             public static IntPtr Initialize()
             {
                 if (jobReflectionData == IntPtr.Zero)
-                    jobReflectionData = JobsUtility.CreateJobReflectionData(typeof(NativeMultiHashMapVisitKeyValueJobStruct<TJob, TKey, TValue>), typeof(TJob),
-                        JobType.ParallelFor, (ExecuteJobFunction)Execute);
+                    { jobReflectionData = JobsUtility.CreateJobReflectionData(typeof(NativeMultiHashMapVisitKeyValueJobStruct<TJob, TKey, TValue>), typeof(TJob), (ExecuteJobFunction)Execute); }
                 return jobReflectionData;
             }
 
@@ -1463,7 +1461,7 @@ namespace Unity.Collections
             };
 
             var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref fullData),
-                NativeMultiHashMapVisitKeyValueJobStruct<TJob, TKey, TValue>.Initialize(), dependsOn, ScheduleMode.Batched);
+                NativeMultiHashMapVisitKeyValueJobStruct<TJob, TKey, TValue>.Initialize(), dependsOn, ScheduleMode.Parallel);
             return JobsUtility.ScheduleParallelFor(ref scheduleParams, hashMap.m_Buffer->bucketCapacityMask + 1,
                 minIndicesPerJobCount);
         }
@@ -1522,8 +1520,7 @@ namespace Unity.Collections
             public static IntPtr Initialize()
             {
                 if (jobReflectionData == IntPtr.Zero)
-                    jobReflectionData = JobsUtility.CreateJobReflectionData(typeof(NativeMultiHashMapVisitKeyMutableValueJobStruct<TJob, TKey, TValue>), typeof(TJob),
-                        JobType.ParallelFor, (ExecuteJobFunction)Execute);
+                    { jobReflectionData = JobsUtility.CreateJobReflectionData(typeof(NativeMultiHashMapVisitKeyMutableValueJobStruct<TJob, TKey, TValue>), typeof(TJob), (ExecuteJobFunction)Execute); }
                 return jobReflectionData;
             }
 
@@ -1576,7 +1573,7 @@ namespace Unity.Collections
             };
 
             var scheduleParams = new JobsUtility.JobScheduleParameters(UnsafeUtility.AddressOf(ref fullData),
-                NativeMultiHashMapVisitKeyMutableValueJobStruct<TJob, TKey, TValue>.Initialize(), dependsOn, ScheduleMode.Batched);
+                NativeMultiHashMapVisitKeyMutableValueJobStruct<TJob, TKey, TValue>.Initialize(), dependsOn, ScheduleMode.Parallel);
             return JobsUtility.ScheduleParallelFor(ref scheduleParams, hashMap.m_Buffer->bucketCapacityMask + 1,
                 minIndicesPerJobCount);
         }

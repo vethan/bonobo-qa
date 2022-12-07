@@ -69,7 +69,7 @@ public class ReplayRecorder : MonoBehaviour
         InitialiseReplay(gameInstance.leftScore,gameInstance.rightScore);
     }
 
-    public Stream GetReplayStream()
+    public MemoryStream GetReplayStream()
     {
         var memoryStream = new MemoryStream();
         currentReplay.Save(memoryStream);

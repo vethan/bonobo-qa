@@ -56,7 +56,7 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
     bool PredictOpponentPositionWhenAttacking(out Vector2 hitPoint)
     {
 
-        float opponentRelativeDistance = transform.InverseTransformPoint(opponent.rigid.position).x;
+        float opponentRelativeDistance = self._transform.InverseTransformPoint(opponent.rigid.position).x;
         float t = opponentRelativeDistance / (self.GetAttackVector().x - opponent.velocity.x);
         hitPoint = self.GetLocalPhysicsPosition() + t * self.GetAttackVector();
         
@@ -70,7 +70,7 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
         else
         {
             Vector2 opponentHit = CalculateRelativeJumpCurvePoint(opponent, t);
-            opponentHit = transform.parent.InverseTransformPoint(opponent.transform.TransformPoint(opponentHit));
+            opponentHit = self._transform.parent.InverseTransformPoint(opponent._transform.TransformPoint(opponentHit));
             return opponentHit.y > self.floorHeight- 0.7f 
                 && hitPoint.y > self.floorHeight  -0.7f
                 && hitPoint.y > opponentHit.y + 0.2f * characterHeight
@@ -125,14 +125,14 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
         return Mathf.Clamp01((opponent.GetLocalPhysicsPosition().y - opponent.floorHeight) / max);
     }
 
-    float NormalisedOpponentHorizontalDistance(float max)
+    float NormalisedOpponentHorizontalDistance(float max, float myX, float opponentX)
     {
-        return Mathf.Clamp01(Mathf.Abs(self.GetLocalPhysicsPosition().x - opponent.GetLocalPhysicsPosition().x) / max);
+        return Mathf.Clamp01(Mathf.Abs(myX - opponentX) / max);
     }
 
-    float ParabolicOpponentHorizontaldistance(float max)
+    float ParabolicOpponentHorizontaldistance(float max, float myX, float opponentX)
     {
-        float normalisedDistance = NormalisedOpponentHorizontalDistance(max);
+        float normalisedDistance = NormalisedOpponentHorizontalDistance(max, myX, opponentX);
         return Mathf.Clamp01(1 + 1.333333f * normalisedDistance - 22.66667f * Mathf.Pow(normalisedDistance, 2) + 42.66667f * Mathf.Pow(normalisedDistance, 3) - 21.33333f * Mathf.Pow(normalisedDistance, 4));
     }
 
@@ -272,12 +272,12 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
         return 1;
     }
 
-    float CalculateNormalisedBackDistanceToEdge()
+    float CalculateNormalisedBackDistanceToEdge(float myX, float oppoonentX)
     {
         float gameWidth = gameInstance.horizBorder * 2;
-        float position = (self.GetLocalPhysicsPosition().x + gameInstance.horizBorder) / gameWidth;
+        float position = (myX + gameInstance.horizBorder) / gameWidth;
 
-        if(self.GetLocalPhysicsPosition().x > opponent.GetLocalPhysicsPosition().x)
+        if(myX > oppoonentX)
         {
             return position;
         }
@@ -298,9 +298,9 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
         return new Vector2(xDisplacement, yDisplacement);
     }
 
-    float CalulateRetreatSpaceUtility()
+    float CalulateRetreatSpaceUtility(float myX, float oppoonentX)
     {
-        float normalisedDistance = CalculateNormalisedBackDistanceToEdge();
+        float normalisedDistance = CalculateNormalisedBackDistanceToEdge(myX,  oppoonentX);
         return Mathf.Clamp01(-0.02123093f + (0.95f - -0.02123093f) / (1 + Mathf.Pow(normalisedDistance / 0.8571179f, 24.65307f)));
         //return Mathf.Clamp01(1 - 1.1055563f * normalisedDistance - 6.605556f * Mathf.Pow(normalisedDistance, 2) +  14.2777f * Mathf.Pow(normalisedDistance, 3) - 21.33333f * Mathf.Pow(normalisedDistance, 4));
     }
@@ -308,8 +308,9 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
     float JumpBackUtility() {
         if (!self.isOnFloor)
             return 0;
-
-        return ((CalulateRetreatSpaceUtility() * 1.0f) + 0.0f) * (1-ParabolicOpponentHorizontaldistance(12) + 3*CalculateJumpDodgeUtility(DodgeArea.Upper))/4 ;
+        float myX = self.GetLocalPhysicsPosition().x;
+        float opponentX = opponent.GetLocalPhysicsPosition().x;
+        return ((CalulateRetreatSpaceUtility(myX,opponentX) * 1.0f) + 0.0f) * (1-ParabolicOpponentHorizontaldistance(12, myX, opponentX) + 3*CalculateJumpDodgeUtility(DodgeArea.Upper))/4 ;
     }
 
 
@@ -352,8 +353,8 @@ public partial class UtilityDropFeetController : AuthoredAIDropFeetController
         lastUtility.Clear();
         if (DebugMode)
         {
-            lastUtility.Add("CalulateRetreatSpaceUtility", new UtilityOption() { value = CalulateRetreatSpaceUtility() } );
-            lastUtility.Add("NormalisedOpponentHorizontalDistance", new UtilityOption() { value = NormalisedOpponentHorizontalDistance(12) });
+           // lastUtility.Add("CalulateRetreatSpaceUtility", new UtilityOption() { value = CalulateRetreatSpaceUtility() } );
+           // lastUtility.Add("NormalisedOpponentHorizontalDistance", new UtilityOption() { value = NormalisedOpponentHorizontalDistance(12) });
             lastUtility.Add("CalculateJumpDodgeUtility", new UtilityOption() { value = CalculateJumpDodgeUtility(DodgeArea.Upper) });
 
 

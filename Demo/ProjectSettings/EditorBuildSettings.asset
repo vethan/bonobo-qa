@@ -14,12 +14,21 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/PlayerVsAIPong.unity
     guid: b005f9a5796287645b5c18ccdc55bf39
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/DropFeetEvo.unity
     guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
+  - enabled: 0
+    path: Assets/Scenes/ExperimentPreabmle.unity
+    guid: 5219f6a367b78154ead96de6149a0555
+  - enabled: 0
+    path: Assets/Scenes/ExperimentTutorial.unity
+    guid: 09a15f65bdbe82540a53a4d289086769
+  - enabled: 0
     path: Assets/Scenes/PlayerVsAIDropFeet.unity
     guid: 86eec43a2b9362f46b945f709e627181
+  - enabled: 0
+    path: Assets/Scenes/ExperimentPostamble.unity
+    guid: fe45769bc4173e541954b02e9ea769af
   - enabled: 0
     path: Assets/Scenes/ReplayLoader.unity
     guid: d5a9d72f04bf27d44a26372b40871cfb
