@@ -7,9 +7,15 @@ using KNN.Jobs;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms;
+using Redzen.Numerics;
 using Redzen.Numerics.Distributions;
 using Redzen.Random;
+using Redzen.Sorting;
+using SharpNeat;
+using SharpNeat.Core;
+using SharpNeat.DistanceMetrics;
 using SharpNeat.Genomes.Neat;
+using SharpNeat.SpeciationStrategies;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -37,6 +43,7 @@ public class GenomeRepository : IDisposable
     private IRandomSource _rng;
     private readonly bool writeData;
     private readonly int runNumber;
+    private readonly int speciesCount;
     private readonly string gameType;
     private int nextModelUpdateValue = 0;
     private int nextModelUpdateGapIncrease = 10;
@@ -44,6 +51,9 @@ public class GenomeRepository : IDisposable
 
     public const bool RETRAIN_BASED_ON_REPO_SIZE = false;
     private DateTime beginTime;
+
+    private ISpeciationStrategy<NeatGenome> _speciationStrategy;
+    IList<Specie<NeatGenome>> _specieList;
 
     void UpdateThreshold()
     {
@@ -53,8 +63,9 @@ public class GenomeRepository : IDisposable
     }
 
 
-    public GenomeRepository(int targetSize, ScatterPlot scatterPlot, IRandomSource rng, bool writeData = false,
-        string gameType = null, int runNumber = 0, DateTime? startTime = null)
+    public GenomeRepository(int targetSize, ScatterPlot scatterPlot, IRandomSource rng, bool behaviourSpec,
+        bool writeData = false,
+        string gameType = null, int runNumber = 0, DateTime? startTime = null, int speciesCount = 4)
     {
         columnsToIgnore = new HashSet<string>();
 
@@ -80,6 +91,7 @@ public class GenomeRepository : IDisposable
         _rng = rng;
         this.writeData = writeData;
         this.runNumber = runNumber;
+        this.speciesCount = speciesCount;
         this.gameType = gameType ?? "Unknown";
         if (startTime.HasValue)
         {
@@ -88,6 +100,16 @@ public class GenomeRepository : IDisposable
         else
         {
             beginTime = DateTime.Now;
+        }
+
+        if (behaviourSpec)
+        {
+            _speciationStrategy =
+                new KMeansBehaviourClusteringStrategy<NeatGenome>(this, new EuclideanDistanceMetric());
+        }
+        else
+        {
+            _speciationStrategy = new KMeansClusteringStrategy<NeatGenome>(new EuclideanDistanceMetric());
         }
     }
 
@@ -190,6 +212,8 @@ public class GenomeRepository : IDisposable
                     GetStableValue(pcaVector.GetItemOrDefault(0)),
                     GetStableValue(pcaVector.GetItemOrDefault(1)),
                     GetStableValue(pcaVector.GetItemOrDefault(2)));
+                pointLookup[metricRepository[index].genome.Id] = repositoryPoints[index];
+
                 pcaBounds.Encapsulate(repositoryPoints[index]);
                 index++;
             }
@@ -204,11 +228,24 @@ public class GenomeRepository : IDisposable
         {
             var end = GetPCAPoints(testCases, false);
             var distanceVector = start[0] - end[0];
-            var distance = ((Vector3) distanceVector).magnitude;
+            var distance = ((Vector3)distanceVector).magnitude;
             Debug.Log("Changed by: " + distance);
             start.Dispose();
             end.Dispose();
         }
+
+        if (_specieList == null)
+        {
+            Debug.Log("NO species set up");
+            return;
+        }
+
+        foreach (Specie<NeatGenome> specie in _specieList)
+        {
+            specie.GenomeList.Clear();
+        }
+
+        _speciationStrategy.SpeciateGenomes(metricRepository.Select(x => x.genome).ToList(), _specieList);
     }
 
     void PruneClosePoints()
@@ -343,6 +380,8 @@ public class GenomeRepository : IDisposable
             drawPoints[i] = repositoryPoints[i];
         }
 
+        _specieList =
+            _speciationStrategy.InitializeSpeciation(metricRepository.Select(x => x.genome).ToList(), speciesCount);
         scatterPlot.DrawLayer(drawPoints, metricRepository.ToArray(), 0);
         if (RETRAIN_BASED_ON_REPO_SIZE)
         {
@@ -357,8 +396,7 @@ public class GenomeRepository : IDisposable
 
         if (testCases == null)
         {
-            testCases = new List<GenomeMetric>();
-            testCases.Add(tempRepertoire[0]);
+            testCases = new List<GenomeMetric> { tempRepertoire[0] };
         }
     }
 
@@ -442,14 +480,14 @@ public class GenomeRepository : IDisposable
         {
             if (interestingIndexes.Contains(i))
             {
-                thisGenInteresting[interestingPointer] = (Vector3) queryPoints[i];
+                thisGenInteresting[interestingPointer] = (Vector3)queryPoints[i];
                 thisGenInterestingData[interestingPointer] = tempRepository[i];
                 interestingPointer++;
             }
             else
             {
                 thisGenData[normalPointer] = tempRepository[i];
-                thisGeneration[normalPointer] = ((Vector3) queryPoints[i]);
+                thisGeneration[normalPointer] = ((Vector3)queryPoints[i]);
                 normalPointer++;
             }
         }
@@ -484,15 +522,20 @@ public class GenomeRepository : IDisposable
         }
 
         //Add new ones to repository
+        List<GenomeMetric> newThisGeneration = new List<GenomeMetric>();
         for (int i = 0; i < interestingIndexes.Count(); i++)
         {
             repositoryPoints[metricRepository.Count] = queryPoints[interestingIndexes[i]];
+            pointLookup[tempRepository[interestingIndexes[i]].genome.Id] = queryPoints[interestingIndexes[i]];
             metricRepository.Add(tempRepository[interestingIndexes[i]]);
+            newThisGeneration.Add(tempRepository[interestingIndexes[i]]);
             pcaBounds.Encapsulate(queryPoints[interestingIndexes[i]]);
         }
 
+
         if (interestingIndexes.Count() > 0)
         {
+            _speciationStrategy.SpeciateOffspring(newThisGeneration.Select(x => x.genome).ToList(), _specieList);
             rebuildHandle = new KnnRebuildJob(knnContainer).Schedule();
             UpdateThreshold();
         }
@@ -520,6 +563,7 @@ public class GenomeRepository : IDisposable
                 nextModelUpdateGapIncrease = Mathf.Min(nextModelUpdateGapIncrease, 20);
             }
         }
+
 
         if (writeData)
         {
@@ -596,6 +640,7 @@ public class GenomeRepository : IDisposable
     private HashSet<uint> recordedGenomeIds;
     private StreamWriter metricDataStream = null;
     private StreamWriter repoContentDataStream = null;
+    private int _bestSpecieIdx;
 
     class GenomeDistance
     {
@@ -628,7 +673,7 @@ public class GenomeRepository : IDisposable
             }
 
             maxDist = Mathf.Max(maxDist, totalDistSq);
-            distances[i] = new GenomeDistance() {DistSq = totalDistSq};
+            distances[i] = new GenomeDistance() { DistSq = totalDistSq };
         }
 
         //Debug.Log("MAX DIST FOR NOVELTY: " + maxDist);
@@ -642,7 +687,7 @@ public class GenomeRepository : IDisposable
 
         result.Dispose();
 
-        return normalisedData.GetColumn<float>("DistSq").Select(x => (double) x).ToArray();
+        return normalisedData.GetColumn<float>("DistSq").Select(x => (double)x).ToArray();
     }
 
     public enum SelectionType
@@ -652,20 +697,194 @@ public class GenomeRepository : IDisposable
         Uniform
     }
 
-    public List<NeatGenome> GenerateOffspring(uint generation, int aSexualCount, int sexualCount,
+    public void AssignScoresToFitness(SelectionType selectionType)
+    {
+        switch (selectionType)
+        {
+            case SelectionType.Curisoity:
+                foreach (var genomeMetric in metricRepository)
+                {
+                    genomeMetric.genome.EvaluationInfo.SetFitness(genomeMetric.curiosityScore);
+                }
+
+                break;
+            case SelectionType.Novelty:
+                var genomeProbabilities = GenerateNearestNeighbourNovelty(Mathf.Min(metricRepository.Count - 1, 5));
+                for (int i = 0; i < genomeProbabilities.Length; i++)
+                {
+                    metricRepository[i].genome.EvaluationInfo.SetFitness(genomeProbabilities[i]);
+                }
+
+                break;
+            case SelectionType.Uniform:
+                foreach (var genomeMetric in metricRepository)
+                {
+                    genomeMetric.genome.EvaluationInfo.SetFitness(1);
+                }
+
+                break;
+            default:
+                foreach (var genomeMetric in metricRepository)
+                {
+                    genomeMetric.genome.EvaluationInfo.SetFitness(genomeMetric.curiosityScore);
+                }
+
+                break;
+        }
+    }
+
+    public List<NeatGenome> GenerateOffspring(uint generation, int populationSize, double OffspringAsexualProportion,
+        double selectionProportion,
+        double interspeciesProportion,
         SelectionType selectionType = SelectionType.Novelty)
     {
+        AssignScoresToFitness(selectionType);
+        SortSpecieGenomes();
+        UpdateBestGenome();
+
+
+        int offspringCount;
+        SpecieStats[] specieStatsArr = CalcSpecieStats(out offspringCount, populationSize, OffspringAsexualProportion,
+            selectionProportion);
+        int specieCount = specieStatsArr.Length;
+        double[] specieFitnessArr = new double[specieCount];
+        DiscreteDistribution[] distArr = new DiscreteDistribution[specieCount];
         foreach (var genomeMetric in metricRepository)
         {
             genomeMetric.childrenThisGen.Clear();
         }
 
+        // Count of species with non-zero selection size.
+        // If this is exactly 1 then we skip inter-species mating. One is a special case because for 0 the 
+        // species all get an even chance of selection, and for >1 we can just select normally.
+        int nonZeroSpecieCount = 0;
+        for (int i = 0; i < specieCount; i++)
+        {
+            // Array of probabilities for specie selection. Note that some of these probabilities can be zero, but at least one of them won't be.
+            SpecieStats inst = specieStatsArr[i];
+            specieFitnessArr[i] = inst._selectionSizeInt;
+
+            if (0 == inst._selectionSizeInt)
+            {
+                // Skip building a DiscreteDistribution for species that won't be selected from.
+                distArr[i] = null;
+                continue;
+            }
+
+            nonZeroSpecieCount++;
+
+            // For each specie we build a DiscreteDistribution for genome selection within 
+            // that specie. Fitter genomes have higher probability of selection.
+            List<NeatGenome> genomeList = _specieList[i].GenomeList;
+            double[] probabilities = new double[inst._selectionSizeInt];
+            for (int j = 0; j < inst._selectionSizeInt; j++)
+            {
+                probabilities[j] = genomeList[j].EvaluationInfo.Fitness;
+            }
+
+            distArr[i] = new DiscreteDistribution(probabilities);
+        }
+
+        // Complete construction of DiscreteDistribution for specie selection.
+        DiscreteDistribution rwlSpecies = new DiscreteDistribution(specieFitnessArr);
+
+        // Produce offspring from each specie in turn and store them in offspringList.
+        List<NeatGenome> offspringList = new List<NeatGenome>(offspringCount);
+        for (int specieIdx = 0; specieIdx < specieCount; specieIdx++)
+        {
+            SpecieStats inst = specieStatsArr[specieIdx];
+            List<NeatGenome> genomeList = _specieList[specieIdx].GenomeList;
+
+            // Get DiscreteDistribution for genome selection.
+            DiscreteDistribution dist = distArr[specieIdx];
+
+            // --- Produce the required number of offspring from asexual reproduction.
+            for (int i = 0; i < inst._offspringAsexualCount; i++)
+            {
+                int genomeIdx = DiscreteDistribution.Sample(_rng, dist);
+                NeatGenome offspring = genomeList[genomeIdx].CreateOffspring(generation);
+                offspringList.Add(offspring);
+            }
+
+            // --- Produce the required number of offspring from sexual reproduction.
+            // Cross-specie mating.
+            // If nonZeroSpecieCount is exactly 1 then we skip inter-species mating. One is a special case because
+            // for 0 the  species all get an even chance of selection, and for >1 we can just select species normally.
+            int crossSpecieMatings = nonZeroSpecieCount == 1
+                ? 0
+                : (int)NumericsUtils.ProbabilisticRound(interspeciesProportion
+                                                        * inst._offspringSexualCount, _rng);
+
+
+            // An index that keeps track of how many offspring have been produced in total.
+            int matingsCount = 0;
+            for (; matingsCount < crossSpecieMatings; matingsCount++)
+            {
+                NeatGenome offspring =
+                    CreateOffspring_CrossSpecieMating(generation, dist, distArr, rwlSpecies, specieIdx, genomeList);
+                offspringList.Add(offspring);
+            }
+
+            // For the remainder we use normal intra-specie mating.
+            // Test for special case - we only have one genome to select from in the current specie. 
+            if (1 == inst._selectionSizeInt)
+            {
+                // Fall-back to asexual reproduction.
+                for (; matingsCount < inst._offspringSexualCount; matingsCount++)
+                {
+                    int genomeIdx = DiscreteDistribution.Sample(_rng, dist);
+                    NeatGenome offspring = genomeList[genomeIdx].CreateOffspring(generation);
+                    offspringList.Add(offspring);
+                    metricRepository[genomeIdx].childrenThisGen.Add(offspring.Id);
+                    metricRepository[genomeIdx].hasHadChildren = true;
+                }
+            }
+            else
+            {
+                // Remainder of matings are normal within-specie.
+                for (; matingsCount < inst._offspringSexualCount; matingsCount++)
+                {
+                    // Select parent 1.
+                    int parent1Idx = DiscreteDistribution.Sample(_rng, dist);
+                    NeatGenome parent1 = genomeList[parent1Idx];
+
+                    // Remove selected parent from set of possible outcomes.
+                    DiscreteDistribution distTmp = dist.RemoveOutcome(parent1Idx);
+
+                    // Test for existence of at least one more parent to select.
+                    if (0 != distTmp.Probabilities.Length)
+                    {
+                        // Get the two parents to mate.
+                        int parent2Idx = DiscreteDistribution.Sample(_rng, distTmp);
+                        NeatGenome parent2 = genomeList[parent2Idx];
+                        NeatGenome offspring = parent1.CreateOffspring(parent2, generation);
+                        offspringList.Add(offspring);
+                        metricRepository[parent1Idx].childrenThisGen.Add(offspring.Id);
+                        metricRepository[parent2Idx].childrenThisGen.Add(offspring.Id);
+                        metricRepository[parent1Idx].hasHadChildren = true;
+                        metricRepository[parent2Idx].hasHadChildren = true;
+                    }
+                    else
+                    {
+                        // No other parent has a non-zero selection probability (they all have zero fitness).
+                        // Fall back to asexual reproduction of the single genome with a non-zero fitness.
+                        NeatGenome offspring = parent1.CreateOffspring(generation);
+                        offspringList.Add(offspring);
+                        metricRepository[parent1Idx].childrenThisGen.Add(offspring.Id);
+                        metricRepository[parent1Idx].hasHadChildren = true;
+                    }
+                }
+            }
+        }
+
+        return offspringList;
+/*
         double[] genomeProbabilities;
 
         switch (selectionType)
         {
             case SelectionType.Curisoity:
-                genomeProbabilities = metricRepository.Select(x => (double) x.curiosityScore).ToArray();
+                genomeProbabilities = metricRepository.Select(x => (double)x.curiosityScore).ToArray();
                 break;
             case SelectionType.Novelty:
                 genomeProbabilities = GenerateNearestNeighbourNovelty(Mathf.Min(metricRepository.Count - 1, 5));
@@ -725,6 +944,338 @@ public class GenomeRepository : IDisposable
             }
         }
 
-        return offspringList;
+        return offspringList;*/
+    }
+
+    private void SortSpecieGenomes()
+    {
+        int minSize = _specieList[0].GenomeList.Count;
+        int maxSize = minSize;
+        int specieCount = _specieList.Count;
+
+        for (int i = 0; i < specieCount; i++)
+        {
+            SortUtils.SortUnstable(_specieList[i].GenomeList, GenomeFitnessComparer<NeatGenome>.Singleton, _rng);
+            minSize = System.Math.Min(minSize, _specieList[i].GenomeList.Count);
+            maxSize = System.Math.Max(maxSize, _specieList[i].GenomeList.Count);
+        }
+
+        // Update stats.
+        //_stats._minSpecieSize = minSize;
+        //_stats._maxSpecieSize = maxSize;
+    }
+
+    private SpecieStats[] CalcSpecieStats(out int offspringCount, int populationSize, double OffspringAsexualProportion,
+        double SelectionProportion)
+    {
+        double totalMeanFitness = 0.0;
+
+        // Build stats array and get the mean fitness of each specie.
+        int specieCount = _specieList.Count;
+        SpecieStats[] specieStatsArr = new SpecieStats[specieCount];
+        for (int i = 0; i < specieCount; i++)
+        {
+            SpecieStats inst = new SpecieStats();
+            specieStatsArr[i] = inst;
+            inst._meanFitness = _specieList[i].CalcMeanFitness();
+            totalMeanFitness += inst._meanFitness;
+        }
+
+        // Calculate the new target size of each specie using fitness sharing. 
+        // Keep a total of all allocated target sizes, typically this will vary slightly from the
+        // overall target population size due to rounding of each real/fractional target size.
+        int totalTargetSizeInt = 0;
+
+        if (0.0 == totalMeanFitness)
+        {
+            // Handle specific case where all genomes/species have a zero fitness. 
+            // Assign all species an equal targetSize.
+            double targetSizeReal = (double)populationSize / (double)specieCount;
+
+            for (int i = 0; i < specieCount; i++)
+            {
+                SpecieStats inst = specieStatsArr[i];
+                inst._targetSizeReal = targetSizeReal;
+
+                // Stochastic rounding will result in equal allocation if targetSizeReal is a whole
+                // number, otherwise it will help to distribute allocations evenly.
+                inst._targetSizeInt = (int)NumericsUtils.ProbabilisticRound(targetSizeReal, _rng);
+
+                // Total up discretized target sizes.
+                totalTargetSizeInt += inst._targetSizeInt;
+            }
+        }
+        else
+        {
+            // The size of each specie is based on its fitness relative to the other species.
+            /*  for (int i = 0; i < specieCount; i++)
+              {
+                  SpecieStats inst = specieStatsArr[i];
+                  inst._targetSizeReal = (inst._meanFitness / totalMeanFitness) * (double) gamesToCreate;
+  
+                  // Discretize targetSize (stochastic rounding).
+                  inst._targetSizeInt = (int) NumericsUtils.ProbabilisticRound(inst._targetSizeReal, _rng);
+  
+                  // Total up discretized target sizes.
+                  totalTargetSizeInt += inst._targetSizeInt;
+              }*/
+        }
+
+        // Discretized target sizes may total up to a value that is not equal to the required overall population
+        // size. Here we check this and if there is a difference then we adjust the specie's targetSizeInt values
+        // to compensate for the difference.
+        //
+        // E.g. If we are short of the required populationSize then we add the required additional allocation to
+        // selected species based on the difference between each specie's targetSizeReal and targetSizeInt values.
+        // What we're effectively doing here is assigning the additional required target allocation to species based
+        // on their real target size in relation to their actual (integer) target size.
+        // Those species that have an actual allocation below there real allocation (the difference will often 
+        // be a fractional amount) will be assigned extra allocation probabilistically, where the probability is
+        // based on the differences between real and actual target values.
+        //
+        // Where the actual target allocation is higher than the required target (due to rounding up), we use the same
+        // method but we adjust specie target sizes down rather than up.
+        int targetSizeDeltaInt = totalTargetSizeInt - populationSize;
+
+        if (targetSizeDeltaInt < 0)
+        {
+            // Check for special case. If we are short by just 1 then increment targetSizeInt for the specie containing
+            // the best genome. We always ensure that this specie has a minimum target size of 1 with a final test (below),
+            // by incrementing here we avoid the probabilistic allocation below followed by a further correction if
+            // the champ specie ended up with a zero target size.
+            if (-1 == targetSizeDeltaInt)
+            {
+                specieStatsArr[0]._targetSizeInt++;
+            }
+            else
+            {
+                // We are short of the required populationSize. Add the required additional allocations.
+                // Determine each specie's relative probability of receiving additional allocation.
+                double[] probabilities = new double[specieCount];
+                for (int i = 0; i < specieCount; i++)
+                {
+                    SpecieStats inst = specieStatsArr[i];
+                    probabilities[i] = System.Math.Max(0.0, inst._targetSizeReal - (double)inst._targetSizeInt);
+                }
+
+                // Use a built in class for choosing an item based on a list of relative probabilities.
+                DiscreteDistribution dist = new DiscreteDistribution(probabilities);
+
+                // Probabilistically assign the required number of additional allocations.
+                // FIXME/ENHANCEMENT: We can improve the allocation fairness by updating the DiscreteDistribution 
+                // after each allocation (to reflect that allocation).
+                // targetSizeDeltaInt is negative, so flip the sign for code clarity.
+                targetSizeDeltaInt *= -1;
+                for (int i = 0; i < targetSizeDeltaInt; i++)
+                {
+                    int specieIdx = DiscreteDistribution.Sample(_rng, dist);
+                    specieStatsArr[specieIdx]._targetSizeInt++;
+                }
+            }
+        }
+        else if (targetSizeDeltaInt > 0)
+        {
+            // We have overshot the required populationSize. Adjust target sizes down to compensate.
+            // Determine each specie's relative probability of target size downward adjustment.
+            double[] probabilities = new double[specieCount];
+            for (int i = 0; i < specieCount; i++)
+            {
+                SpecieStats inst = specieStatsArr[i];
+                probabilities[i] = System.Math.Max(0.0, (double)inst._targetSizeInt - inst._targetSizeReal);
+            }
+
+            // Use a built in class for choosing an item based on a list of relative probabilities.
+            DiscreteDistribution dist = new DiscreteDistribution(probabilities);
+
+            // Probabilistically decrement specie target sizes.
+            // ENHANCEMENT: We can improve the selection fairness by updating the DiscreteDistribution 
+            // after each decrement (to reflect that decrement).
+            for (int i = 0; i < targetSizeDeltaInt;)
+            {
+                int specieIdx = DiscreteDistribution.Sample(_rng, dist);
+
+                // Skip empty species. This can happen because the same species can be selected more than once.
+                if (0 != specieStatsArr[specieIdx]._targetSizeInt)
+                {
+                    specieStatsArr[specieIdx]._targetSizeInt--;
+                    i++;
+                }
+            }
+        }
+
+        // We now have Sum(_targetSizeInt) == _populationSize. 
+        //Debug.Assert(SumTargetSizeInt(specieStatsArr) == populationSize);
+
+        // TODO: Better way of ensuring champ species has non-zero target size?
+        // However we need to check that the specie with the best genome has a non-zero targetSizeInt in order
+        // to ensure that the best genome is preserved. A zero size may have been allocated in some pathological cases.
+        if (0 == specieStatsArr[_bestSpecieIdx]._targetSizeInt)
+        {
+            specieStatsArr[_bestSpecieIdx]._targetSizeInt++;
+
+            // Adjust down the target size of one of the other species to compensate.
+            // Pick a specie at random (but not the champ specie). Note that this may result in a specie with a zero 
+            // target size, this is OK at this stage. We handle allocations of zero in PerformOneGeneration().
+            int idx = _rng.Next(specieCount - 1);
+            idx = idx == _bestSpecieIdx ? idx + 1 : idx;
+
+            if (specieStatsArr[idx]._targetSizeInt > 0)
+            {
+                specieStatsArr[idx]._targetSizeInt--;
+            }
+            else
+            {
+                // Scan forward from this specie to find a suitable one.
+                bool done = false;
+                idx++;
+                for (; idx < specieCount; idx++)
+                {
+                    if (idx != _bestSpecieIdx && specieStatsArr[idx]._targetSizeInt > 0)
+                    {
+                        specieStatsArr[idx]._targetSizeInt--;
+                        done = true;
+                        break;
+                    }
+                }
+
+                // Scan forward from start of species list.
+                if (!done)
+                {
+                    for (int i = 0; i < specieCount; i++)
+                    {
+                        if (i != _bestSpecieIdx && specieStatsArr[i]._targetSizeInt > 0)
+                        {
+                            specieStatsArr[i]._targetSizeInt--;
+                            done = true;
+                            break;
+                        }
+                    }
+
+                    if (!done)
+                    {
+                        throw new SharpNeatException(
+                            "CalcSpecieStats(). Error adjusting target population size down. Is the population size less than or equal to the number of species?");
+                    }
+                }
+            }
+        }
+
+        // Now determine the eliteSize for each specie. This is the number of genomes that will remain in a 
+        // specie from the current generation and is a proportion of the specie's current size.
+        // Also here we calculate the total number of offspring that will need to be generated.
+        offspringCount = 0;
+        for (int i = 0; i < specieCount; i++)
+        {
+            // Special case - zero target size.
+            if (0 == specieStatsArr[i]._targetSizeInt)
+            {
+                Debug.Log("Target size was zero. Elite size became zero");
+                specieStatsArr[i]._eliteSizeInt = 0;
+                continue;
+            }
+
+            // Discretize the real size with a probabilistic handling of the fractional part.
+            double eliteSizeReal = _specieList[i].GenomeList.Count * 0; // _eaParams.ElitismProportion;
+            int eliteSizeInt = (int)NumericsUtils.ProbabilisticRound(eliteSizeReal, _rng);
+
+            // Ensure eliteSizeInt is no larger than the current target size (remember it was calculated 
+            // against the current size of the specie not its new target size).
+            SpecieStats inst = specieStatsArr[i];
+            inst._eliteSizeInt = System.Math.Min(eliteSizeInt, inst._targetSizeInt);
+
+            // Ensure the champ specie preserves the champ genome. We do this even if the target size is just 1
+            // - which means the champ genome will remain and no offspring will be produced from it, apart from 
+            // the (usually small) chance of a cross-species mating.
+            /*if (i == _bestSpecieIdx && inst._eliteSizeInt == 0)
+            {
+                Debug.Assert(inst._targetSizeInt != 0, "Zero target size assigned to champ specie.");
+                inst._eliteSizeInt = 1;
+            }*/
+
+            // Now we can determine how many offspring to produce for the specie.
+            inst._offspringCount = inst._targetSizeInt - inst._eliteSizeInt;
+            offspringCount += inst._offspringCount;
+
+            // While we're here we determine the split between asexual and sexual reproduction. Again using 
+            // some probabilistic logic to compensate for any rounding bias.
+            double offspringAsexualCountReal = (double)inst._offspringCount * OffspringAsexualProportion;
+            inst._offspringAsexualCount = (int)NumericsUtils.ProbabilisticRound(offspringAsexualCountReal, _rng);
+            inst._offspringSexualCount = inst._offspringCount - inst._offspringAsexualCount;
+
+            // Also while we're here we calculate the selectionSize. The number of the specie's fittest genomes
+            // that are selected from to create offspring. This should always be at least 1.
+            double selectionSizeReal = _specieList[i].GenomeList.Count * SelectionProportion;
+            inst._selectionSizeInt =
+                System.Math.Max(1, (int)NumericsUtils.ProbabilisticRound(selectionSizeReal, _rng));
+        }
+
+        return specieStatsArr;
+    }
+
+    protected void UpdateBestGenome()
+    {
+        // If all genomes have the same fitness (including zero) then we simply return the first genome.
+        NeatGenome bestGenome = null;
+        double bestFitness = -1.0;
+        int bestSpecieIdx = -1;
+
+        int count = _specieList.Count;
+        for (int i = 0; i < count; i++)
+        {
+            // Get the specie's first genome. Genomes are sorted, therefore this is also the fittest 
+            // genome in the specie.
+            NeatGenome genome = _specieList[i].GenomeList[0];
+            if (genome.EvaluationInfo.Fitness > bestFitness)
+            {
+                bestGenome = genome;
+                bestFitness = genome.EvaluationInfo.Fitness;
+                bestSpecieIdx = i;
+            }
+        }
+
+        //_currentBestGenome = bestGenome;
+        _bestSpecieIdx = bestSpecieIdx;
+    }
+
+
+    private NeatGenome CreateOffspring_CrossSpecieMating(uint generation, DiscreteDistribution dist,
+        DiscreteDistribution[] distArr,
+        DiscreteDistribution rwlSpecies,
+        int currentSpecieIdx,
+        IList<NeatGenome> genomeList)
+    {
+        // Select parent from current specie.
+        int parent1Idx = DiscreteDistribution.Sample(_rng, dist);
+
+        // Select specie other than current one for 2nd parent genome.
+        DiscreteDistribution distSpeciesTmp = rwlSpecies.RemoveOutcome(currentSpecieIdx);
+        int specie2Idx = DiscreteDistribution.Sample(_rng, distSpeciesTmp);
+
+        // Select a parent genome from the second specie.
+        int parent2Idx = DiscreteDistribution.Sample(_rng, distArr[specie2Idx]);
+
+        // Get the two parents to mate.
+        NeatGenome parent1 = genomeList[parent1Idx];
+        NeatGenome parent2 = _specieList[specie2Idx].GenomeList[parent2Idx];
+        var offspring = parent1.CreateOffspring(parent2, generation);
+        metricRepository[parent1Idx].childrenThisGen.Add(offspring.Id);
+        metricRepository[parent2Idx].childrenThisGen.Add(offspring.Id);
+        metricRepository[parent1Idx].hasHadChildren = true;
+        metricRepository[parent2Idx].hasHadChildren = true;
+        return offspring;
+    }
+
+    private Dictionary<uint, float3> pointLookup = new Dictionary<uint, float3>();
+
+    public CoordinateVector GetPosition<TGenome>(TGenome genome) where TGenome : class, IGenome<TGenome>
+    {
+        //genome.Id
+        //TODO: Cache positions
+        KeyValuePair<ulong, double>[] positions = new KeyValuePair<ulong, double>[3];
+        var point = pointLookup[genome.Id];
+        positions[0] = new KeyValuePair<ulong, double>(0, point.x);
+        positions[1] = new KeyValuePair<ulong, double>(1, point.y);
+        positions[2] = new KeyValuePair<ulong, double>(2, point.z);
+        return new CoordinateVector(positions);
     }
 }

@@ -11,6 +11,7 @@
  */
 using System.Collections.Generic;
 using SharpNeat.Network;
+using UnityEngine;
 
 namespace SharpNeat.Genomes.Neat
 {
@@ -109,6 +110,10 @@ namespace SharpNeat.Genomes.Neat
                 if(!_neuronDictionary.TryGetValue(connectionGene.SourceNodeId, out srcNeuronGene))
                 {
                     srcNeuronGene = parentGenome.NeuronGeneList.GetNeuronById(connectionGene.SourceNodeId);
+                    if (srcNeuronGene == null)
+                    {
+                        Debug.LogError("srcNeuronGene was null.");
+                    }
                     srcNeuronGene = new NeuronGene(srcNeuronGene, false); // Make a copy.
                     _neuronDictionary.Add(srcNeuronGene.Id, srcNeuronGene);
                 }
