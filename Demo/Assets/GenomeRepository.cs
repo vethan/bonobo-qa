@@ -33,6 +33,7 @@ public class GenomeRepository : IDisposable
     private KnnContainer knnContainer;
     private JobHandle rebuildHandle;
     private List<GenomeMetric> metricRepository;
+    private Dictionary<uint, GenomeMetric> metricIdLookup;
     private List<GenomeMetric> testCases;
     public float thresholdSq = 0.2f;
     public Bounds pcaBounds = new Bounds();
@@ -79,6 +80,7 @@ public class GenomeRepository : IDisposable
         columnsToIgnore.Add("leftRetreatDistance");
 
         metricRepository = new List<GenomeMetric>();
+        metricIdLookup = new Dictionary<uint, GenomeMetric>();
         repositoryPoints = new NativeArray<float3>(MAX_REPOSITORY_SIZE, Allocator.Persistent);
         for (int i = 0; i < MAX_REPOSITORY_SIZE; i++)
         {
@@ -140,7 +142,8 @@ public class GenomeRepository : IDisposable
 
     private HashSet<string> columnsToIgnore;
 
-    public NativeArray<float3> GetPCAPoints(List<GenomeMetric> tempRepository, bool updateBounds)
+    public NativeArray<float3> GetPCAPoints(List<GenomeMetric> tempRepository, bool updateBounds,
+        bool forceAddLookup = false)
     {
         IDataView inData = new GenomeMetricDataView(tempRepository, columnsToIgnore);
         IDataView normalisedData = dataPrepTransformer.Transform(inData);
@@ -165,6 +168,10 @@ public class GenomeRepository : IDisposable
                 queryPoints[index] = new float3(GetStableValue(pcaVector.GetItemOrDefault(0)),
                     GetStableValue(pcaVector.GetItemOrDefault(1)),
                     GetStableValue(pcaVector.GetItemOrDefault(2)));
+                if (forceAddLookup)
+                {
+                    pointLookup[tempRepository[index].genome.Id] = (Vector3)queryPoints[index];
+                }
 
                 if (updateBounds)
                 {
@@ -307,7 +314,9 @@ public class GenomeRepository : IDisposable
         toBePruned.Reverse();
         foreach (int prunedPoint in toBePruned)
         {
+            var metric = metricRepository[prunedPoint];
             metricRepository.RemoveAt(prunedPoint);
+            metricIdLookup.Remove(metric.genome.Id);
         }
     }
 
@@ -344,7 +353,7 @@ public class GenomeRepository : IDisposable
                 {
                     if (indexesToSkip.Contains(j))
                     {
-                        Debug.Log("Skipping one");
+//                        Debug.Log("Skipping one");
                         continue;
                     }
 
@@ -367,6 +376,7 @@ public class GenomeRepository : IDisposable
                 }
 
                 metricRepository.Add(tempRepertoire[i]);
+                metricIdLookup[tempRepertoire[i].genome.Id] = tempRepertoire[i];
             }
         }
 
@@ -528,6 +538,7 @@ public class GenomeRepository : IDisposable
             repositoryPoints[metricRepository.Count] = queryPoints[interestingIndexes[i]];
             pointLookup[tempRepository[interestingIndexes[i]].genome.Id] = queryPoints[interestingIndexes[i]];
             metricRepository.Add(tempRepository[interestingIndexes[i]]);
+            metricIdLookup[tempRepository[interestingIndexes[i]].genome.Id] = tempRepository[interestingIndexes[i]];
             newThisGeneration.Add(tempRepository[interestingIndexes[i]]);
             pcaBounds.Encapsulate(queryPoints[interestingIndexes[i]]);
         }
@@ -803,6 +814,9 @@ public class GenomeRepository : IDisposable
             {
                 int genomeIdx = DiscreteDistribution.Sample(_rng, dist);
                 NeatGenome offspring = genomeList[genomeIdx].CreateOffspring(generation);
+
+                metricIdLookup[genomeList[genomeIdx].Id].childrenThisGen.Add(offspring.Id);
+                metricIdLookup[genomeList[genomeIdx].Id].hasHadChildren = true;
                 offspringList.Add(offspring);
             }
 
@@ -835,8 +849,8 @@ public class GenomeRepository : IDisposable
                     int genomeIdx = DiscreteDistribution.Sample(_rng, dist);
                     NeatGenome offspring = genomeList[genomeIdx].CreateOffspring(generation);
                     offspringList.Add(offspring);
-                    metricRepository[genomeIdx].childrenThisGen.Add(offspring.Id);
-                    metricRepository[genomeIdx].hasHadChildren = true;
+                    metricIdLookup[genomeList[genomeIdx].Id].childrenThisGen.Add(offspring.Id);
+                    metricIdLookup[genomeList[genomeIdx].Id].hasHadChildren = true;
                 }
             }
             else
@@ -859,10 +873,10 @@ public class GenomeRepository : IDisposable
                         NeatGenome parent2 = genomeList[parent2Idx];
                         NeatGenome offspring = parent1.CreateOffspring(parent2, generation);
                         offspringList.Add(offspring);
-                        metricRepository[parent1Idx].childrenThisGen.Add(offspring.Id);
-                        metricRepository[parent2Idx].childrenThisGen.Add(offspring.Id);
-                        metricRepository[parent1Idx].hasHadChildren = true;
-                        metricRepository[parent2Idx].hasHadChildren = true;
+                        metricIdLookup[genomeList[parent1Idx].Id].childrenThisGen.Add(offspring.Id);
+                        metricIdLookup[genomeList[parent2Idx].Id].childrenThisGen.Add(offspring.Id);
+                        metricIdLookup[genomeList[parent1Idx].Id].hasHadChildren = true;
+                        metricIdLookup[genomeList[parent2Idx].Id].hasHadChildren = true;
                     }
                     else
                     {
@@ -870,8 +884,8 @@ public class GenomeRepository : IDisposable
                         // Fall back to asexual reproduction of the single genome with a non-zero fitness.
                         NeatGenome offspring = parent1.CreateOffspring(generation);
                         offspringList.Add(offspring);
-                        metricRepository[parent1Idx].childrenThisGen.Add(offspring.Id);
-                        metricRepository[parent1Idx].hasHadChildren = true;
+                        metricIdLookup[genomeList[parent1Idx].Id].childrenThisGen.Add(offspring.Id);
+                        metricIdLookup[genomeList[parent1Idx].Id].hasHadChildren = true;
                     }
                 }
             }
@@ -1258,14 +1272,14 @@ public class GenomeRepository : IDisposable
         NeatGenome parent1 = genomeList[parent1Idx];
         NeatGenome parent2 = _specieList[specie2Idx].GenomeList[parent2Idx];
         var offspring = parent1.CreateOffspring(parent2, generation);
-        metricRepository[parent1Idx].childrenThisGen.Add(offspring.Id);
-        metricRepository[parent2Idx].childrenThisGen.Add(offspring.Id);
-        metricRepository[parent1Idx].hasHadChildren = true;
-        metricRepository[parent2Idx].hasHadChildren = true;
+        metricIdLookup[parent1.Id].childrenThisGen.Add(offspring.Id);
+        metricIdLookup[parent2.Id].childrenThisGen.Add(offspring.Id);
+        metricIdLookup[parent1.Id].hasHadChildren = true;
+        metricIdLookup[parent2.Id].hasHadChildren = true;
         return offspring;
     }
 
-    private Dictionary<uint, float3> pointLookup = new Dictionary<uint, float3>();
+    private Dictionary<uint, Vector3> pointLookup = new Dictionary<uint, Vector3>();
 
     public CoordinateVector GetPosition<TGenome>(TGenome genome) where TGenome : class, IGenome<TGenome>
     {

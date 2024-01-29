@@ -29,7 +29,7 @@ public class GameCreator : MonoBehaviour
 {
     #region sharpNEAT variables
 
-    ISpeciationStrategy<NeatGenome> _speciationStrategy;
+    //ISpeciationStrategy<NeatGenome> _speciationStrategy;
     IList<Specie<NeatGenome>> _specieList;
 
     int _bestSpecieIdx;
@@ -118,6 +118,7 @@ public class GameCreator : MonoBehaviour
     private GenomeRepository repository;
     private DateTime startTime;
     private float topSpeedScale = 25;
+    private bool shouldCycle = true;
 
     private void Awake()
     {
@@ -133,6 +134,20 @@ public class GameCreator : MonoBehaviour
                 {
                     targetGeneration = (int)options.gens;
                     Debug.Log("Setting gens to " + targetGeneration);
+                }
+                shouldCycle = options.selectmode == 0;
+                switch (options.selectmode)
+                {
+                    case 0:
+                    case 1:
+                        currentSelectionType = GenomeRepository.SelectionType.Curisoity;
+                        break;
+                    case 2:
+                        currentSelectionType = GenomeRepository.SelectionType.Novelty;
+                        break;
+                    case 3:
+                        currentSelectionType = GenomeRepository.SelectionType.Uniform;
+                        break;
                 }
 
                 {
@@ -200,15 +215,15 @@ public class GameCreator : MonoBehaviour
             resetButton.gameObject.SetActive(false);
         }
 
-        if (bootOptions.behaviour == 0)
-        {
-            _speciationStrategy = new KMeansClusteringStrategy<NeatGenome>(new EuclideanDistanceMetric());
-        }
-        else
-        {
-            _speciationStrategy =
-                new KMeansBehaviourClusteringStrategy<NeatGenome>(repository, new EuclideanDistanceMetric());
-        }
+        /*  if (bootOptions.behaviour == 0)
+          {
+              _speciationStrategy = new KMeansClusteringStrategy<NeatGenome>(new EuclideanDistanceMetric());
+          }
+          else
+          {
+              _speciationStrategy =
+                  new KMeansBehaviourClusteringStrategy<NeatGenome>(repository, new EuclideanDistanceMetric());
+          }*/
         _complexityRegulationMode = ComplexityRegulationMode.Complexifying;
         //_complexityRegulationStrategy = new DefaultComplexityRegulationStrategy(ComplexityCeilingType.Relative, 4);
         _complexityRegulationStrategy = new NullComplexityRegulationStrategy();
@@ -584,8 +599,8 @@ public class GameCreator : MonoBehaviour
     void InitialisePopulation()
     {
         repository?.Dispose();
-        repository = new GenomeRepository(300, scatterPlot, _rng, bootOptions.behaviour==1, true,
-            "DropFeet p" + gamesToCreate.ToString() + " g" + targetGeneration.ToString() + " s" + bootOptions.species +
+        repository = new GenomeRepository(300, scatterPlot, _rng, bootOptions.behaviour == 1, true,
+            gamePrefab.GameName + " p" + gamesToCreate.ToString() + " g" + targetGeneration.ToString() + " s" + bootOptions.species +
             (bootOptions.behaviour == 0 ? " " : " behav ") +
             currentSelectionType.ToString(),
             runNumberForType, startTime, bootOptions.species);
@@ -777,7 +792,7 @@ public class GameCreator : MonoBehaviour
             genomeList[i].EvaluationInfo.SetFitness(Mathf.Max(1000 + gi.CalculateFitness(), 0));
         }
 
-        if (generation > 0 && _specieList != null)
+        if (generation > 0)
         {
             var tempRepository = new List<GenomeMetric>(gamesToCreate);
             for (int i = 0; i < games.Count; i++)
@@ -837,6 +852,7 @@ public class GameCreator : MonoBehaviour
         }
         else
         {
+            Debug.Log("FIRST RUN");
             //First!
             var tempRepertoire = new List<GenomeMetric>();
             for (int i = 0; i < games.Count; i++)
@@ -848,9 +864,9 @@ public class GameCreator : MonoBehaviour
 
             repository.Initialise(tempRepertoire);
 
-            _specieList = _speciationStrategy.InitializeSpeciation(genomeList, _eaParams.SpecieCount);
+            //_specieList = _speciationStrategy.InitializeSpeciation(genomeList, _eaParams.SpecieCount);
             //SortSpecieGenomes();
-            UpdateBestGenome();
+            //UpdateBestGenome();
         }
 
 
@@ -926,20 +942,25 @@ public class GameCreator : MonoBehaviour
         generation++;
         if (pauseAutoAtTargetGeneration && generation == targetGeneration)
         {
-            if (currentSelectionType == GenomeRepository.SelectionType.Curisoity)
+            if (shouldCycle)
             {
-                currentSelectionType = GenomeRepository.SelectionType.Novelty;
-            }
-            else if (currentSelectionType == GenomeRepository.SelectionType.Novelty)
-            {
-                currentSelectionType = GenomeRepository.SelectionType.Uniform;
+                switch (currentSelectionType)
+                {
+                    case GenomeRepository.SelectionType.Curisoity:
+                        currentSelectionType = GenomeRepository.SelectionType.Novelty;
+                        break;
+                    case GenomeRepository.SelectionType.Novelty:
+                        currentSelectionType = GenomeRepository.SelectionType.Uniform;
+                        break;
+                    default:
+                        runNumberForType++;
+                        currentSelectionType = GenomeRepository.SelectionType.Curisoity;
+                        break;
+                }
             }
             else
             {
                 runNumberForType++;
-                {
-                    currentSelectionType = GenomeRepository.SelectionType.Curisoity;
-                }
             }
 
 
@@ -949,6 +970,7 @@ public class GameCreator : MonoBehaviour
         }
 
         generationTimer = 0;
+        GC.Collect();
     }
 
     private int runNumberForType = 0;
@@ -1266,13 +1288,13 @@ public class GameCreator : MonoBehaviour
         int offspringAsexualCount = (int)NumericsUtils.ProbabilisticRound(offspringAsexualCountReal, _rng);
         int offspringSexualCount = offspringCount - offspringAsexualCount;
         // Produce offspring from each specie in turn and store them in offspringList.
-        List<NeatGenome> offspringList =
+        List<NeatGenome> tempOffspringList =
             repository.GenerateOffspring(generation, offspringCount, _eaParams.OffspringAsexualProportion,
                 _eaParams.SelectionProportion, _eaParams.InterspeciesMatingProportion, currentSelectionType);
         _stats._asexualOffspringCount += (ulong)offspringAsexualCount;
         _stats._sexualOffspringCount += (ulong)(offspringSexualCount);
         _stats._totalOffspringCount += (ulong)offspringCount;
-        return offspringList;
+        return tempOffspringList;
     }
 
     /// <summary>
@@ -1372,16 +1394,18 @@ public class GameCreator : MonoBehaviour
             double totalFitness = genomeList[0].EvaluationInfo.Fitness;
             double totalComplexity = genomeList[0].Complexity;
             double maxComplexity = totalComplexity;
-
+            double maxFitness = double.MinValue;
             int count = genomeList.Count;
             for (int i = 1; i < count; i++)
             {
                 totalFitness += genomeList[i].EvaluationInfo.Fitness;
+                if (genomeList[i].EvaluationInfo.Fitness > maxFitness)
+                    maxFitness = genomeList[i].EvaluationInfo.Fitness;
                 totalComplexity += genomeList[i].Complexity;
                 maxComplexity = System.Math.Max(maxComplexity, genomeList[i].Complexity);
             }
 
-            _stats._maxFitness = _currentBestGenome.EvaluationInfo.Fitness;
+            _stats._maxFitness = maxFitness;
             _stats._meanFitness = totalFitness / count;
 
             _stats._maxComplexity = maxComplexity;

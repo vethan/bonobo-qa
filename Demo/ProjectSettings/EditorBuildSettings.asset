@@ -14,7 +14,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/PlayerVsAIPong.unity
     guid: b005f9a5796287645b5c18ccdc55bf39
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DropFeetEvo.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 0
@@ -35,4 +35,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/ReplayGrid.unity
     guid: 2ec20acf967442f459ced9e122224375
+  - enabled: 1
+    path: Assets/Scenes/ChaserEvo.unity
+    guid: 680f77fdbcfb2f0498ad84d6616a8cfe
   m_configObjects: {}

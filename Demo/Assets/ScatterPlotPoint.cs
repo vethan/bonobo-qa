@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using SharpNeat.Genomes.Neat;
 using UnityEngine;
 
 public class ScatterPlotPoint : MonoBehaviour
@@ -36,7 +37,7 @@ public class ScatterPlotPoint : MonoBehaviour
 
     public void ShowScaleColor(ulong min, ulong max)
     {
-        float scale = min == max ? 1 : (tally - min) / (float) (max - min);
+        float scale = min == max ? 1 : (tally - min) / (float)(max - min);
         _renderer.enabled = this.layer == 0 || this.layer == 3 || this.layer == 2;
         Color mainColor;
         if (scale < 0.5)
@@ -87,5 +88,12 @@ public class ScatterPlotPoint : MonoBehaviour
     public void SetTally(ulong newTally)
     {
         this.tally = newTally;
+    }
+
+    private NeatGenome _genome;
+
+    public void SetGenome(NeatGenome genome)
+    {
+        _genome = genome;
     }
 }

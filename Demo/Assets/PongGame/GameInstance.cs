@@ -8,6 +8,7 @@ using UnityEngine.PlayerLoop;
 
 public class GameInstance : AbstractGameInstance
 {
+    public override string GameName => "Ping";
     public Rigidbody2D ball;
     public Goal leftGoal;
     public Goal rightGoal;

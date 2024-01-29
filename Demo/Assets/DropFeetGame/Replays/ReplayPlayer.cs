@@ -10,6 +10,7 @@ using UnityEngine;
 
 public class ReplayPlayer : AbstractGameInstance
 {
+    public override string GameName => "DropFeetReplay";
     public Transform leftScoreSprite;
     public Transform rightScoreSprite;
     public ReplayCharacter leftPlayer;

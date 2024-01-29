@@ -39,8 +39,11 @@ public class CommandLineOptions
     [Option(Required = false, HelpText = "Species Count?", Default = (int)4)]
     public int species { get; set; }
 
-    [Option(Required = false, HelpText = "Use Behaviour Clustering? 0 no 1 for yes", Default = (int)0)]
+    [Option(Required = false, HelpText = "Use Behaviour Clustering? 0 no 1 for yes", Default = (int)1)]
     public int behaviour { get; set; }
+    
+    [Option(Required = false, HelpText = "Select Mode? 0= cycle, 1= curiosity, 2= novelty, 3=uniform", Default = (int)0)]
+    public int selectmode { get; set; }
 }
 
 public class GameCreatorNEAT : MonoBehaviour
@@ -600,8 +603,8 @@ public class GameCreatorNEAT : MonoBehaviour
     void InitialisePopulation()
     {
         repository?.Dispose();
-        repository = new GenomeRepository(300, scatterPlot, _rng, bootOptions.behaviour==1,true,
-            "DropFeet p" + gamesToCreate.ToString() + " g" + targetGeneration.ToString() + " s" + bootOptions.species +
+        repository = new GenomeRepository(300, scatterPlot, _rng, bootOptions.behaviour == 1, true,
+            gamePrefab.GameName+" p" + gamesToCreate.ToString() + " g" + targetGeneration.ToString() + " s" + bootOptions.species +
             (bootOptions.behaviour == 0 ? " " : " behav ") + " NEAT",
             runNumberForType, startTime, bootOptions.species);
 
@@ -839,6 +842,8 @@ public class GameCreatorNEAT : MonoBehaviour
 
             //Add new things into repo
             repository.HandleNewGeneration(tempRepository, generation);
+            var pts = repository.GetPCAPoints(tempRepository, false, true);
+            pts.Dispose();
             //TODO: EVALUATE USED TO BE HERE
             // Integrate offspring into species.
             if (emptySpeciesFlag)
@@ -898,6 +903,9 @@ public class GameCreatorNEAT : MonoBehaviour
             }
 
             repository.Initialise(tempRepertoire);
+
+            var pts = repository.GetPCAPoints(tempRepertoire, false, true);
+            pts.Dispose();
             _specieList = _speciationStrategy.InitializeSpeciation(genomeList, _eaParams.SpecieCount);
             SortSpecieGenomes();
             UpdateBestGenome();
@@ -992,6 +1000,7 @@ public class GameCreatorNEAT : MonoBehaviour
         }
 
         generationTimer = 0;
+        GC.Collect();
     }
 
     private int runNumberForType = 0;

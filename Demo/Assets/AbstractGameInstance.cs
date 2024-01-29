@@ -44,6 +44,7 @@ public abstract class AbstractGameInstance : MonoBehaviour
 
     public void DisableGraph()
     {
+        return;
         graphRoot.gameObject.SetActive(false);
     }
 
@@ -59,9 +60,9 @@ public abstract class AbstractGameInstance : MonoBehaviour
     }
 
     public bool GameDone { get; protected set; } = false;
-        
-    
-    
+    public abstract string GameName { get; }
+
+
     public void AlignCameras()
     {
         var trueVert = transform.TransformVector(horizBorder, vertBorder, 1).y;
@@ -133,9 +134,12 @@ public abstract class AbstractGameInstance : MonoBehaviour
 
     internal virtual void SetGraph(Graph graph)
     {
+        return;
         if (graphRoot != null)
         {
-            Destroy(graphRoot.gameObject);
+            return; //DONT REMAKE THE GRAPH
+            //Destroy(graphRoot.gameObject);
+            
         }
 
 

@@ -10,12 +10,15 @@ public class ChaserPickup : MonoBehaviour
     private SpriteGlowEffect glow;
 
     private SpriteRenderer renderer;
-    
+    public Rigidbody2D rigid;
+
+    public Transform mTransform;
     // Start is called before the first frame update
     void Awake()
     {
         glow = GetComponent<SpriteGlowEffect>();
         renderer = GetComponent<SpriteRenderer>();
+        mTransform = transform;
     }
 
     public void SetColor(Color c)
@@ -29,14 +32,9 @@ public class ChaserPickup : MonoBehaviour
     }
 
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void WarpTo(Vector2 getRandomPosition)
     {
-        transform.localPosition = getRandomPosition;
+        mTransform.localPosition = getRandomPosition;
     }
 }

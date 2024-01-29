@@ -1,40 +1,95 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using SharpNeat.Phenomes;
 using UnityEngine;
 
 public class ChaserBrain : MonoBehaviour
 {
     Camera main;
     Rigidbody2D body;
-    float maxSpeed = 20.0f;
+    float maxSpeed = 10.0f;
     ChaserGameInstance myGame;
-    
-    
-    
-    // Start is called before the first frame update
-    void Start()
+    private AbstractChaserController controller = null;
+    public ChaserEnemy myEnemy;
+    private Vector2 localPhysicsPos;
+
+    private Vector2 originalPosition;
+
+    public float distanceFromOrb = 0;
+
+    private void Awake()
     {
         myGame = GetComponentInParent<ChaserGameInstance>();
 
         main = FindObjectOfType<Camera>();
         body = GetComponent<Rigidbody2D>();
+        originalPosition = new Vector2(-6.559999f, 0);
+        lastSafePosition = originalPosition;
+        mTrans = transform;
+        mParentTrans = transform.parent;
     }
 
-    void MoveViaMouse()
+    // Start is called before the first frame update
+    void Start()
     {
-        var viewPoint = main.ScreenToViewportPoint(Input.mousePosition);
-        Vector3 mousePosition = new Vector3(Mathf.Lerp(-7.5f,7.5f, viewPoint.x), Mathf.Lerp(-3.5f, 3.5f, viewPoint.y));
-        mousePosition.z = 0;
-
-        mousePosition = (myGame.transform.localToWorldMatrix * mousePosition);
-        mousePosition += (myGame.transform.position);
-
-        //transform.position = mousePosition;
-        body.MovePosition(Vector2.MoveTowards(transform.position,mousePosition,Time.fixedDeltaTime * maxSpeed * transform.parent.lossyScale.x));
+        controller ??= new KeyboardChaserController();
     }
-    
+
+    public Vector2 GetLocalPhysicsPosition()
+    {
+        return localPhysicsPos;
+    }
+
+    void UpdateLocalPhysicsPosition()
+    {
+        localPhysicsPos = mParentTrans.InverseTransformPoint(body.position);
+    }
+
     void FixedUpdate()
     {
-        MoveViaMouse();
+        controller.UpdateButtons();
+        var position = body.position;
+        var lossyScale = mParentTrans.lossyScale;
+        body.MovePosition(Vector2.MoveTowards(position,
+            position + new Vector2(controller.GetXAxis(), controller.GetYAxis()) * 100,
+            Time.fixedDeltaTime * maxSpeed * lossyScale.x));
+        UpdateLocalPhysicsPosition();
+        distanceFromOrb = (body.position - (Vector2)myGame.originalPickup.mTransform.position).magnitude / lossyScale.x;
+        distanceAdded += 15 - distanceFromOrb;
+    }
+
+    public void SetBrain(IBlackBox brain)
+    {
+        var newController = new EvolvedChaserController(this, myEnemy, myGame);
+        newController.SetBrain(brain);
+        controller = newController;
+        
+    }
+
+    public float distanceAdded = 0;
+    public void Reset()
+    {
+        distanceAdded = 0;
+        mTrans.localPosition = originalPosition;
+        lastSafePosition = originalPosition;
+        if (controller is EvolvedChaserController brainCon)
+        {
+            brainCon.Reset();
+        }
+    }
+
+    private Vector2 lastSafePosition;
+    public Transform mTrans;
+    private Transform mParentTrans;
+
+    public void Respawn()
+    {
+        mTrans.localPosition = lastSafePosition;
+    }
+
+    public void SavePosition()
+    {
+        lastSafePosition = mTrans.localPosition;
     }
 }

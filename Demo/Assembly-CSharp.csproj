@@ -147,6 +147,7 @@
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\SelectiveGenomeListEvaluator.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Core\FitnessInfo.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\LogisticFunctionSteep.cs" />
+     <Compile Include="Assets\Chaser\ChaserControllers.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\DistanceMetrics\EuclideanDistanceMetric.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\INetworkDefinition.cs" />
      <Compile Include="Assets\Chaser\ChaserBrain.cs" />
@@ -197,6 +198,7 @@
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\RadialBasis\RbfGaussian.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatDomains\Xor\XorBlackBoxEvaluator.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NetworkDepthInfo.cs" />
+     <Compile Include="Assets\Chaser\ChaserEnemy.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\IConnectionList.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\NeuralNets\CyclicNetwork\RelaxingCyclicNetwork.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\HyperNeat\SubstrateConnection.cs" />
@@ -211,6 +213,7 @@
      <Compile Include="Assets\TutorialManager.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\EvolutionAlgorithms\NeatEvolutionAlgorithmParameters.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Bipolar\Sine.cs" />
+     <Compile Include="Assets\SharpNEAT\SharpNeatLib\SpeciationStrategies\KMeansBehaviourClusteringStrategy.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\NetworkNode.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\LeakyReLUShifted.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\ActivationFunctions\Unipolar\LeakyReLU.cs" />
@@ -232,6 +235,7 @@
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\DefaultActivationFunctionLibrary.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Network\CyclicNetworkTest.cs" />
      <Compile Include="Assets\DictUtils.cs" />
+     <Compile Include="Assets\Chaser\VisionCone.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\DistanceMetrics\ManhattanDistanceMetric.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Phenomes\OutputSignalArray.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\Neat\NeatGenomeDecoder.cs" />
@@ -243,7 +247,6 @@
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Genomes\Neat\NeatGenomeXmlIO.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\CyclicNetworkFactory.cs" />
      <Compile Include="Assets\SharpNEAT\SharpNeatLib\Decoders\HyperNeat\INodeSetMappingFunction.cs" />
-     <Compile Include="Assets\SharpNEAT\SharpNeatLib\SpeciationStrategies\KMeansBehaviourClusteringStrategy.cs" />
      <Folder Include="Assets" />
      <None Include="Assets\DropFeetGame\DropFeetGamemetrics2022-04-4--14-33-17\Genome2974.xml" />
      <None Include="Assets\DropFeetGame\DropFeetGamemetrics2022-04-4--14-33-17\Genome8628.xml" />

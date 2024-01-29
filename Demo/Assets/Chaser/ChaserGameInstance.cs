@@ -9,36 +9,32 @@ public class ChaserGameInstance : AbstractGameInstance
 {
     private IBlackBox brain;
     private NeatGenome genome;
-    private int[] board = new int[9];
-    private int fitness;
     public ChaserBrain player;
     public ChaserPickup originalPickup;
 
-    private ChaserPickup redPickup;
-    private ChaserPickup bluePickup;
+    private int timesCollected = 0;
 
     public override int InputCount
     {
-        get { return 9; }
+        get { return 7; }
     }
 
     public override int OutputCount
     {
-        get { return 9; }
+        get { return 4; }
     }
 
     // Start is called before the first frame update
+    public override string GameName => "Chaser";
+
     protected override void Start()
     {
         base.Start();
-        redPickup = originalPickup;
-        bluePickup = Instantiate(originalPickup, transform);
 
-        bluePickup.SetColor(Color.cyan);
-        redPickup.SetColor(Color.red);
+        originalPickup.SetColor(Color.cyan);
+        pseudoRandom = new System.Random(84902);
 
-        bluePickup.OnCollision += BlueCollision;
-        redPickup.OnCollision += RedCollision;
+        originalPickup.OnCollision = BlueCollision;
     }
 
     protected override string GetInputLabel(int index)
@@ -46,35 +42,29 @@ public class ChaserGameInstance : AbstractGameInstance
         return GetOutputLabel(index - 1);
     }
 
-    Vector2 GetRandomPosition()
+    Vector2 GetRandomPosition(bool isLeft)
     {
-        return new Vector2(Random.Range(-horizBorder,horizBorder) * 0.9f,Random.Range(-vertBorder,vertBorder)* 0.9f);
-        
+        return new Vector2((isLeft ? -1 : 1) * horizBorder * 0.7f,
+            ((float)(pseudoRandom.NextDouble() * vertBorder * 2) - vertBorder) * 0.7f);
     }
-    
+
+    private bool leftSideSpawn = false;
+
     void MovePickups()
     {
-
-        bluePickup.WarpTo(GetRandomPosition());
-        redPickup.WarpTo(GetRandomPosition());
+        originalPickup.WarpTo(GetRandomPosition(leftSideSpawn));
     }
-    
-    void RedCollision(GameObject other)
-    {
-        if (other != player.gameObject)
-            return;
 
-        print("COLLIDE RED");
-        MovePickups();
-    }
 
     void BlueCollision(GameObject other)
     {
         if (other != player.gameObject)
             return;
-
-        print("COLLIDE BLUE");
+        timesCollected++;
+        //print("COLLIDE BLUE: " + timesCollected);
+        leftSideSpawn = !leftSideSpawn;
         MovePickups();
+        player.SavePosition();
     }
 
     protected override string GetOutputLabel(int index)
@@ -106,28 +96,9 @@ public class ChaserGameInstance : AbstractGameInstance
         return "unknown";
     }
 
-    private int playerTurn = 0;
 
-    bool checkBoardFull()
-    {
-        for (int i = 0; i < board.Length; i++)
-        {
-            if (board[i] == 0)
-                return false;
-        }
-
-        return true;
-    }
-
-    void ResetBoard()
-    {
-        for (int i = 0; i < board.Length; i++)
-        {
-            board[i] = 0;
-        }
-    }
-
-    private bool turnFlipper;
+    private int timesCaptured;
+    private System.Random pseudoRandom;
 
     private void FixedUpdate()
     {
@@ -137,26 +108,41 @@ public class ChaserGameInstance : AbstractGameInstance
 
     public override float CalculateFitness()
     {
-        return fitness;
+        // Debug.Log(player.distanceAdded);
+        
+        return player.distanceAdded + (timesCollected * 7000) - (timesCaptured * 200);
     }
 
     public override void FullReset()
     {
-        fitness = 0;
-        GameDone = false;
-        ResetBoard();
+        timesCollected = 0;
+        timesCaptured = 0;
+        player.Reset();
+        player.myEnemy.Reset();
+        leftSideSpawn = false;
+        pseudoRandom = new System.Random(84902);
+
+        originalPickup.WarpTo(GetRandomPosition(leftSideSpawn));
     }
 
     public override void SetEvolvedBrain(IBlackBox blackBox, NeatGenome genome)
     {
         brain = blackBox;
         this.genome = genome;
+        player.SetBrain(brain);
     }
 
     //TODO: Generate some stats for Chaser
     public override Dictionary<string, float> GetGameStats()
     {
-        return new Dictionary<string, float>();
+        var results =
+            new Dictionary<string, float>()
+            {
+                { "Times Collected", timesCollected },
+                { "Distance Measure", player.distanceAdded }
+            };
+        results.MergeInPlace(player.myEnemy.GetStats());
+        return results;
     }
 
     // Update is called once per frame

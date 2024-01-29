@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class TicTacToeGameInstance : AbstractGameInstance
 {
+    public override string GameName => "TicTacToe";
     private IBlackBox brain;
     private NeatGenome genome;
     private int[] board = new int[9];

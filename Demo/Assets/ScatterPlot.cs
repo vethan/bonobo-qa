@@ -109,6 +109,7 @@ public class ScatterPlot : MonoBehaviour
             var sphere = GetPoint();
             sphere.SetLayer(layer);
             sphere.transform.localPosition = layerPoints[i] * 50;
+            sphere.SetGenome(data[i].genome);
             sphere.SetTally(data[i].nearTally);
             if (showHotspots)
             {

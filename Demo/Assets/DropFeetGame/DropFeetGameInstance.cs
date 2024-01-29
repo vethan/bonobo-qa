@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class DropFeetGameInstance : AbstractGameInstance
 {
+    public override string GameName => "DropFeet";
     public System.Action OnNewRound = () => { };
     public Transform leftScoreSprite;
     public Transform rightScoreSprite;
