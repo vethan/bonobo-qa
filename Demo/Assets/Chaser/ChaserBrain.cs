@@ -41,10 +41,7 @@ public class ChaserBrain : MonoBehaviour
         return localPhysicsPos;
     }
 
-    void UpdateLocalPhysicsPosition()
-    {
-        localPhysicsPos = mParentTrans.InverseTransformPoint(body.position);
-    }
+
 
     void FixedUpdate()
     {
@@ -54,17 +51,19 @@ public class ChaserBrain : MonoBehaviour
         body.MovePosition(Vector2.MoveTowards(position,
             position + new Vector2(controller.GetXAxis(), controller.GetYAxis()) * 100,
             Time.fixedDeltaTime * maxSpeed * lossyScale.x));
-        UpdateLocalPhysicsPosition();
-        distanceFromOrb = (body.position - (Vector2)myGame.originalPickup.mTransform.position).magnitude / lossyScale.x;
+        localPhysicsPos = mParentTrans.InverseTransformPoint(position);
+        distanceFromOrb = (position - (Vector2)myGame.originalPickup.mTransform.position).magnitude / lossyScale.x;
         distanceAdded += 15 - distanceFromOrb;
     }
 
     public void SetBrain(IBlackBox brain)
     {
-        var newController = new EvolvedChaserController(this, myEnemy, myGame);
-        newController.SetBrain(brain);
-        controller = newController;
-        
+        if (controller is not EvolvedChaserController)
+        {
+            controller = new EvolvedChaserController(this, myEnemy, myGame);
+
+        }
+        ((EvolvedChaserController)controller).SetBrain(brain);
     }
 
     public float distanceAdded = 0;

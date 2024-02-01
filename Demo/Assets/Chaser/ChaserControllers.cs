@@ -46,6 +46,7 @@ public class EvolvedChaserController : AbstractChaserController
     public void SetBrain(IBlackBox newBrain)
     {
         brain = newBrain;
+        
     }
 
     public override float GetXAxis()
@@ -66,23 +67,23 @@ public class EvolvedChaserController : AbstractChaserController
         // var dist = temp.magnitude; 
         temp.Normalize();
         //Direction to enemy
-        inputSignals[0] = temp.x / 0.5f + 0.5f;
-        inputSignals[1] = temp.y / 0.5f + 0.5f;
+        inputSignals[0] = temp.x / 2 + 0.5f;
+        inputSignals[1] = temp.y / 2 + 0.5f;
 
         //Is sighted?
         inputSignals[2] = enemy.visionCone.PlayerVisible ? 1 : 0;
 
         //Which direction the enemy wants to face
-        inputSignals[3] = enemy.targetVector.x;
-        inputSignals[4] = enemy.targetVector.y;
+        inputSignals[3] = enemy.targetVector.x/ 2 + 0.5f;
+        inputSignals[4] = enemy.targetVector.y/ 2 + 0.5f;
 
         
         temp = (Vector2)gameInstance.originalPickup.mTransform.localPosition - me.GetLocalPhysicsPosition();
         
         temp.Normalize();
         // Direction to target
-        inputSignals[5] = temp.x / 0.5f + 0.5f;
-        inputSignals[6] = temp.y / 0.5f + 0.5f;
+        inputSignals[5] = temp.x / 2 + 0.5f;
+        inputSignals[6] = temp.y / 2 + 0.5f;
         brain.InputSignalArray.CopyFrom(inputSignals, 0);
 
     }

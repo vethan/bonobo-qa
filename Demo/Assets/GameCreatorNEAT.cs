@@ -41,8 +41,9 @@ public class CommandLineOptions
 
     [Option(Required = false, HelpText = "Use Behaviour Clustering? 0 no 1 for yes", Default = (int)1)]
     public int behaviour { get; set; }
-    
-    [Option(Required = false, HelpText = "Select Mode? 0= cycle, 1= curiosity, 2= novelty, 3=uniform", Default = (int)0)]
+
+    [Option(Required = false, HelpText = "Select Mode? 0= cycle, 1= curiosity, 2= novelty, 3=uniform",
+        Default = (int)0)]
     public int selectmode { get; set; }
 }
 
@@ -144,6 +145,8 @@ public class GameCreatorNEAT : MonoBehaviour
 
     private void Awake()
     {
+        Time.captureDeltaTime = Time.fixedDeltaTime;
+
         string[] args = System.Environment.GetCommandLineArgs();
         var parser = new Parser(with =>
         {
@@ -161,26 +164,9 @@ public class GameCreatorNEAT : MonoBehaviour
                 }
                 {
                     gamesToCreate = (int)options.population;
-                    if (gamesToCreate <= 4)
-                    {
-                        topSpeedScale = 80;
-                    }
-                    else if (gamesToCreate <= 8)
-                    {
-                        topSpeedScale = 50;
-                    }
-                    else if (gamesToCreate <= 16)
-                    {
-                        topSpeedScale = 25;
-                    }
-                    else if (gamesToCreate <= 32)
-                    {
-                        topSpeedScale = 16;
-                    }
-                    else
-                    {
-                        topSpeedScale = 10;
-                    }
+
+                    topSpeedScale = 4;
+
 
                     Debug.Log("Setting population to " + gamesToCreate);
                 }
@@ -441,7 +427,9 @@ public class GameCreatorNEAT : MonoBehaviour
 
         for (int i = 0; i < gamesToCreate; i++)
         {
-            games.Add(GameObject.Instantiate<AbstractGameInstance>(gamePrefab));
+            var game = GameObject.Instantiate<AbstractGameInstance>(gamePrefab);
+            games.Add(game);
+            game.transform.localScale = new Vector3(100.0f, 100.0f, 1);
         }
 
         InitialisePopulation();
@@ -596,7 +584,6 @@ public class GameCreatorNEAT : MonoBehaviour
 
     public void PositionGame(AbstractGameInstance instance, float xAdj, float yAdj, float x, float y, Vector3 offset)
     {
-        instance.transform.localScale = new Vector3(100.0f, 100.0f, 1);
         instance.transform.position = new Vector3(xAdj * 2 * x, yAdj * 2 * y) + offset;
     }
 
@@ -604,7 +591,8 @@ public class GameCreatorNEAT : MonoBehaviour
     {
         repository?.Dispose();
         repository = new GenomeRepository(300, scatterPlot, _rng, bootOptions.behaviour == 1, true,
-            gamePrefab.GameName+" p" + gamesToCreate.ToString() + " g" + targetGeneration.ToString() + " s" + bootOptions.species +
+            gamePrefab.GameName + " p" + gamesToCreate.ToString() + " g" + targetGeneration.ToString() + " s" +
+            bootOptions.species +
             (bootOptions.behaviour == 0 ? " " : " behav ") + " NEAT",
             runNumberForType, startTime, bootOptions.species);
 
@@ -1028,7 +1016,7 @@ public class GameCreatorNEAT : MonoBehaviour
         if (textChangeTimer > textChangeSeconds)
         {
             currentTextIndex = (currentTextIndex + 1) % proTips.Length;
-            proTipText.text = proTips[currentTextIndex];
+            // proTipText.text = proTips[currentTextIndex];
             textChangeTimer -= textChangeSeconds;
         }
 

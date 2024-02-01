@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.Collections.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{d00500db-6fe4-6e23-2f57-76542fed5f47}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-firstpass", "Assembly-CSharp-firstpass.csproj", "{c2b00574-098c-f9b5-1158-26143dd6f644}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +24,8 @@ Global
 		{5c7ad018-f0ea-5ed9-5550-1ddb90aba297}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{d00500db-6fe4-6e23-2f57-76542fed5f47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{d00500db-6fe4-6e23-2f57-76542fed5f47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{c2b00574-098c-f9b5-1158-26143dd6f644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{c2b00574-098c-f9b5-1158-26143dd6f644}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -30,7 +30,13 @@ public class ChaserGameInstance : AbstractGameInstance
     protected override void Start()
     {
         base.Start();
-
+       // Physics2D.simulationMode = SimulationMode2D.Script;
+        Physics2D.jobOptions = new PhysicsJobOptions2D()
+        {
+            useMultithreading = false,
+        };
+        Physics.autoSimulation = false;
+        Physics2D.autoSyncTransforms = true;
         originalPickup.SetColor(Color.cyan);
         pseudoRandom = new System.Random(84902);
 
